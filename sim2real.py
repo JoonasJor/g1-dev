@@ -1,6 +1,7 @@
 import time
 import sys
 import numpy as np
+import select
 
 from unitree_sdk2py.core.channel import ChannelPublisher, ChannelFactoryInitialize
 from unitree_sdk2py.core.channel import ChannelSubscriber, ChannelFactoryInitialize
@@ -131,79 +132,6 @@ kd_hand = [
     1, 1, 1, 1, 1, 1
 ]
 
-class HandJointIndex:
-    LeftThumb1      = 29
-    LeftThumb2      = 30
-    LeftThumb3      = 31
-    LeftThumb4      = 32
-    LeftIndex1      = 33
-    LeftIndex2      = 34
-    LeftMiddle1     = 35
-    LeftMiddle2     = 36
-    LeftRing1       = 37
-    LeftRing2       = 38
-    LeftLittle1     = 39
-    LeftLittle2     = 40
-
-    RightThumb1     = 41
-    RightThumb2     = 42
-    RightThumb3     = 43
-    RightThumb4     = 44
-    RightIndex1     = 45
-    RightIndex2     = 46
-    RightMiddle1    = 47
-    RightMiddle2    = 48
-    RightRing1      = 49
-    RightRing2      = 50
-    RightLittle1    = 51
-    RightLittle2    = 52
-
-class G1JointIndex:
-    # Left leg
-    LeftHipPitch = 0
-    LeftHipRoll = 1
-    LeftHipYaw = 2
-    LeftKnee = 3
-    LeftAnklePitch = 4
-    LeftAnkleB = 4
-    LeftAnkleRoll = 5
-    LeftAnkleA = 5
-
-    # Right leg
-    RightHipPitch = 6
-    RightHipRoll = 7
-    RightHipYaw = 8
-    RightKnee = 9
-    RightAnklePitch = 10
-    RightAnkleB = 10
-    RightAnkleRoll = 11
-    RightAnkleA = 11
-
-    # Waist
-    WaistYaw = 12
-    WaistRoll = 13        # NOTE: INVALID for g1 23dof/29dof with waist locked
-    WaistA = 13           # NOTE: INVALID for g1 23dof/29dof with waist locked
-    WaistPitch = 14       # NOTE: INVALID for g1 23dof/29dof with waist locked
-    WaistB = 14           # NOTE: INVALID for g1 23dof/29dof with waist locked
-
-    # Left arm
-    LeftShoulderPitch = 15
-    LeftShoulderRoll = 16
-    LeftShoulderYaw = 17
-    LeftElbow = 18
-    LeftWristRoll = 19
-    LeftWristPitch = 20
-    LeftWristYaw = 21
-
-    # Right arm
-    RightShoulderPitch = 22
-    RightShoulderRoll = 23
-    RightShoulderYaw = 24
-    RightElbow = 25
-    RightWristRoll = 26
-    RightWristPitch = 27
-    RightWristYaw = 28
-
 
 class Mode:
     PR = 0  # Series Control for Pitch/Roll Joints
@@ -266,7 +194,31 @@ class Custom:
             self.counter_ = 0
             #print(self.low_state.imu_state.rpy)
 
-    def LowCmdControl(self, target_angles, kp = default_kp_body, kd = default_kd_body, duration = 10, debug = False):
+    def HoldAngles(self):
+        current_angles = [motor.q for motor in self.low_state.motor_state]
+
+        while True:
+            for i in range(self.num_motor):
+                self.low_cmd.mode_pr = Mode.PR
+                self.low_cmd.mode_machine = self.mode_machine_
+                self.low_cmd.motor_cmd[i].mode = 1
+                self.low_cmd.motor_cmd[i].tau = 0.0
+                self.low_cmd.motor_cmd[i].dq = 0.0
+                self.low_cmd.motor_cmd[i].kp = default_kp_body[i]
+                self.low_cmd.motor_cmd[i].kd = default_kd_body[i]
+                self.low_cmd.motor_cmd[i].q = current_angles[i]
+
+            self.low_cmd.crc = self.crc.Crc(self.low_cmd)
+            self.lowcmd_publisher_.Write(self.low_cmd)
+
+            time.sleep(self.control_dt_)
+
+            # Wait for user input to break the loop
+            if sys.stdin in select.select([sys.stdin], [], [], 0)[0]:
+                input()  # Consume the Enter key
+                break
+
+    def LowCmdControl(self, target_angles, kp = default_kp_body, kd = default_kd_body, duration = 10, debug = False, wait_for_user_input = True):
         # tau = Joint target torque  
         # q   = Joint target position
         # dq  = Joint target speed
@@ -305,9 +257,14 @@ class Custom:
                     print(f"{i}: \tcurrent={self.low_state.motor_state[i].q:.5f} \tcommand={self.low_cmd.motor_cmd[i].q:.5f} \ttarget={target_angles[i]:.5f}")
                 print()
 
-            time.sleep(self.control_dt_)  
+            time.sleep(self.control_dt_) 
+        
+        print("Done.\n") 
+        if wait_for_user_input:
+            print("Keeping joints at current position. Press Enter to continue...") 
+            self.HoldAngles()
 
-    def Demo(self):
+    def DemoFloor(self):
         while self.low_state is None:
             print(f"[Demo] Waiting for low_state, {self.low_state=}")
             time.sleep(1) 
@@ -318,34 +275,45 @@ class Custom:
         print("Setting joint angles to zero position...")
         target_angles = [0] * 29
         self.LowCmdControl(target_angles, duration=6)
-        print("Done.\n")
-
-        print("Keeping joint angles at current position...")
-        target_angles = [motor.q for motor in self.low_state.motor_state]
-        self.LowCmdControl(target_angles, duration=2)
-        print("Done.\n")    
 
         print("Moving right leg...")
         target_angles = [motor.q for motor in self.low_state.motor_state]
-        target_angles[G1JointIndex.RightHipRoll] = np.deg2rad(45)
-        target_angles[G1JointIndex.RightKnee] = np.deg2rad(90)
-        target_angles[G1JointIndex.RightAnklePitch] = np.deg2rad(90)
+        target_angles[config.G1JointIndex.RightHipRoll] = np.deg2rad(45)
+        target_angles[config.G1JointIndex.RightKnee] = np.deg2rad(90)
+        target_angles[config.G1JointIndex.RightAnklePitch] = np.deg2rad(90)
         #kp = default_kp_body.copy()
         #kp[G1JointIndex.WaistPitch] = 80
         self.LowCmdControl(target_angles, duration=6)
-        print("Done.\n")    
-
-        print("Keeping joint angles at current position...")
-        target_angles = [motor.q for motor in self.low_state.motor_state]
-        self.LowCmdControl(target_angles, duration=2)
-        print("Done.\n")      
 
         print("Setting joint angles to start position...")
         target_angles = start_angles
         self.LowCmdControl(target_angles, duration=6)
-        print("Done.\n")  
 
-        print("Exiting demo.")
+    def DemoStand(self):
+        while self.low_state is None:
+            print(f"[Demo] Waiting for low_state, {self.low_state=}")
+            time.sleep(1) 
+        time.sleep(2)
+
+        start_angles = [motor.q for motor in self.low_state.motor_state]
+
+        print("Setting joint angles to default position...")
+        default_angles = [0] * 29
+        default_angles[config.G1JointIndex.LeftShoulderRoll] = np.deg2rad(30)
+        default_angles[config.G1JointIndex.RightShoulderRoll] = np.deg2rad(-30)
+        self.LowCmdControl(default_angles, duration=6)
+
+        print("Moving hand...")
+        target_angles = [motor.q for motor in self.low_state.motor_state]
+        target_angles[config.G1JointIndex.LeftElbow] = np.deg2rad(-90)
+        self.LowCmdControl(target_angles, duration=6)       
+
+        print("Setting joint angles to default position...")
+        self.LowCmdControl(default_angles, duration=6) 
+
+        print("Setting joint angles to start position...")
+        target_angles = start_angles
+        self.LowCmdControl(target_angles, duration=6)
 
 if __name__ == '__main__':
     if len(sys.argv)>1:
@@ -355,4 +323,10 @@ if __name__ == '__main__':
 
     custom = Custom()
     custom.Init()
-    custom.Demo()
+
+    if config.START_ON_FLOOR:
+        custom.DemoFloor()
+    else:
+        custom.DemoStand()
+
+    print("Exiting demo.")

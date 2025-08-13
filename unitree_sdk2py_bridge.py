@@ -395,7 +395,7 @@ class ElasticBand:
     def __init__(self):
         self.stiffness = 200
         self.damping = 100
-        self.point = np.array([0, 0, 3])
+        self.point = np.array([0, 0, 2.5])
         self.length = 0
         self.enable = True
 

@@ -22,7 +22,7 @@ if config.START_ON_FLOOR:
     mj_data.qvel[:] = 0   
     mujoco.mj_step(mj_model, mj_data)
 
-if config.ENABLE_ELASTIC_BAND:
+if config.ENABLE_ELASTIC_BAND and not config.START_ON_FLOOR:
     elastic_band = ElasticBand()
     if config.ROBOT == "h1" or config.ROBOT == "g1":
         band_attached_link = mj_model.body("torso_link").id

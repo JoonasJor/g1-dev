@@ -208,3 +208,5 @@ __marimo__/
 
 .vscode/
 inspire_hand_ws/
+unitree_sdk2py/
+MUJOCO_LOG.TXT
