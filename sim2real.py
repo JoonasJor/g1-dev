@@ -12,6 +12,8 @@ from unitree_sdk2py.utils.crc import CRC
 from unitree_sdk2py.utils.thread import RecurrentThread
 from unitree_sdk2py.comm.motion_switcher.motion_switcher_client import MotionSwitcherClient
 
+from inspire_sdkpy import inspire_hand_defaut,inspire_dds
+
 import config
 
 # -- G1 body joint parameters --
@@ -242,16 +244,6 @@ class Custom:
         # create publisher #
         self.lowcmd_publisher_ = ChannelPublisher("rt/lowcmd", LowCmd_)
         self.lowcmd_publisher_.Init()
-
-    def Start(self):
-        self.lowCmdWriteThreadPtr = RecurrentThread(
-            interval=self.control_dt_, target=self.LowCmdWrite, name="control"
-        )
-        while self.update_mode_machine_ == False:
-            time.sleep(1)
-
-        if self.update_mode_machine_ == True:
-            self.lowCmdWriteThreadPtr.Start()
 
     def LowStateHandler(self, msg: LowState_):
         #q: types.float32 # Shutdown feedback position information
