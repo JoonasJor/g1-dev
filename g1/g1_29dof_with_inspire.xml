@@ -850,41 +850,51 @@
     <jointactuatorfrc name="right_little_2_joint_torque" joint="right_little_2_joint"/>
 
     <!-- Inspire force sensors -->
-    <touch name="left_palm_force_sensor" site="left_palm_force_sensor" />
-    <touch name="left_thumb_force_sensor_1" site="left_thumb_force_sensor_1" />
-    <touch name="left_thumb_force_sensor_2" site="left_thumb_force_sensor_2" />
-    <touch name="left_thumb_force_sensor_3" site="left_thumb_force_sensor_3" />
-    <touch name="left_thumb_force_sensor_4" site="left_thumb_force_sensor_4" />
-    <touch name="left_index_force_sensor_1" site="left_index_force_sensor_1" />
-    <touch name="left_index_force_sensor_2" site="left_index_force_sensor_2" />
-    <touch name="left_index_force_sensor_3" site="left_index_force_sensor_3" />
-    <touch name="left_middle_force_sensor_1" site="left_middle_force_sensor_1" />
-    <touch name="left_middle_force_sensor_2" site="left_middle_force_sensor_2" />
-    <touch name="left_middle_force_sensor_3" site="left_middle_force_sensor_3" />
-    <touch name="left_ring_force_sensor_1" site="left_ring_force_sensor_1" />
-    <touch name="left_ring_force_sensor_2" site="left_ring_force_sensor_2" />
-    <touch name="left_ring_force_sensor_3" site="left_ring_force_sensor_3" />
     <touch name="left_little_force_sensor_1" site="left_little_force_sensor_1" />
     <touch name="left_little_force_sensor_2" site="left_little_force_sensor_2" />
     <touch name="left_little_force_sensor_3" site="left_little_force_sensor_3" />
 
-    <touch name="right_palm_force_sensor" site="right_palm_force_sensor" />
+    <touch name="left_ring_force_sensor_1" site="left_ring_force_sensor_1" />
+    <touch name="left_ring_force_sensor_2" site="left_ring_force_sensor_2" />
+    <touch name="left_ring_force_sensor_3" site="left_ring_force_sensor_3" />
+
+    <touch name="left_middle_force_sensor_1" site="left_middle_force_sensor_1" />
+    <touch name="left_middle_force_sensor_2" site="left_middle_force_sensor_2" />
+    <touch name="left_middle_force_sensor_3" site="left_middle_force_sensor_3" />
+
+    <touch name="left_index_force_sensor_1" site="left_index_force_sensor_1" />
+    <touch name="left_index_force_sensor_2" site="left_index_force_sensor_2" />
+    <touch name="left_index_force_sensor_3" site="left_index_force_sensor_3" />
+
+    <touch name="left_thumb_force_sensor_1" site="left_thumb_force_sensor_1" />
+    <touch name="left_thumb_force_sensor_2" site="left_thumb_force_sensor_2" />
+    <touch name="left_thumb_force_sensor_3" site="left_thumb_force_sensor_3" />
+    <touch name="left_thumb_force_sensor_4" site="left_thumb_force_sensor_4" />
+
+    <touch name="left_palm_force_sensor" site="left_palm_force_sensor" />
+
+    <touch name="right_little_force_sensor_1" site="right_little_force_sensor_1" />
+    <touch name="right_little_force_sensor_2" site="right_little_force_sensor_2" />
+    <touch name="right_little_force_sensor_3" site="right_little_force_sensor_3" />
+    
+    <touch name="right_ring_force_sensor_1" site="right_ring_force_sensor_1" />
+    <touch name="right_ring_force_sensor_2" site="right_ring_force_sensor_2" />
+    <touch name="right_ring_force_sensor_3" site="right_ring_force_sensor_3" />
+    
+    <touch name="right_middle_force_sensor_1" site="right_middle_force_sensor_1" />
+    <touch name="right_middle_force_sensor_2" site="right_middle_force_sensor_2" />
+    <touch name="right_middle_force_sensor_3" site="right_middle_force_sensor_3" />
+    
+    <touch name="right_index_force_sensor_1" site="right_index_force_sensor_1" />
+    <touch name="right_index_force_sensor_2" site="right_index_force_sensor_2" />
+    <touch name="right_index_force_sensor_3" site="right_index_force_sensor_3" />
+    
     <touch name="right_thumb_force_sensor_1" site="right_thumb_force_sensor_1" />
     <touch name="right_thumb_force_sensor_2" site="right_thumb_force_sensor_2" />
     <touch name="right_thumb_force_sensor_3" site="right_thumb_force_sensor_3" />
     <touch name="right_thumb_force_sensor_4" site="right_thumb_force_sensor_4" />
-    <touch name="right_index_force_sensor_2" site="right_index_force_sensor_2" />
-    <touch name="right_index_force_sensor_3" site="right_index_force_sensor_3" />
-    <touch name="right_index_force_sensor_1" site="right_index_force_sensor_1" />
-    <touch name="right_middle_force_sensor_2" site="right_middle_force_sensor_2" />
-    <touch name="right_middle_force_sensor_3" site="right_middle_force_sensor_3" />
-    <touch name="right_middle_force_sensor_1" site="right_middle_force_sensor_1" />
-    <touch name="right_ring_force_sensor_2" site="right_ring_force_sensor_2" />
-    <touch name="right_ring_force_sensor_3" site="right_ring_force_sensor_3" />
-    <touch name="right_ring_force_sensor_1" site="right_ring_force_sensor_1" />
-    <touch name="right_little_force_sensor_2" site="right_little_force_sensor_2" />
-    <touch name="right_little_force_sensor_3" site="right_little_force_sensor_3" />
-    <touch name="right_little_force_sensor_1" site="right_little_force_sensor_1" />
+
+    <touch name="right_palm_force_sensor" site="right_palm_force_sensor" />
 
     <framequat name="imu_quat" objtype="site" objname="imu"/>
     <gyro name="imu_gyro" site="imu"/>

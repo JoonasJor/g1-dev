@@ -7,6 +7,8 @@ import threading
 from unitree_sdk2py.core.channel import ChannelFactoryInitialize
 from unitree_sdk2py_bridge import UnitreeSdk2Bridge, ElasticBand
 
+from inspire_bridge import InspireBridge
+
 import config
 
 
@@ -52,6 +54,8 @@ def SimulationThread():
         print("[SimulationThread] Initializing Unitree SDK...")
         ChannelFactoryInitialize(config.DOMAIN_ID, config.INTERFACE)
         unitree = UnitreeSdk2Bridge(mj_model, mj_data)
+
+        inspire_r = InspireBridge(mj_model, mj_data, "r")
 
         if config.USE_JOYSTICK:
             print("[SimulationThread] Setting up joystick...")

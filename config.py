@@ -21,7 +21,39 @@ FLOOR_POSITION = [0.0, 0.0, 0.07]
 FLOOR_ORIENTATION = [-0.7071, 0, 0.7071, 0.0]
 FLOOR_JOINT_ANGLES = [-0.008621, -0.002926, 0.008328, 0.063897, -0.655341, 0.011785, -0.011218, -0.004299, 0.000337, 0.066435, -0.655403, -0.012579, -0.008698, -0.003402, 0.012972, 0.177344, 0.015336, -0.018787, 1.4005, -0.154848, -1.0316, 1.53425, 1.16461, -0.000033, 0.003182, 0.000881, -0.000045, -0.000014, -0.000054, -0.000019, -0.000047, -0.000015, -0.000038, -0.00001, 0.15875, -0.019087, 0.017306, 1.41357, 0.170391, -0.989743, -1.48135, 1.16461, -0.000034, 0.002237, 0.00062, -0.000044, -0.000014, -0.000052, -0.000018, -0.000046, -0.000015, -0.000037, -0.000009]
 
-class HandJointIndex:
+hand_joint_idx_l = [
+    29, 30, 31, 32,  # Left Thumb joints
+    33, 34,          # Left Index joints
+    35, 36,          # Left Middle joints
+    37, 38,          # Left Ring joints
+    39, 40           # Left Little joints
+]
+hand_joint_idx_r = [
+    41, 42, 43, 44,  # Right Thumb joints
+    45, 46,          # Right Index joints
+    47, 48,          # Right Middle joints
+    49, 50,          # Right Ring joints
+    51, 52           # Right Little joints
+]
+
+g1_joint_idx = [
+    # Left leg
+    0, 1, 2, 3, 4, 5,
+
+    # Right leg
+    6, 7, 8, 9, 10, 11,
+
+    # Waist
+    12, 13, 14,
+
+    # Left arm
+    15, 16, 17, 18, 19, 20, 21,
+
+    # Right arm
+    22, 23, 24, 25, 26, 27, 28
+]
+
+class HandJointIndex_L:
     LeftThumb1      = 29
     LeftThumb2      = 30
     LeftThumb3      = 31
@@ -35,6 +67,12 @@ class HandJointIndex:
     LeftLittle1     = 39
     LeftLittle2     = 40
 
+    @classmethod
+    def idx_list(cls):
+        return [value for name, value in vars(cls).items() if not name.startswith('__') and isinstance(value, int)]
+
+
+class HandJointIndex_R:
     RightThumb1     = 41
     RightThumb2     = 42
     RightThumb3     = 43
@@ -47,6 +85,10 @@ class HandJointIndex:
     RightRing2      = 50
     RightLittle1    = 51
     RightLittle2    = 52
+
+    @classmethod
+    def idx_list(cls):
+        return [value for name, value in vars(cls).items() if not name.startswith('__') and isinstance(value, int)]
 
 class G1JointIndex:
     # Left leg
@@ -93,3 +135,7 @@ class G1JointIndex:
     RightWristRoll = 26
     RightWristPitch = 27
     RightWristYaw = 28
+
+    @classmethod
+    def idx_list(cls):
+        return [value for name, value in vars(cls).items() if not name.startswith('__') and isinstance(value, int)]

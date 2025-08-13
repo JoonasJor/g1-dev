@@ -84,4 +84,4 @@ if __name__ == '__main__':
         else:
             print("Waitting for subscriber.")
 
-        time.sleep(0.1)
+        time.sleep(0.3)
