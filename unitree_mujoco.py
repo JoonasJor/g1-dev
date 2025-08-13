@@ -67,7 +67,7 @@ def SimulationThread():
             locker.acquire()
 
             try:
-                if config.ENABLE_ELASTIC_BAND:
+                if config.ENABLE_ELASTIC_BAND and not config.START_ON_FLOOR:
                     # Check qpos and qvel lengths
                     if len(mj_data.qpos) < 3 or len(mj_data.qvel) < 3:
                         print(f"[SimulationThread] qpos or qvel too short: qpos={mj_data.qpos}, qvel={mj_data.qvel}")
