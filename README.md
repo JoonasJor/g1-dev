@@ -15,11 +15,16 @@ https://github.com/unitreerobotics/unitree_sdk2_python
 https://github.com/NaCl-1374/inspire_hand_ws
 
 ## Run
-Mujoco sim:
+### Mujoco sim:  
+terminal 1:
+```
+python unitree_mujoco.py
+```
+terminal 2:
 ```
 python sim2real.py
 ```
-Real robot:
+### Real robot:
 ```
 python sim2real.py <network_interface_name>
 ```
