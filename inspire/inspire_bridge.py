@@ -1,34 +1,13 @@
-import mujoco
 import traceback
 import numpy as np
-
-from inspire_sdkpy import inspire_hand_defaut, inspire_dds # TODO: do own classes instead
 
 from unitree_sdk2py.core.channel import ChannelSubscriber, ChannelPublisher
 from unitree_sdk2py.utils.thread import RecurrentThread
 
-import config
+import inspire_dds
+import inspire_defaults
 
-# name, address, length, size
-HAND_TOUCH_DATA = [
-    ("fingerone_tip_touch", 3000, 18, (3, 3)),      
-    ("fingerone_top_touch", 3018, 192, (12, 8)),      
-    ("fingerone_palm_touch", 3210, 160, (10, 8)),     
-    ("fingertwo_tip_touch", 3370, 18, (3, 3)),      
-    ("fingertwo_top_touch", 3388, 192, (12, 8)),      
-    ("fingertwo_palm_touch", 3580, 160, (10, 8)),     
-    ("fingerthree_tip_touch", 3740, 18, (3, 3)),    
-    ("fingerthree_top_touch", 3758, 192, (12, 8)),    
-    ("fingerthree_palm_touch", 3950, 160, (10, 8)),   
-    ("fingerfour_tip_touch", 4110, 18, (3, 3)),     
-    ("fingerfour_top_touch", 4128, 192, (12, 8)),     
-    ("fingerfour_palm_touch", 4320, 160, (10, 8)),    
-    ("fingerfive_tip_touch", 4480, 18, (3, 3)),     
-    ("fingerfive_top_touch", 4498, 192, (12, 8)),     
-    ("fingerfive_middle_touch", 4690, 18, (3, 3)),  
-    ("fingerfive_palm_touch", 4708, 192, (12, 8)),    
-    ("palm_touch", 4900, 224, (14, 8))                
-]
+import config as cfg
 
 TOPIC_CMD = "rt/inspire_hand/ctrl"
 TOPIC_STATE = "rt/inspire_hand/state"
@@ -40,12 +19,10 @@ class InspireBridge():
         self.mj_data = mj_data
         self.dt = self.mj_model.opt.timestep
 
-        self.num_motor = config.NUM_MOTOR_BODY # TODO: check this
+        self.num_motor = cfg.NUM_MOTOR_BODY # TODO: check this
 
         # Inspire message
-        self.touch_data = inspire_hand_defaut.data_sheet
-
-        self.hand_state = inspire_hand_defaut.get_inspire_hand_state()
+        self.hand_state = inspire_defaults.state()
         self.hand_state_pub = ChannelPublisher(f"{TOPIC_STATE}/{l_r}", inspire_dds.inspire_hand_state)
         self.hand_state_pub.Init()
         self.hand_state_thread = RecurrentThread(
@@ -53,7 +30,7 @@ class InspireBridge():
         )
         self.hand_state_thread.Start()
 
-        self.hand_touch = inspire_hand_defaut.get_inspire_hand_touch()
+        self.hand_touch = inspire_defaults.touch()
         self.hand_touch_pub = ChannelPublisher(f"{TOPIC_TOUCH}/{l_r}", inspire_dds.inspire_hand_touch)
         self.hand_touch_pub.Init()
         self.hand_touch_thread = RecurrentThread(
@@ -73,7 +50,7 @@ class InspireBridge():
         # TODO: make class similar to inspire_subscribe.py to handle two hands and to convert between inspire_hand_ctrl and MotorCmd_
         test_idx = [0,0,1,1,2,2,3,3,4,4,5,5] # for testing
         try:
-            for i, joint_idx in enumerate(config.HandJointIndex_R.idx_list()):
+            for i, joint_idx in enumerate(cfg.HandJointIndex_R.idx_list()):
                 self.mj_data.ctrl[joint_idx] = (
                     # TODO: figure out how to properly calculate this
                     msg.force_set[test_idx[i]]
@@ -97,7 +74,7 @@ class InspireBridge():
             return
         
         test_idx = [0,0,1,1,2,2,3,3,4,4,5,5] # for testing
-        for i, joint_idx in enumerate(config.HandJointIndex_R.idx_list()):
+        for i, joint_idx in enumerate(cfg.HandJointIndex_R.idx_list()):
             q_index = i + joint_idx
             dq_index = i + self.num_motor + joint_idx
             tau_index = i + 2 * self.num_motor + joint_idx
@@ -137,7 +114,7 @@ class InspireBridge():
 
         return
 
-        for i, joint_idx in enumerate(config.HandJointIndex_R.idx_list()):
+        for i, joint_idx in enumerate(cfg.HandJointIndex_R.idx_list()):
             force_sensor_index = i + 3 * self.num_motor + joint_idx
 
             try:

@@ -1,3 +1,5 @@
+import numpy as np
+
 ROBOT = "g1" # Robot name, "go2", "b2", "b2w", "h1", "go2w", "g1" 
 ROBOT_SCENE = "./g1/g1_29dof_with_inspire.xml" # Robot scene
 DOMAIN_ID = 1 # Domain id
@@ -16,44 +18,120 @@ VIEWER_DT = 0.02  # 50 fps for viewer
 NUM_MOTOR_BODY = 29
 NUM_MOTOR_HANDS = 24
 
-START_ON_FLOOR = False
+START_ON_FLOOR = True
 FLOOR_POSITION = [0.0, 0.0, 0.07]
 FLOOR_ORIENTATION = [-0.7071, 0, 0.7071, 0.0]
 FLOOR_JOINT_ANGLES = [-0.008621, -0.002926, 0.008328, 0.063897, -0.655341, 0.011785, -0.011218, -0.004299, 0.000337, 0.066435, -0.655403, -0.012579, -0.008698, -0.003402, 0.012972, 0.177344, 0.015336, -0.018787, 1.4005, -0.154848, -1.0316, 1.53425, 1.16461, -0.000033, 0.003182, 0.000881, -0.000045, -0.000014, -0.000054, -0.000019, -0.000047, -0.000015, -0.000038, -0.00001, 0.15875, -0.019087, 0.017306, 1.41357, 0.170391, -0.989743, -1.48135, 1.16461, -0.000034, 0.002237, 0.00062, -0.000044, -0.000014, -0.000052, -0.000018, -0.000046, -0.000015, -0.000037, -0.000009]
 
-hand_joint_idx_l = [
-    29, 30, 31, 32,  # Left Thumb joints
-    33, 34,          # Left Index joints
-    35, 36,          # Left Middle joints
-    37, 38,          # Left Ring joints
-    39, 40           # Left Little joints
-]
-hand_joint_idx_r = [
-    41, 42, 43, 44,  # Right Thumb joints
-    45, 46,          # Right Index joints
-    47, 48,          # Right Middle joints
-    49, 50,          # Right Ring joints
-    51, 52           # Right Little joints
-]
+class JointDefaults:
+    # -- G1 body joint parameters --
+    angles_body = np.array([
+        # Left leg
+        -0.1, 0.0, 0.0, 0.3, -0.2, 0.0,
+        # Right leg
+        -0.1, 0.0, 0.0, 0.3, -0.2, 0.0,
+        # Waist
+        0.0, 0.0, 0.0,
+        # Left arm
+        0.0, 0.0, 0.0, 1.5, 0.0, 0.0, 0.0,
+        # Right arm
+        0.0, 0.0, 0.0, 1.5, 0.0, 0.0, 0.0
+    ])
 
-g1_joint_idx = [
-    # Left leg
-    0, 1, 2, 3, 4, 5,
+    kp_body = np.array([
+        # Left leg
+        60, 60, 60, 100, 40, 40,
+        # Right leg
+        60, 60, 60, 100, 40, 40,
+        # Waist
+        60, 40, 40,
+        # Left arm
+        40, 40, 40, 40, 40, 40, 40,
+        # Right arm
+        40, 40, 40, 40, 40, 40, 40
+    ])
 
-    # Right leg
-    6, 7, 8, 9, 10, 11,
+    kd_body = np.array([
+        # Left leg
+        1, 1, 1, 2, 1, 1,
+        # Right leg
+        1, 1, 1, 2, 1, 1,
+        # Waist
+        1, 1, 1,
+        # Left arm
+        1, 1, 1, 1, 1, 1, 1,
+        # Right arm
+        1, 1, 1, 1, 1, 1, 1
+    ])
 
-    # Waist
-    12, 13, 14,
+    angle_limits_body = [
+        (-2.5307, 2.8798),   # LeftHipPitch
+        (-0.5236, 2.9671),   # LeftHipRoll
+        (-2.7576, 2.7576),   # LeftHipYaw
+        (-0.087267, 2.8798), # LeftKnee
+        (-0.87267, 0.5236),  # LeftAnklePitch
+        (-0.2618, 0.2618),   # LeftAnkleRoll
+        (-2.5307, 2.8798),   # RightHipPitch
+        (-2.9671, 0.5236),   # RightHipRoll
+        (-2.7576, 2.7576),   # RightHipYaw
+        (-0.087267, 2.8798), # RightKnee
+        (-0.87267, 0.5236),  # RightAnklePitch
+        (-0.2618, 0.2618),   # RightAnkleRoll
+        (-2.618, 2.618),     # WaistYaw
+        (-0.52, 0.52),       # WaistRoll
+        (-0.52, 0.52),       # WaistPitch
+        (-3.0892, 2.6704),   # LeftShoulderPitch
+        (-1.5882, 2.2515),   # LeftShoulderRoll
+        (-2.618, 2.618),     # LeftShoulderYaw
+        (-1.0472, 2.0944),   # LeftElbow
+        (-1.9722, 1.9722),   # LeftWristRoll
+        (-1.6144, 1.6144),   # LeftWristPitch
+        (-1.6144, 1.6144),   # LeftWristYaw
+        (-3.0892, 2.6704),   # RightShoulderPitch
+        (-2.2515, 1.5882),   # RightShoulderRoll
+        (-2.618, 2.618),     # RightShoulderYaw
+        (-1.0472, 2.0944),   # RightElbow
+        (-1.9722, 1.9722),   # RightWristRoll
+        (-1.6144, 1.6144),   # RightWristPitch
+        (-1.6144, 1.6144)    # RightWristYaw
+    ]
 
-    # Left arm
-    15, 16, 17, 18, 19, 20, 21,
+    # -- Inspire hand joint parameters --
+    angles_hand = np.array([
+        # Left fingers
+        0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+        0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+        # Right fingers
+        0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+        0.0, 0.0, 0.0, 0.0, 0.0, 0.0
+    ])
 
-    # Right arm
-    22, 23, 24, 25, 26, 27, 28
-]
+    kp_hand = np.array([
+        # Left fingers
+        20, 20, 20, 20, 20, 20,
+        20, 20, 20, 20, 20, 20,
+        # Right fingers
+        20, 20, 20, 20, 20, 20,
+        20, 20, 20, 20, 20, 20
+    ])
 
-class HandJointIndex_L:
+    kd_hand = np.array([
+        # Left fingers
+        1, 1, 1, 1, 1, 1,
+        1, 1, 1, 1, 1, 1,
+        # Right fingers
+        1, 1, 1, 1, 1, 1,
+        1, 1, 1, 1, 1, 1
+    ])
+
+    # Combined parameters
+    angles = np.concatenate([angles_body, angles_hand])
+    kp = np.concatenate([kp_body, kp_hand])
+    kd = np.concatenate([kd_body, kd_hand])
+
+from enum import IntEnum
+
+class HandJointIndex_L(IntEnum):
     LeftThumb1      = 29
     LeftThumb2      = 30
     LeftThumb3      = 31
@@ -69,10 +147,10 @@ class HandJointIndex_L:
 
     @classmethod
     def idx_list(cls):
-        return [value for name, value in vars(cls).items() if not name.startswith('__') and isinstance(value, int)]
+        return [member.value for member in cls]
 
 
-class HandJointIndex_R:
+class HandJointIndex_R(IntEnum):
     RightThumb1     = 41
     RightThumb2     = 42
     RightThumb3     = 43
@@ -88,9 +166,9 @@ class HandJointIndex_R:
 
     @classmethod
     def idx_list(cls):
-        return [value for name, value in vars(cls).items() if not name.startswith('__') and isinstance(value, int)]
+        return [member.value for member in cls]
 
-class G1JointIndex:
+class G1JointIndex(IntEnum):
     # Left leg
     LeftHipPitch = 0
     LeftHipRoll = 1
@@ -138,4 +216,4 @@ class G1JointIndex:
 
     @classmethod
     def idx_list(cls):
-        return [value for name, value in vars(cls).items() if not name.startswith('__') and isinstance(value, int)]
+        return [member.value for member in cls]

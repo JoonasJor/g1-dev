@@ -4,17 +4,20 @@ import pygame
 import sys
 import struct
 import traceback
+import os
+import sys
 
 from unitree_sdk2py.core.channel import ChannelSubscriber, ChannelPublisher
-
 from unitree_sdk2py.idl.unitree_go.msg.dds_ import SportModeState_
 from unitree_sdk2py.idl.unitree_go.msg.dds_ import WirelessController_
 from unitree_sdk2py.idl.default import unitree_go_msg_dds__SportModeState_
 from unitree_sdk2py.idl.default import unitree_go_msg_dds__WirelessController_
 from unitree_sdk2py.utils.thread import RecurrentThread
 
-import config
-if config.ROBOT=="g1":
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+import config as cfg
+
+if cfg.ROBOT=="g1":
     from unitree_sdk2py.idl.unitree_hg.msg.dds_ import LowCmd_
     from unitree_sdk2py.idl.unitree_hg.msg.dds_ import LowState_
     from unitree_sdk2py.idl.default import unitree_hg_msg_dds__LowState_ as LowState_default
@@ -38,7 +41,7 @@ class UnitreeSdk2Bridge:
         self.mj_model = mj_model
         self.mj_data = mj_data
 
-        self.num_motor = config.NUM_MOTOR_BODY
+        self.num_motor = cfg.NUM_MOTOR_BODY
         self.dim_motor_sensor = MOTOR_SENSOR_NUM * self.num_motor
         self.have_imu = False
         self.have_frame_sensor = False
@@ -115,7 +118,7 @@ class UnitreeSdk2Bridge:
             return
         
         try:
-            for joint_idx in config.G1JointIndex.idx_list():
+            for joint_idx in cfg.G1JointIndex.idx_list():
                 self.mj_data.ctrl[joint_idx] = (
                     msg.motor_cmd[joint_idx].tau
                     + msg.motor_cmd[joint_idx].kp

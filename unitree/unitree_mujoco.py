@@ -1,32 +1,33 @@
 import time
 import mujoco
 import mujoco.viewer
-from threading import Thread
 import threading
+import os
+import sys
 
 from unitree_sdk2py.core.channel import ChannelFactoryInitialize
 from unitree_sdk2py_bridge import UnitreeSdk2Bridge, ElasticBand
 
-from inspire_bridge import InspireBridge
+from inspire.inspire_bridge import InspireBridge
 
-import config
-
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+import config as cfg
 
 locker = threading.Lock()
 
-mj_model = mujoco.MjModel.from_xml_path(config.ROBOT_SCENE)
+mj_model = mujoco.MjModel.from_xml_path(cfg.ROBOT_SCENE)
 mj_data = mujoco.MjData(mj_model)
 
-if config.START_ON_FLOOR:
-    mj_data.qpos[0:3] = config.FLOOR_POSITION
-    mj_data.qpos[3:7] = config.FLOOR_ORIENTATION
-    mj_data.qpos[7:60] = config.FLOOR_JOINT_ANGLES
+if cfg.START_ON_FLOOR:
+    mj_data.qpos[0:3] = cfg.FLOOR_POSITION
+    mj_data.qpos[3:7] = cfg.FLOOR_ORIENTATION
+    mj_data.qpos[7:60] = cfg.FLOOR_JOINT_ANGLES
     mj_data.qvel[:] = 0   
     mujoco.mj_step(mj_model, mj_data)
 
-if config.ENABLE_ELASTIC_BAND and not config.START_ON_FLOOR:
+if cfg.ENABLE_ELASTIC_BAND and not cfg.START_ON_FLOOR:
     elastic_band = ElasticBand()
-    if config.ROBOT == "h1" or config.ROBOT == "g1":
+    if cfg.ROBOT == "h1" or cfg.ROBOT == "g1":
         band_attached_link = mj_model.body("torso_link").id
     else:
         band_attached_link = mj_model.body("base_link").id
@@ -36,7 +37,7 @@ if config.ENABLE_ELASTIC_BAND and not config.START_ON_FLOOR:
 else:
     viewer = mujoco.viewer.launch_passive(mj_model, mj_data)
 
-mj_model.opt.timestep = config.SIMULATE_DT
+mj_model.opt.timestep = cfg.SIMULATE_DT
 num_motor_ = mj_model.nu
 dim_motor_sensor_ = 3 * num_motor_
 
@@ -46,22 +47,22 @@ time.sleep(0.2)
 def SimulationThread():
     global mj_data, mj_model
 
-    if config.START_ON_FLOOR:
+    if cfg.START_ON_FLOOR:
         print("[SimulationThread] Setting robot initial position...")
 
 
     try:
         print("[SimulationThread] Initializing Unitree SDK...")
-        ChannelFactoryInitialize(config.DOMAIN_ID, config.INTERFACE)
+        ChannelFactoryInitialize(cfg.DOMAIN_ID, cfg.INTERFACE)
         unitree = UnitreeSdk2Bridge(mj_model, mj_data)
 
         inspire_r = InspireBridge(mj_model, mj_data, "r")
 
-        if config.USE_JOYSTICK:
+        if cfg.USE_JOYSTICK:
             print("[SimulationThread] Setting up joystick...")
-            unitree.SetupJoystick(device_id=0, js_type=config.JOYSTICK_TYPE)
+            unitree.SetupJoystick(device_id=0, js_type=cfg.JOYSTICK_TYPE)
 
-        if config.PRINT_SCENE_INFORMATION:
+        if cfg.PRINT_SCENE_INFORMATION:
             unitree.PrintSceneInformation()
 
         print("[SimulationThread] Starting simulation loop...")
@@ -71,7 +72,7 @@ def SimulationThread():
             locker.acquire()
 
             try:
-                if config.ENABLE_ELASTIC_BAND and not config.START_ON_FLOOR:
+                if cfg.ENABLE_ELASTIC_BAND and not cfg.START_ON_FLOOR:
                     # Check qpos and qvel lengths
                     if len(mj_data.qpos) < 3 or len(mj_data.qvel) < 3:
                         print(f"[SimulationThread] qpos or qvel too short: qpos={mj_data.qpos}, qvel={mj_data.qvel}")
@@ -117,15 +118,15 @@ def PhysicsViewerThread():
             finally:
                 locker.release()
 
-            time.sleep(config.VIEWER_DT)
+            time.sleep(cfg.VIEWER_DT)
     except Exception as e:
         print(f"[PhysicsViewerThread] Fatal error: {type(e).__name__}: {e}")
         raise
 
 
 if __name__ == "__main__":
-    viewer_thread = Thread(target=PhysicsViewerThread)
-    sim_thread = Thread(target=SimulationThread)
+    viewer_thread = threading.Thread(target=PhysicsViewerThread)
+    sim_thread = threading.Thread(target=SimulationThread)
 
     viewer_thread.start()
     sim_thread.start()
