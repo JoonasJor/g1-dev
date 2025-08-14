@@ -132,18 +132,18 @@ class JointDefaults:
 from enum import IntEnum
 
 class HandJointIndex_L(IntEnum):
-    LeftThumb1      = 29
-    LeftThumb2      = 30
-    LeftThumb3      = 31
-    LeftThumb4      = 32
-    LeftIndex1      = 33
-    LeftIndex2      = 34
-    LeftMiddle1     = 35
-    LeftMiddle2     = 36
-    LeftRing1       = 37
-    LeftRing2       = 38
-    LeftLittle1     = 39
-    LeftLittle2     = 40
+    LeftLittle1     = 29
+    LeftLittle2     = 30
+    LeftRing1       = 31
+    LeftRing2       = 32
+    LeftMiddle1     = 33
+    LeftMiddle2     = 34
+    LeftIndex1      = 35
+    LeftIndex2      = 36
+    LeftThumb1      = 37
+    LeftThumb2      = 38
+    LeftThumb3      = 39
+    LeftThumb4      = 40
 
     @classmethod
     def idx_list(cls):
@@ -151,18 +151,18 @@ class HandJointIndex_L(IntEnum):
 
 
 class HandJointIndex_R(IntEnum):
-    RightThumb1     = 41
-    RightThumb2     = 42
-    RightThumb3     = 43
-    RightThumb4     = 44
-    RightIndex1     = 45
-    RightIndex2     = 46
-    RightMiddle1    = 47
-    RightMiddle2    = 48
-    RightRing1      = 49
-    RightRing2      = 50
-    RightLittle1    = 51
-    RightLittle2    = 52
+    RightLittle1    = 41
+    RightLittle2    = 42
+    RightRing1      = 43
+    RightRing2      = 44
+    RightMiddle1    = 45
+    RightMiddle2    = 46
+    RightIndex1     = 47
+    RightIndex2     = 48
+    RightThumb1     = 49
+    RightThumb2     = 50
+    RightThumb3     = 51
+    RightThumb4     = 52
 
     @classmethod
     def idx_list(cls):
