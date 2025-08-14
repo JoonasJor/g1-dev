@@ -1,11 +1,10 @@
-import numpy as np
 import time
 import sys
 import threading
 
 from unitree_sdk2py.core.channel import ChannelSubscriber, ChannelFactoryInitialize
-import inspire_dds
-import inspire_defaults
+import inspire.inspire_dds as inspire_dds
+import inspire.inspire_defaults as inspire_defaults
 
 class DDSHandler:
     def __init__(self, sub_touch=True, LR='r'):
@@ -45,6 +44,7 @@ class DDSHandler:
             'TEMP': states_msg.temperature
         }
         print(f"{states_msg.angle_act=}")
+        print(f"{states_msg.force_act=}")
 
     def read(self):
         with self.data_state_lock, self.data_touch_lock:
@@ -57,7 +57,7 @@ if __name__ == '__main__':
         ChannelFactoryInitialize(1, "lo")
 
     ddsHandler = DDSHandler(LR='r')
-    # ddsHandler = DDSHandler(LR='l')
+    #ddsHandler = DDSHandler(LR='l')
 
     while True:
         time.sleep(1)

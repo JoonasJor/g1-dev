@@ -41,7 +41,7 @@ class UnitreeSdk2Bridge:
         self.mj_model = mj_model
         self.mj_data = mj_data
 
-        self.num_motor = cfg.NUM_MOTOR_BODY
+        self.num_motor = cfg.NUM_MOTOR_BODY + cfg.NUM_MOTOR_HANDS
         self.dim_motor_sensor = MOTOR_SENSOR_NUM * self.num_motor
         self.have_imu = False
         self.have_frame_sensor = False
@@ -119,14 +119,17 @@ class UnitreeSdk2Bridge:
         
         try:
             for joint_idx in cfg.G1JointIndex.idx_list():
+                q_index = joint_idx
+                dq_index = joint_idx + self.num_motor
+
                 self.mj_data.ctrl[joint_idx] = (
                     msg.motor_cmd[joint_idx].tau
                     + msg.motor_cmd[joint_idx].kp
-                    * (msg.motor_cmd[joint_idx].q - self.mj_data.sensordata[joint_idx])
+                    * (msg.motor_cmd[joint_idx].q - self.mj_data.sensordata[q_index])
                     + msg.motor_cmd[joint_idx].kd
                     * (
                         msg.motor_cmd[joint_idx].dq
-                        - self.mj_data.sensordata[joint_idx + self.num_motor]
+                        - self.mj_data.sensordata[dq_index]
                     )
                 )
         except Exception as e:
@@ -147,15 +150,15 @@ class UnitreeSdk2Bridge:
                 print(f"[PublishLowState] sensordata too short: expected {expected_len}, got {sensor_len}")
                 return
 
-            for i in range(self.num_motor):
-                q_index = i
-                dq_index = i + self.num_motor
-                tau_index = i + 2 * self.num_motor
+            for joint_idx in cfg.G1JointIndex.idx_list():
+                q_index = joint_idx
+                dq_index = joint_idx + self.num_motor
+                tau_index = joint_idx + 2 * self.num_motor
 
                 try:
-                    self.low_state.motor_state[i].q = self.mj_data.sensordata[q_index]
-                    self.low_state.motor_state[i].dq = self.mj_data.sensordata[dq_index]
-                    self.low_state.motor_state[i].tau_est = self.mj_data.sensordata[tau_index]
+                    self.low_state.motor_state[joint_idx].q = self.mj_data.sensordata[q_index]
+                    self.low_state.motor_state[joint_idx].dq = self.mj_data.sensordata[dq_index]
+                    self.low_state.motor_state[joint_idx].tau_est = self.mj_data.sensordata[tau_index]
                 except IndexError as e:
                     #return
                     print(f"[PublishLowState] error: {e} - {i=}, {q_index=}, {dq_index=}, {tau_index=}")

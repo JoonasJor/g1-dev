@@ -4,8 +4,10 @@ import numpy as np
 from unitree_sdk2py.core.channel import ChannelSubscriber, ChannelPublisher
 from unitree_sdk2py.utils.thread import RecurrentThread
 
-import inspire_dds
-import inspire_defaults
+import inspire.inspire_dds as inspire_dds
+import inspire.inspire_defaults as inspire_defaults
+import inspire.joint_mapping as joint_mapping
+import inspire.conversions as conversions
 
 import config as cfg
 
@@ -19,9 +21,14 @@ class InspireBridge():
         self.mj_data = mj_data
         self.dt = self.mj_model.opt.timestep
 
-        self.num_motor = cfg.NUM_MOTOR_BODY # TODO: check this
+        self.num_motor = cfg.NUM_MOTOR_BODY + cfg.NUM_MOTOR_HANDS
+        
+        self.angle_range, self.force_range = joint_mapping.get_joint_limits(mj_model, l_r)
+        self.kp = cfg.JointDefaults.kp_hand
+        self.kd = cfg.JointDefaults.kd_hand
 
         # Inspire message
+        self.l_r = l_r
         self.hand_state = inspire_defaults.state()
         self.hand_state_pub = ChannelPublisher(f"{TOPIC_STATE}/{l_r}", inspire_dds.inspire_hand_state)
         self.hand_state_pub.Init()
@@ -43,57 +50,95 @@ class InspireBridge():
 
     def HandCmdHandler(self, msg: inspire_dds.inspire_hand_ctrl):
         if self.mj_data is None:
-            print("[HandCmdHandler] mj_data is None")
+            print(f"[HandCmdHandler_{self.l_r}] mj_data is None")
             return
         
-        # TODO: modify to work with 6 dof
-        # TODO: make class similar to inspire_subscribe.py to handle two hands and to convert between inspire_hand_ctrl and MotorCmd_
-        test_idx = [0,0,1,1,2,2,3,3,4,4,5,5] # for testing
+        if self.l_r == "r":
+            joint_indice = cfg.HandJointIndex_R.idx_list()
+        else:
+            joint_indice = cfg.HandJointIndex_L.idx_list()
+
         try:
-            for i, joint_idx in enumerate(cfg.HandJointIndex_R.idx_list()):
+            # Convert inspire dds message to mujoco control command
+            # 1. Expand 6 joints to 12 joints
+            angles_12, forces_12, speeds_12 = joint_mapping.dds_to_mujoco(msg.angle_set, msg.force_set, msg.speed_set, self.l_r)
+
+            for i, joint_idx in enumerate(joint_indice):
+                # 2. Convert angles and forces from (0 - 1000) to radians and from (-4000 - 4000) to N
+                angle_set = conversions.scaled_to_radian(angles_12[i], *self.angle_range[i])
+                force_set = conversions.scaled_to_force(forces_12[i], *self.force_range[i])
+                speed_set = 0 # TODO: figure out later
+
+                if self.l_r == "r":
+                    print(f"[HandCmdHandler_{self.l_r}] {joint_idx=} {angle_set=} {force_set=} {speed_set=}")
+
+                # 3. Set the mujoco control command
                 self.mj_data.ctrl[joint_idx] = (
-                    # TODO: figure out how to properly calculate this
-                    msg.force_set[test_idx[i]]
-                    + 20 # is this needed?
-                    * (msg.angle_set[test_idx[i]] / 1000 - self.mj_data.sensordata[joint_idx])
-                    + 1 # is this needed?
-                    * (
-                        msg.speed_set[test_idx[i]]
-                        - self.mj_data.sensordata[joint_idx + self.num_motor]
-                    )
+                    force_set + self.kp[i]
+                    * (angle_set - self.mj_data.sensordata[joint_idx]) + self.kd[i]
+                    * (speed_set - self.mj_data.sensordata[joint_idx + self.num_motor])
                 )
+
+                if self.l_r == "r":
+                    print(f"[HandCmdHandler_{self.l_r}] {joint_idx=} {self.mj_data.ctrl[joint_idx]=} {self.mj_data.sensordata[joint_idx]=}")
+
         except Exception as e:
-            print(f"[HandCmdHandler] error: {type(e).__name__}: {e}")
+            print(f"[HandCmdHandler_{self.l_r}] error: {type(e).__name__}: {e}")
             print(f"{len(self.mj_data.ctrl)=}")
             print(f"{self.num_motor=}")
             traceback.print_exc()
 
     def PublishHandState(self):
         if self.mj_data is None:
-            print("[PublishHandState] mj_data is None")
+            print(f"[PublishHandState_{self.l_r}] mj_data is None")
             return
         
-        test_idx = [0,0,1,1,2,2,3,3,4,4,5,5] # for testing
-        for i, joint_idx in enumerate(cfg.HandJointIndex_R.idx_list()):
-            q_index = i + joint_idx
-            dq_index = i + self.num_motor + joint_idx
-            tau_index = i + 2 * self.num_motor + joint_idx
+        if self.l_r == "r":
+            joint_indice = cfg.HandJointIndex_R.idx_list()
+        else:
+            joint_indice = cfg.HandJointIndex_L.idx_list()
+        
+        angles_12 = [0.0] * 12
+        forces_12 = [0.0] * 12
+        speeds_12 = [0.0] * 12
+
+        for i, joint_idx in enumerate(joint_indice):
+            q_index = joint_idx
+            dq_index = joint_idx + self.num_motor
+            tau_index = joint_idx + 2 * self.num_motor  
 
             try:
-                # for testing
-                self.hand_state.angle_act[test_idx[i]] = np.clip(int(self.mj_data.sensordata[q_index] * 1000), 0, 1000)
-                self.hand_state.force_act[test_idx[i]] = np.clip(int(self.mj_data.sensordata[tau_index] * 1000), 0, 1000)
+                angles_12[i] = self.mj_data.sensordata[q_index]
+                forces_12[i] = self.mj_data.sensordata[dq_index]
+                speeds_12[i] = self.mj_data.sensordata[tau_index]
+
             except IndexError as e:
-                #return
-                print(f"[PublishHandState] error: {e} - {i=}, {q_index=}, {dq_index=}, {tau_index=}")
-                print(f"{len(self.hand_state.angle_act)=}")
+                print(f"[PublishHandState_{self.l_r}] error: {e} - {i=}, {q_index=}, {dq_index=}, {tau_index=}")
+                print(f"{len(angles_12)=}")
                 print(f"{len(self.mj_data.sensordata)=}")
                 print(f"{self.num_motor=}")
-                
-            except Exception as e:
-                print(f"[PublishHandState] error: {type(e).__name__}: {e}")  
-        self.hand_state_pub.Write(self.hand_state)
 
+        # Convert mujoco sensor data to inspire DDS format
+        # 1. Convert angles and forces from radians to (0 - 1000) and from N to (-4000 - 4000)
+        angles_scaled_12 = []
+        for i, angle in enumerate(angles_12):
+            scaled = conversions.radian_to_scaled(angle, *self.angle_range[i])
+            angles_scaled_12.append(scaled)
+
+        force_scaled_12 = []
+        for i, force in enumerate(forces_12):
+            scaled = conversions.force_to_scaled(force, *self.force_range[i])
+            force_scaled_12.append(scaled)
+
+        # 2. Compress 12 joints to 6 joints
+        angles_scaled_6, forces_scaled_6 = joint_mapping.mujoco_to_dds(angles_scaled_12, force_scaled_12, self.l_r)
+
+        # 3. Fill the inspire hand state message
+        self.hand_state.angle_act = angles_scaled_6
+        self.hand_state.force_act = forces_scaled_6
+
+        # 4. Publish the hand state
+        self.hand_state_pub.Write(self.hand_state)
             
     def PublishHandTouch(self):
         if self.mj_data is None:

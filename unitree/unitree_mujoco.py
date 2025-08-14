@@ -2,15 +2,11 @@ import time
 import mujoco
 import mujoco.viewer
 import threading
-import os
-import sys
 
 from unitree_sdk2py.core.channel import ChannelFactoryInitialize
 from unitree_sdk2py_bridge import UnitreeSdk2Bridge, ElasticBand
-
 from inspire.inspire_bridge import InspireBridge
 
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 import config as cfg
 
 locker = threading.Lock()
@@ -57,6 +53,7 @@ def SimulationThread():
         unitree = UnitreeSdk2Bridge(mj_model, mj_data)
 
         inspire_r = InspireBridge(mj_model, mj_data, "r")
+        inspire_l = InspireBridge(mj_model, mj_data, "l")
 
         if cfg.USE_JOYSTICK:
             print("[SimulationThread] Setting up joystick...")

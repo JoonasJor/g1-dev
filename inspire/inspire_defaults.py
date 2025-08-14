@@ -1,4 +1,4 @@
-import inspire_dds
+import inspire.inspire_dds as inspire_dds
 
 #   name                       address  length  size
 TOUCH_DATA = [

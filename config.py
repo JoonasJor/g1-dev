@@ -18,7 +18,7 @@ VIEWER_DT = 0.02  # 50 fps for viewer
 NUM_MOTOR_BODY = 29
 NUM_MOTOR_HANDS = 24
 
-START_ON_FLOOR = True
+START_ON_FLOOR = False
 FLOOR_POSITION = [0.0, 0.0, 0.07]
 FLOOR_ORIENTATION = [-0.7071, 0, 0.7071, 0.0]
 FLOOR_JOINT_ANGLES = [-0.008621, -0.002926, 0.008328, 0.063897, -0.655341, 0.011785, -0.011218, -0.004299, 0.000337, 0.066435, -0.655403, -0.012579, -0.008698, -0.003402, 0.012972, 0.177344, 0.015336, -0.018787, 1.4005, -0.154848, -1.0316, 1.53425, 1.16461, -0.000033, 0.003182, 0.000881, -0.000045, -0.000014, -0.000054, -0.000019, -0.000047, -0.000015, -0.000038, -0.00001, 0.15875, -0.019087, 0.017306, 1.41357, 0.170391, -0.989743, -1.48135, 1.16461, -0.000034, 0.002237, 0.00062, -0.000044, -0.000014, -0.000052, -0.000018, -0.000046, -0.000015, -0.000037, -0.000009]
@@ -71,15 +71,18 @@ class JointDefaults:
         (-0.087267, 2.8798), # LeftKnee
         (-0.87267, 0.5236),  # LeftAnklePitch
         (-0.2618, 0.2618),   # LeftAnkleRoll
+
         (-2.5307, 2.8798),   # RightHipPitch
         (-2.9671, 0.5236),   # RightHipRoll
         (-2.7576, 2.7576),   # RightHipYaw
         (-0.087267, 2.8798), # RightKnee
         (-0.87267, 0.5236),  # RightAnklePitch
         (-0.2618, 0.2618),   # RightAnkleRoll
+
         (-2.618, 2.618),     # WaistYaw
         (-0.52, 0.52),       # WaistRoll
         (-0.52, 0.52),       # WaistPitch
+
         (-3.0892, 2.6704),   # LeftShoulderPitch
         (-1.5882, 2.2515),   # LeftShoulderRoll
         (-2.618, 2.618),     # LeftShoulderYaw
@@ -87,6 +90,7 @@ class JointDefaults:
         (-1.9722, 1.9722),   # LeftWristRoll
         (-1.6144, 1.6144),   # LeftWristPitch
         (-1.6144, 1.6144),   # LeftWristYaw
+
         (-3.0892, 2.6704),   # RightShoulderPitch
         (-2.2515, 1.5882),   # RightShoulderRoll
         (-2.618, 2.618),     # RightShoulderYaw
@@ -97,33 +101,42 @@ class JointDefaults:
     ]
 
     # -- Inspire hand joint parameters --
-    angles_hand = np.array([
-        # Left fingers
-        0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
-        0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
-        # Right fingers
-        0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
-        0.0, 0.0, 0.0, 0.0, 0.0, 0.0
-    ])
+    angles_hand = np.full(24, 0.0)
 
-    kp_hand = np.array([
-        # Left fingers
-        20, 20, 20, 20, 20, 20,
-        20, 20, 20, 20, 20, 20,
-        # Right fingers
-        20, 20, 20, 20, 20, 20,
-        20, 20, 20, 20, 20, 20
-    ])
+    kp_hand = np.full(24, 3)
 
-    kd_hand = np.array([
-        # Left fingers
-        1, 1, 1, 1, 1, 1,
-        1, 1, 1, 1, 1, 1,
-        # Right fingers
-        1, 1, 1, 1, 1, 1,
-        1, 1, 1, 1, 1, 1
-    ])
+    kd_hand = np.full(24, 0.05)
 
+    angle_limits_hand_r = [
+        (0, 1.4381),   # right_little_1
+        (0, 3.14),     # right_little_2
+        (0, 1.4381),   # right_ring_1
+        (0, 3.14),     # right_ring_2
+        (0, 1.4381),   # right_middle_1
+        (0, 3.14),     # right_middle_2
+        (0, 1.4381),   # right_index_1
+        (0, 3.14),     # right_index_2
+        (0, 1.1641),   # right_thumb_1
+        (0, 0.5864),   # right_thumb_2
+        (0, 0.5),      # right_thumb_3
+        (0, 3.14),     # right_thumb_4
+    ]
+
+    angle_limits_hand_l = [
+        (0, 1.4381),   # left_little_1
+        (0, 3.14),     # left_little_2
+        (0, 1.4381),   # left_ring_1
+        (0, 3.14),     # left_ring_2
+        (0, 1.4381),   # left_middle_1
+        (0, 3.14),     # left_middle_2
+        (0, 1.4381),   # left_index_1
+        (0, 3.14),     # left_index_2
+        (0, 1.1641),   # left_thumb_1
+        (0, 0.5864),   # left_thumb_2
+        (0, 0.5),      # left_thumb_3
+        (0, 3.14),     # left_thumb_4
+    ]
+    
     # Combined parameters
     angles = np.concatenate([angles_body, angles_hand])
     kp = np.concatenate([kp_body, kp_hand])

@@ -7,16 +7,10 @@
 """
 
 from dataclasses import dataclass
-from enum import auto
-from typing import TYPE_CHECKING, Optional
 
 import cyclonedds.idl as idl
 import cyclonedds.idl.annotations as annotate
 import cyclonedds.idl.types as types
-
-# root module import for resolving types
-# import inspire_dds
-
 
 @dataclass
 @annotate.final
