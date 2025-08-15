@@ -44,7 +44,7 @@ class DDSHandler:
             'TEMP': states_msg.temperature
         }
         print(f"{states_msg.angle_act=}")
-        print(f"{states_msg.force_act=}")
+        #print(f"{states_msg.force_act=}")
 
     def read(self):
         with self.data_state_lock, self.data_touch_lock:

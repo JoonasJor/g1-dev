@@ -15,9 +15,10 @@ from unitree_sdk2py.idl.default import unitree_go_msg_dds__WirelessController_
 from unitree_sdk2py.utils.thread import RecurrentThread
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-import config as cfg
+import config as Cfg
+import g1_joints as Joints
 
-if cfg.ROBOT=="g1":
+if Cfg.ROBOT=="g1":
     from unitree_sdk2py.idl.unitree_hg.msg.dds_ import LowCmd_
     from unitree_sdk2py.idl.unitree_hg.msg.dds_ import LowState_
     from unitree_sdk2py.idl.default import unitree_hg_msg_dds__LowState_ as LowState_default
@@ -41,7 +42,7 @@ class UnitreeSdk2Bridge:
         self.mj_model = mj_model
         self.mj_data = mj_data
 
-        self.num_motor = cfg.NUM_MOTOR_BODY + cfg.NUM_MOTOR_HANDS
+        self.num_motor = Cfg.NUM_MOTOR_BODY + Cfg.NUM_MOTOR_FINGERS
         self.dim_motor_sensor = MOTOR_SENSOR_NUM * self.num_motor
         self.have_imu = False
         self.have_frame_sensor = False
@@ -49,6 +50,13 @@ class UnitreeSdk2Bridge:
         self.idl_type = (self.num_motor > NUM_MOTOR_IDL_GO) # 0: unitree_go, 1: unitree_hg
 
         self.joystick = None
+
+        joint_angle_range = []
+        for idx in Joints.Body.mujoco_idx_list():
+            # offset by 1 to accommodate for (joint_index: 0 , name: floating_base_joint)
+            # this offset only applies to worldbody joints. not actuators or sensors.
+            joint_angle_range.append(tuple(mj_model.jnt_range[idx + 1]))
+        print(joint_angle_range)
 
         # Check sensor
         for i in range(self.dim_motor_sensor, self.mj_model.nsensor):
@@ -118,22 +126,23 @@ class UnitreeSdk2Bridge:
             return
         
         try:
-            for joint_idx in cfg.G1JointIndex.idx_list():
+            for cmd_idx, joint_idx in enumerate(Joints.Body.mujoco_idx_list()):
                 q_index = joint_idx
                 dq_index = joint_idx + self.num_motor
 
-                self.mj_data.ctrl[joint_idx] = (
-                    msg.motor_cmd[joint_idx].tau
-                    + msg.motor_cmd[joint_idx].kp
-                    * (msg.motor_cmd[joint_idx].q - self.mj_data.sensordata[q_index])
-                    + msg.motor_cmd[joint_idx].kd
+                self.mj_data.ctrl[cmd_idx] = (
+                    msg.motor_cmd[cmd_idx].tau
+                    + msg.motor_cmd[cmd_idx].kp
+                    * (msg.motor_cmd[cmd_idx].q - self.mj_data.sensordata[q_index])
+                    + msg.motor_cmd[cmd_idx].kd
                     * (
-                        msg.motor_cmd[joint_idx].dq
+                        msg.motor_cmd[cmd_idx].dq
                         - self.mj_data.sensordata[dq_index]
                     )
                 )
         except Exception as e:
             print(f"[LowCmdHandler] error: {type(e).__name__}: {e}")
+            print(f"{joint_idx=}, {q_index=}, {dq_index=}")
             print(f"{len(msg.motor_cmd)=}")
             print(f"{len(self.mj_data.ctrl)=}")
             print(f"{self.num_motor=}")
@@ -150,18 +159,18 @@ class UnitreeSdk2Bridge:
                 print(f"[PublishLowState] sensordata too short: expected {expected_len}, got {sensor_len}")
                 return
 
-            for joint_idx in cfg.G1JointIndex.idx_list():
+            for state_idx, joint_idx in enumerate(Joints.Body.mujoco_idx_list()):
                 q_index = joint_idx
                 dq_index = joint_idx + self.num_motor
                 tau_index = joint_idx + 2 * self.num_motor
 
                 try:
-                    self.low_state.motor_state[joint_idx].q = self.mj_data.sensordata[q_index]
-                    self.low_state.motor_state[joint_idx].dq = self.mj_data.sensordata[dq_index]
-                    self.low_state.motor_state[joint_idx].tau_est = self.mj_data.sensordata[tau_index]
+                    self.low_state.motor_state[state_idx].q = self.mj_data.sensordata[q_index]
+                    self.low_state.motor_state[state_idx].dq = self.mj_data.sensordata[dq_index]
+                    self.low_state.motor_state[state_idx].tau_est = self.mj_data.sensordata[tau_index]
                 except IndexError as e:
-                    #return
-                    print(f"[PublishLowState] error: {e} - {i=}, {q_index=}, {dq_index=}, {tau_index=}")
+                    print(f"[PublishLowState] error: {type(e).__name__}: {e}")
+                    print(f"{joint_idx=}, {q_index=}, {dq_index=}, {tau_index=}")
                     print(f"{len(self.low_state.motor_state)=}")
                     print(f"{len(self.mj_data.sensordata)=}")
                     print(f"{self.num_motor=}")

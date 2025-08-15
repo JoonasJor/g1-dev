@@ -17,7 +17,7 @@
             <joint damping="0.3" armature="0.01" frictionloss="0.3"/>
         </default>
         <default class="finger_motor">
-            <joint damping="0.1" armature="0.01" frictionloss="0.1"/>
+            <joint damping="0.2" armature="0.01" frictionloss="0.1"/>
         </default>      
     </default>
 
@@ -633,6 +633,20 @@
     <motor name="left_wrist_pitch_joint" joint="left_wrist_pitch_joint" ctrlrange="-5 5"/>
     <motor name="left_wrist_yaw_joint" joint="left_wrist_yaw_joint" ctrlrange="-5 5"/>
 
+    <!-- Left fingers -->
+    <motor name="left_thumb_1_joint" joint="left_thumb_1_joint" ctrlrange="-1.4 1.4"/>
+    <motor name="left_thumb_2_joint" joint="left_thumb_2_joint" ctrlrange="-1.4 1.4"/>
+    <motor name="left_thumb_3_joint" joint="left_thumb_3_joint" ctrlrange="-1.4 1.4"/>
+    <motor name="left_thumb_4_joint" joint="left_thumb_4_joint" ctrlrange="-1.4 1.4"/>
+    <motor name="left_index_1_joint" joint="left_index_1_joint" ctrlrange="-1.4 1.4"/>
+    <motor name="left_index_2_joint" joint="left_index_2_joint" ctrlrange="-1.4 1.4"/>
+    <motor name="left_middle_1_joint" joint="left_middle_1_joint" ctrlrange="-1.4 1.4"/>
+    <motor name="left_middle_2_joint" joint="left_middle_2_joint" ctrlrange="-1.4 1.4"/>
+    <motor name="left_ring_1_joint" joint="left_ring_1_joint" ctrlrange="-1.4 1.4"/>
+    <motor name="left_ring_2_joint" joint="left_ring_2_joint" ctrlrange="-1.4 1.4"/>
+    <motor name="left_little_1_joint" joint="left_little_1_joint" ctrlrange="-1.4 1.4"/>
+    <motor name="left_little_2_joint" joint="left_little_2_joint" ctrlrange="-1.4 1.4"/>
+
     <!-- Right arm -->
     <motor name="right_shoulder_pitch_joint" joint="right_shoulder_pitch_joint" ctrlrange="-25 25"/>
     <motor name="right_shoulder_roll_joint" joint="right_shoulder_roll_joint" ctrlrange="-25 25"/>
@@ -642,33 +656,19 @@
     <motor name="right_wrist_pitch_joint" joint="right_wrist_pitch_joint" ctrlrange="-5 5"/>
     <motor name="right_wrist_yaw_joint" joint="right_wrist_yaw_joint" ctrlrange="-5 5"/>
 
-    <!-- Left fingers -->
-    <motor name="left_little_1_joint" joint="left_little_1_joint" ctrlrange="-1.4 1.4"/>
-    <motor name="left_little_2_joint" joint="left_little_2_joint" ctrlrange="-1.4 1.4"/>
-    <motor name="left_ring_1_joint" joint="left_ring_1_joint" ctrlrange="-1.4 1.4"/>
-    <motor name="left_ring_2_joint" joint="left_ring_2_joint" ctrlrange="-1.4 1.4"/>
-    <motor name="left_middle_1_joint" joint="left_middle_1_joint" ctrlrange="-1.4 1.4"/>
-    <motor name="left_middle_2_joint" joint="left_middle_2_joint" ctrlrange="-1.4 1.4"/>
-    <motor name="left_index_1_joint" joint="left_index_1_joint" ctrlrange="-1.4 1.4"/>
-    <motor name="left_index_2_joint" joint="left_index_2_joint" ctrlrange="-1.4 1.4"/>
-    <motor name="left_thumb_1_joint" joint="left_thumb_1_joint" ctrlrange="-1.4 1.4"/>
-    <motor name="left_thumb_2_joint" joint="left_thumb_2_joint" ctrlrange="-1.4 1.4"/>
-    <motor name="left_thumb_3_joint" joint="left_thumb_3_joint" ctrlrange="-1.4 1.4"/>
-    <motor name="left_thumb_4_joint" joint="left_thumb_4_joint" ctrlrange="-1.4 1.4"/>
-
     <!-- Right fingers -->
-    <motor name="right_little_1_joint" joint="right_little_1_joint" ctrlrange="-1.4 1.4"/>
-    <motor name="right_little_2_joint" joint="right_little_2_joint" ctrlrange="-1.4 1.4"/>
-    <motor name="right_ring_1_joint" joint="right_ring_1_joint" ctrlrange="-1.4 1.4"/>
-    <motor name="right_ring_2_joint" joint="right_ring_2_joint" ctrlrange="-1.4 1.4"/>
-    <motor name="right_middle_1_joint" joint="right_middle_1_joint" ctrlrange="-1.4 1.4"/>
-    <motor name="right_middle_2_joint" joint="right_middle_2_joint" ctrlrange="-1.4 1.4"/>
-    <motor name="right_index_1_joint" joint="right_index_1_joint" ctrlrange="-1.4 1.4"/>
-    <motor name="right_index_2_joint" joint="right_index_2_joint" ctrlrange="-1.4 1.4"/>
     <motor name="right_thumb_1_joint" joint="right_thumb_1_joint" ctrlrange="-1.4 1.4"/>
     <motor name="right_thumb_2_joint" joint="right_thumb_2_joint" ctrlrange="-1.4 1.4"/>
     <motor name="right_thumb_3_joint" joint="right_thumb_3_joint" ctrlrange="-1.4 1.4"/>
     <motor name="right_thumb_4_joint" joint="right_thumb_4_joint" ctrlrange="-1.4 1.4"/>
+    <motor name="right_index_1_joint" joint="right_index_1_joint" ctrlrange="-1.4 1.4"/>
+    <motor name="right_index_2_joint" joint="right_index_2_joint" ctrlrange="-1.4 1.4"/>
+    <motor name="right_middle_1_joint" joint="right_middle_1_joint" ctrlrange="-1.4 1.4"/>
+    <motor name="right_middle_2_joint" joint="right_middle_2_joint" ctrlrange="-1.4 1.4"/>
+    <motor name="right_ring_1_joint" joint="right_ring_1_joint" ctrlrange="-1.4 1.4"/>
+    <motor name="right_ring_2_joint" joint="right_ring_2_joint" ctrlrange="-1.4 1.4"/>
+    <motor name="right_little_1_joint" joint="right_little_1_joint" ctrlrange="-1.4 1.4"/>
+    <motor name="right_little_2_joint" joint="right_little_2_joint" ctrlrange="-1.4 1.4"/>
   </actuator>
 
 
@@ -700,6 +700,19 @@
     <jointpos name="left_wrist_pitch_pos" joint="left_wrist_pitch_joint"/>
     <jointpos name="left_wrist_yaw_pos" joint="left_wrist_yaw_joint"/>
 
+    <jointpos name="left_thumb_1_joint_pos" joint="left_thumb_1_joint"/>
+    <jointpos name="left_thumb_2_joint_pos" joint="left_thumb_2_joint"/>
+    <jointpos name="left_thumb_3_joint_pos" joint="left_thumb_3_joint"/>
+    <jointpos name="left_thumb_4_joint_pos" joint="left_thumb_4_joint"/>
+    <jointpos name="left_index_1_joint_pos" joint="left_index_1_joint"/>
+    <jointpos name="left_index_2_joint_pos" joint="left_index_2_joint"/>
+    <jointpos name="left_middle_1_joint_pos" joint="left_middle_1_joint"/>
+    <jointpos name="left_middle_2_joint_pos" joint="left_middle_2_joint"/>
+    <jointpos name="left_ring_1_joint_pos" joint="left_ring_1_joint"/>
+    <jointpos name="left_ring_2_joint_pos" joint="left_ring_2_joint"/>
+    <jointpos name="left_little_1_joint_pos" joint="left_little_1_joint"/>
+    <jointpos name="left_little_2_joint_pos" joint="left_little_2_joint"/>
+
     <jointpos name="right_shoulder_pitch_pos" joint="right_shoulder_pitch_joint"/>
     <jointpos name="right_shoulder_roll_pos" joint="right_shoulder_roll_joint"/>
     <jointpos name="right_shoulder_yaw_pos" joint="right_shoulder_yaw_joint"/>
@@ -708,31 +721,18 @@
     <jointpos name="right_wrist_pitch_pos" joint="right_wrist_pitch_joint"/>
     <jointpos name="right_wrist_yaw_pos" joint="right_wrist_yaw_joint"/>
 
-    <jointpos name="left_little_1_joint_pos" joint="left_little_1_joint"/>
-    <jointpos name="left_little_2_joint_pos" joint="left_little_2_joint"/>
-    <jointpos name="left_ring_1_joint_pos" joint="left_ring_1_joint"/>
-    <jointpos name="left_ring_2_joint_pos" joint="left_ring_2_joint"/>
-    <jointpos name="left_middle_1_joint_pos" joint="left_middle_1_joint"/>
-    <jointpos name="left_middle_2_joint_pos" joint="left_middle_2_joint"/>
-    <jointpos name="left_index_1_joint_pos" joint="left_index_1_joint"/>
-    <jointpos name="left_index_2_joint_pos" joint="left_index_2_joint"/>
-    <jointpos name="left_thumb_1_joint_pos" joint="left_thumb_1_joint"/>
-    <jointpos name="left_thumb_2_joint_pos" joint="left_thumb_2_joint"/>
-    <jointpos name="left_thumb_3_joint_pos" joint="left_thumb_3_joint"/>
-    <jointpos name="left_thumb_4_joint_pos" joint="left_thumb_4_joint"/>
-
-    <jointpos name="right_little_1_joint_pos" joint="right_little_1_joint"/>
-    <jointpos name="right_little_2_joint_pos" joint="right_little_2_joint"/>
-    <jointpos name="right_ring_1_joint_pos" joint="right_ring_1_joint"/>
-    <jointpos name="right_ring_2_joint_pos" joint="right_ring_2_joint"/>
-    <jointpos name="right_middle_1_joint_pos" joint="right_middle_1_joint"/>
-    <jointpos name="right_middle_2_joint_pos" joint="right_middle_2_joint"/>
-    <jointpos name="right_index_1_joint_pos" joint="right_index_1_joint"/>
-    <jointpos name="right_index_2_joint_pos" joint="right_index_2_joint"/>
     <jointpos name="right_thumb_1_joint_pos" joint="right_thumb_1_joint"/>
     <jointpos name="right_thumb_2_joint_pos" joint="right_thumb_2_joint"/>
     <jointpos name="right_thumb_3_joint_pos" joint="right_thumb_3_joint"/>
     <jointpos name="right_thumb_4_joint_pos" joint="right_thumb_4_joint"/>
+    <jointpos name="right_index_1_joint_pos" joint="right_index_1_joint"/>
+    <jointpos name="right_index_2_joint_pos" joint="right_index_2_joint"/>
+    <jointpos name="right_middle_1_joint_pos" joint="right_middle_1_joint"/>
+    <jointpos name="right_middle_2_joint_pos" joint="right_middle_2_joint"/>
+    <jointpos name="right_ring_1_joint_pos" joint="right_ring_1_joint"/>
+    <jointpos name="right_ring_2_joint_pos" joint="right_ring_2_joint"/>
+    <jointpos name="right_little_1_joint_pos" joint="right_little_1_joint"/>
+    <jointpos name="right_little_2_joint_pos" joint="right_little_2_joint"/>
 
     <!-- Joint velocity -->
     <jointvel name="left_hip_pitch_vel" joint="left_hip_pitch_joint"/>
@@ -761,6 +761,19 @@
     <jointvel name="left_wrist_pitch_vel" joint="left_wrist_pitch_joint"/>
     <jointvel name="left_wrist_yaw_vel" joint="left_wrist_yaw_joint"/>
 
+    <jointvel name="left_thumb_1_joint_vel" joint="left_thumb_1_joint"/>
+    <jointvel name="left_thumb_2_joint_vel" joint="left_thumb_2_joint"/>
+    <jointvel name="left_thumb_3_joint_vel" joint="left_thumb_3_joint"/>
+    <jointvel name="left_thumb_4_joint_vel" joint="left_thumb_4_joint"/>
+    <jointvel name="left_index_1_joint_vel" joint="left_index_1_joint"/>
+    <jointvel name="left_index_2_joint_vel" joint="left_index_2_joint"/>
+    <jointvel name="left_middle_1_joint_vel" joint="left_middle_1_joint"/>
+    <jointvel name="left_middle_2_joint_vel" joint="left_middle_2_joint"/>
+    <jointvel name="left_ring_1_joint_vel" joint="left_ring_1_joint"/>
+    <jointvel name="left_ring_2_joint_vel" joint="left_ring_2_joint"/>
+    <jointvel name="left_little_1_joint_vel" joint="left_little_1_joint"/>
+    <jointvel name="left_little_2_joint_vel" joint="left_little_2_joint"/>
+
     <jointvel name="right_shoulder_pitch_vel" joint="right_shoulder_pitch_joint"/>
     <jointvel name="right_shoulder_roll_vel" joint="right_shoulder_roll_joint"/>
     <jointvel name="right_shoulder_yaw_vel" joint="right_shoulder_yaw_joint"/>
@@ -769,31 +782,18 @@
     <jointvel name="right_wrist_pitch_vel" joint="right_wrist_pitch_joint"/>
     <jointvel name="right_wrist_yaw_vel" joint="right_wrist_yaw_joint"/>
 
-    <jointvel name="left_little_1_joint_vel" joint="left_little_1_joint"/>
-    <jointvel name="left_little_2_joint_vel" joint="left_little_2_joint"/>
-    <jointvel name="left_ring_1_joint_vel" joint="left_ring_1_joint"/>
-    <jointvel name="left_ring_2_joint_vel" joint="left_ring_2_joint"/>
-    <jointvel name="left_middle_1_joint_vel" joint="left_middle_1_joint"/>
-    <jointvel name="left_middle_2_joint_vel" joint="left_middle_2_joint"/>
-    <jointvel name="left_index_1_joint_vel" joint="left_index_1_joint"/>
-    <jointvel name="left_index_2_joint_vel" joint="left_index_2_joint"/>
-    <jointvel name="left_thumb_1_joint_vel" joint="left_thumb_1_joint"/>
-    <jointvel name="left_thumb_2_joint_vel" joint="left_thumb_2_joint"/>
-    <jointvel name="left_thumb_3_joint_vel" joint="left_thumb_3_joint"/>
-    <jointvel name="left_thumb_4_joint_vel" joint="left_thumb_4_joint"/>
-
-    <jointvel name="right_little_1_joint_vel" joint="right_little_1_joint"/>
-    <jointvel name="right_little_2_joint_vel" joint="right_little_2_joint"/>
-    <jointvel name="right_ring_1_joint_vel" joint="right_ring_1_joint"/>
-    <jointvel name="right_ring_2_joint_vel" joint="right_ring_2_joint"/>
-    <jointvel name="right_middle_1_joint_vel" joint="right_middle_1_joint"/>
-    <jointvel name="right_middle_2_joint_vel" joint="right_middle_2_joint"/>
-    <jointvel name="right_index_1_joint_vel" joint="right_index_1_joint"/>
-    <jointvel name="right_index_2_joint_vel" joint="right_index_2_joint"/>
     <jointvel name="right_thumb_1_joint_vel" joint="right_thumb_1_joint"/>
     <jointvel name="right_thumb_2_joint_vel" joint="right_thumb_2_joint"/>
     <jointvel name="right_thumb_3_joint_vel" joint="right_thumb_3_joint"/>
     <jointvel name="right_thumb_4_joint_vel" joint="right_thumb_4_joint"/>
+    <jointvel name="right_index_1_joint_vel" joint="right_index_1_joint"/>
+    <jointvel name="right_index_2_joint_vel" joint="right_index_2_joint"/>
+    <jointvel name="right_middle_1_joint_vel" joint="right_middle_1_joint"/>
+    <jointvel name="right_middle_2_joint_vel" joint="right_middle_2_joint"/>
+    <jointvel name="right_ring_1_joint_vel" joint="right_ring_1_joint"/>
+    <jointvel name="right_ring_2_joint_vel" joint="right_ring_2_joint"/>
+    <jointvel name="right_little_1_joint_vel" joint="right_little_1_joint"/>
+    <jointvel name="right_little_2_joint_vel" joint="right_little_2_joint"/>
 
     <!-- Joint actuator force -->
     <jointactuatorfrc name="left_hip_pitch_torque" joint="left_hip_pitch_joint"/>
@@ -822,6 +822,19 @@
     <jointactuatorfrc name="left_wrist_pitch_torque" joint="left_wrist_pitch_joint"/>
     <jointactuatorfrc name="left_wrist_yaw_torque" joint="left_wrist_yaw_joint"/>
 
+    <jointactuatorfrc name="left_thumb_1_joint_torque" joint="left_thumb_1_joint"/>
+    <jointactuatorfrc name="left_thumb_2_joint_torque" joint="left_thumb_2_joint"/>
+    <jointactuatorfrc name="left_thumb_3_joint_torque" joint="left_thumb_3_joint"/>
+    <jointactuatorfrc name="left_thumb_4_joint_torque" joint="left_thumb_4_joint"/>
+    <jointactuatorfrc name="left_index_1_joint_torque" joint="left_index_1_joint"/>
+    <jointactuatorfrc name="left_index_2_joint_torque" joint="left_index_2_joint"/>
+    <jointactuatorfrc name="left_middle_1_joint_torque" joint="left_middle_1_joint"/>
+    <jointactuatorfrc name="left_middle_2_joint_torque" joint="left_middle_2_joint"/>
+    <jointactuatorfrc name="left_ring_1_joint_torque" joint="left_ring_1_joint"/>
+    <jointactuatorfrc name="left_ring_2_joint_torque" joint="left_ring_2_joint"/>
+    <jointactuatorfrc name="left_little_1_joint_torque" joint="left_little_1_joint"/>
+    <jointactuatorfrc name="left_little_2_joint_torque" joint="left_little_2_joint"/>
+
     <jointactuatorfrc name="right_shoulder_pitch_torque" joint="right_shoulder_pitch_joint"/>
     <jointactuatorfrc name="right_shoulder_roll_torque" joint="right_shoulder_roll_joint"/>
     <jointactuatorfrc name="right_shoulder_yaw_torque" joint="right_shoulder_yaw_joint"/>
@@ -830,76 +843,63 @@
     <jointactuatorfrc name="right_wrist_pitch_torque" joint="right_wrist_pitch_joint"/>
     <jointactuatorfrc name="right_wrist_yaw_torque" joint="right_wrist_yaw_joint"/>
 
-    <jointactuatorfrc name="left_little_1_joint_torque" joint="left_little_1_joint"/>
-    <jointactuatorfrc name="left_little_2_joint_torque" joint="left_little_2_joint"/>
-    <jointactuatorfrc name="left_ring_1_joint_torque" joint="left_ring_1_joint"/>
-    <jointactuatorfrc name="left_ring_2_joint_torque" joint="left_ring_2_joint"/>
-    <jointactuatorfrc name="left_middle_1_joint_torque" joint="left_middle_1_joint"/>
-    <jointactuatorfrc name="left_middle_2_joint_torque" joint="left_middle_2_joint"/>
-    <jointactuatorfrc name="left_index_1_joint_torque" joint="left_index_1_joint"/>
-    <jointactuatorfrc name="left_index_2_joint_torque" joint="left_index_2_joint"/>
-    <jointactuatorfrc name="left_thumb_1_joint_torque" joint="left_thumb_1_joint"/>
-    <jointactuatorfrc name="left_thumb_2_joint_torque" joint="left_thumb_2_joint"/>
-    <jointactuatorfrc name="left_thumb_3_joint_torque" joint="left_thumb_3_joint"/>
-    <jointactuatorfrc name="left_thumb_4_joint_torque" joint="left_thumb_4_joint"/>
-
-    <jointactuatorfrc name="right_little_1_joint_torque" joint="right_little_1_joint"/>
-    <jointactuatorfrc name="right_little_2_joint_torque" joint="right_little_2_joint"/>
-    <jointactuatorfrc name="right_ring_1_joint_torque" joint="right_ring_1_joint"/>
-    <jointactuatorfrc name="right_ring_2_joint_torque" joint="right_ring_2_joint"/>
-    <jointactuatorfrc name="right_middle_1_joint_torque" joint="right_middle_1_joint"/>
-    <jointactuatorfrc name="right_middle_2_joint_torque" joint="right_middle_2_joint"/>
-    <jointactuatorfrc name="right_index_1_joint_torque" joint="right_index_1_joint"/>
-    <jointactuatorfrc name="right_index_2_joint_torque" joint="right_index_2_joint"/>
     <jointactuatorfrc name="right_thumb_1_joint_torque" joint="right_thumb_1_joint"/>
     <jointactuatorfrc name="right_thumb_2_joint_torque" joint="right_thumb_2_joint"/>
     <jointactuatorfrc name="right_thumb_3_joint_torque" joint="right_thumb_3_joint"/>
     <jointactuatorfrc name="right_thumb_4_joint_torque" joint="right_thumb_4_joint"/>
+    <jointactuatorfrc name="right_index_1_joint_torque" joint="right_index_1_joint"/>
+    <jointactuatorfrc name="right_index_2_joint_torque" joint="right_index_2_joint"/>
+    <jointactuatorfrc name="right_middle_1_joint_torque" joint="right_middle_1_joint"/>
+    <jointactuatorfrc name="right_middle_2_joint_torque" joint="right_middle_2_joint"/>
+    <jointactuatorfrc name="right_ring_1_joint_torque" joint="right_ring_1_joint"/>
+    <jointactuatorfrc name="right_ring_2_joint_torque" joint="right_ring_2_joint"/>
+    <jointactuatorfrc name="right_little_1_joint_torque" joint="right_little_1_joint"/>
+    <jointactuatorfrc name="right_little_2_joint_torque" joint="right_little_2_joint"/>
 
     <!-- Inspire force sensors -->
-    <touch name="left_little_force_sensor_1" site="left_little_force_sensor_1" />
-    <touch name="left_little_force_sensor_2" site="left_little_force_sensor_2" />
-    <touch name="left_little_force_sensor_3" site="left_little_force_sensor_3" />
-
-    <touch name="left_ring_force_sensor_1" site="left_ring_force_sensor_1" />
-    <touch name="left_ring_force_sensor_2" site="left_ring_force_sensor_2" />
-    <touch name="left_ring_force_sensor_3" site="left_ring_force_sensor_3" />
-
-    <touch name="left_middle_force_sensor_1" site="left_middle_force_sensor_1" />
-    <touch name="left_middle_force_sensor_2" site="left_middle_force_sensor_2" />
-    <touch name="left_middle_force_sensor_3" site="left_middle_force_sensor_3" />
-
-    <touch name="left_index_force_sensor_1" site="left_index_force_sensor_1" />
-    <touch name="left_index_force_sensor_2" site="left_index_force_sensor_2" />
-    <touch name="left_index_force_sensor_3" site="left_index_force_sensor_3" />
-
     <touch name="left_thumb_force_sensor_1" site="left_thumb_force_sensor_1" />
     <touch name="left_thumb_force_sensor_2" site="left_thumb_force_sensor_2" />
     <touch name="left_thumb_force_sensor_3" site="left_thumb_force_sensor_3" />
     <touch name="left_thumb_force_sensor_4" site="left_thumb_force_sensor_4" />
 
+    <touch name="left_index_force_sensor_1" site="left_index_force_sensor_1" />
+    <touch name="left_index_force_sensor_2" site="left_index_force_sensor_2" />
+    <touch name="left_index_force_sensor_3" site="left_index_force_sensor_3" />
+
+    <touch name="left_middle_force_sensor_1" site="left_middle_force_sensor_1" />
+    <touch name="left_middle_force_sensor_2" site="left_middle_force_sensor_2" />
+    <touch name="left_middle_force_sensor_3" site="left_middle_force_sensor_3" />
+
+    <touch name="left_ring_force_sensor_1" site="left_ring_force_sensor_1" />
+    <touch name="left_ring_force_sensor_2" site="left_ring_force_sensor_2" />
+    <touch name="left_ring_force_sensor_3" site="left_ring_force_sensor_3" />
+
+    <touch name="left_little_force_sensor_1" site="left_little_force_sensor_1" />
+    <touch name="left_little_force_sensor_2" site="left_little_force_sensor_2" />
+    <touch name="left_little_force_sensor_3" site="left_little_force_sensor_3" />
+
     <touch name="left_palm_force_sensor" site="left_palm_force_sensor" />
 
-    <touch name="right_little_force_sensor_1" site="right_little_force_sensor_1" />
-    <touch name="right_little_force_sensor_2" site="right_little_force_sensor_2" />
-    <touch name="right_little_force_sensor_3" site="right_little_force_sensor_3" />
-    
-    <touch name="right_ring_force_sensor_1" site="right_ring_force_sensor_1" />
-    <touch name="right_ring_force_sensor_2" site="right_ring_force_sensor_2" />
-    <touch name="right_ring_force_sensor_3" site="right_ring_force_sensor_3" />
-    
-    <touch name="right_middle_force_sensor_1" site="right_middle_force_sensor_1" />
-    <touch name="right_middle_force_sensor_2" site="right_middle_force_sensor_2" />
-    <touch name="right_middle_force_sensor_3" site="right_middle_force_sensor_3" />
-    
-    <touch name="right_index_force_sensor_1" site="right_index_force_sensor_1" />
-    <touch name="right_index_force_sensor_2" site="right_index_force_sensor_2" />
-    <touch name="right_index_force_sensor_3" site="right_index_force_sensor_3" />
-    
     <touch name="right_thumb_force_sensor_1" site="right_thumb_force_sensor_1" />
     <touch name="right_thumb_force_sensor_2" site="right_thumb_force_sensor_2" />
     <touch name="right_thumb_force_sensor_3" site="right_thumb_force_sensor_3" />
     <touch name="right_thumb_force_sensor_4" site="right_thumb_force_sensor_4" />
+
+    <touch name="right_index_force_sensor_1" site="right_index_force_sensor_1" />
+    <touch name="right_index_force_sensor_2" site="right_index_force_sensor_2" />
+    <touch name="right_index_force_sensor_3" site="right_index_force_sensor_3" />
+
+    <touch name="right_middle_force_sensor_1" site="right_middle_force_sensor_1" />
+    <touch name="right_middle_force_sensor_2" site="right_middle_force_sensor_2" />
+    <touch name="right_middle_force_sensor_3" site="right_middle_force_sensor_3" />
+
+    <touch name="right_ring_force_sensor_1" site="right_ring_force_sensor_1" />
+    <touch name="right_ring_force_sensor_2" site="right_ring_force_sensor_2" />
+    <touch name="right_ring_force_sensor_3" site="right_ring_force_sensor_3" />
+
+    <touch name="right_little_force_sensor_1" site="right_little_force_sensor_1" />
+    <touch name="right_little_force_sensor_2" site="right_little_force_sensor_2" />
+    <touch name="right_little_force_sensor_3" site="right_little_force_sensor_3" />
 
     <touch name="right_palm_force_sensor" site="right_palm_force_sensor" />
 

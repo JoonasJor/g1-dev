@@ -25,6 +25,8 @@ if __name__ == '__main__':
     dt = 0.1
     t = 0
 
+    cycle = False
+
     print("Setting joints to zero... ")
     for i in range(50):
         cmd.angle_set = [0, 0, 0, 0, 0, 0]
@@ -34,14 +36,17 @@ if __name__ == '__main__':
         time.sleep(dt)
 
     while True:
-        phase = (t % cycle_duration) / cycle_duration
+        if cycle:
+            phase = (t % cycle_duration) / cycle_duration
 
-        if phase < 0.5:
-            value = int(phase * 2 * 1000)
+            if phase < 0.5:
+                value = int(phase * 2 * 1000)
+            else:
+                value = int((1 - phase) * 2 * 1000)
+
+            cmd.angle_set = [value] * 6
         else:
-            value = int((1 - phase) * 2 * 1000)
-
-        cmd.angle_set = [value] * 6
+            cmd.angle_set = [500] * 6
 
         pub_l.Write(cmd)
         pub_r.Write(cmd)
