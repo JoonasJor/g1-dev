@@ -10,22 +10,21 @@ python3.8 -m venv venv
 source venv/bin/activate
 pip install mujoco pygame
 ```
-2. Install SDKs  
+2. Install unitree sdk  
 https://github.com/unitreerobotics/unitree_sdk2_python  
-https://github.com/NaCl-1374/inspire_hand_ws
 
 ## Run
 ### Mujoco sim:  
 terminal 1:
 ```
-python unitree_mujoco.py
+python unitree/unitree_mujoco.py
 ```
 terminal 2:
 ```
-python sim2real.py
+python demo_(body/hands).py
 ```
 ### Real robot:
 ```
-python sim2real.py <network_interface_name>
+python demo_(body/hands).py <network_interface_name>
 ```
 
