@@ -27,9 +27,14 @@ class InspireBridge():
 
         self.num_motor = Cfg.NUM_MOTOR_BODY + Cfg.NUM_MOTOR_FINGERS
         
-        self.joint_angle_range, self.joint_force_range = Joints.get_joint_ranges(mj_model, l_r)
-        self.kp = Joints.Body.default_kp_list()
-        self.kd = Joints.Body.default_kd_list()
+        if l_r == "r":
+            self.joint_angle_range, self.joint_force_range = Joints.Hand_R.get_joint_ranges(mj_model)
+            self.kp = Joints.Hand_R.default_kp_list()
+            self.kd = Joints.Hand_R.default_kd_list()
+        else:
+            self.joint_angle_range, self.joint_force_range = Joints.Hand_L.get_joint_ranges(mj_model)
+            self.kp = Joints.Hand_L.default_kp_list()
+            self.kd = Joints.Hand_L.default_kd_list()
 
         # Inspire message
         self.l_r = l_r
@@ -58,9 +63,9 @@ class InspireBridge():
             return
         
         if self.l_r == "r":
-            joint_indice = Joints.Fingers_R.mujoco_idx_list()
+            joint_indice = Joints.Hand_R.mujoco_idx_list()
         else:
-            joint_indice = Joints.Fingers_L.mujoco_idx_list()
+            joint_indice = Joints.Hand_L.mujoco_idx_list()
 
         try:
             # Convert inspire dds message to mujoco control command
@@ -88,15 +93,15 @@ class InspireBridge():
                 #print(f"[HandCmdHandler_{self.l_r}] {joint_idx=} {angle_set=} {force_set=} {speed_set=}")
                 #print(f"[HandCmdHandler_{self.l_r}] {joint_idx=} {self.mj_data.ctrl[joint_idx]=} {self.mj_data.sensordata[joint_idx]=}")
 
-            if True:
-                finger1 = Joints.Fingers_R.RightLittle1
-                finger2 = Joints.Fingers_R.RightLittle2
+            if False:
+                finger1 = Joints.Hand_R.RightLittle1
+                finger2 = Joints.Hand_R.RightLittle2
                 print(f"[HandCmdHandler_{self.l_r}] {finger1.mujoco_idx} {finger2.mujoco_idx} \
                         \ncurrent: {self.mj_data.sensordata[finger1.mujoco_idx]:.3f} {self.mj_data.sensordata[finger2.mujoco_idx]:.3f} \
-                        \ntarget scaled: {angles_scaled_12[finger1.motor_idx]} {angles_scaled_12[finger2.motor_idx]} \
-                        \ntarget rad: {angles_12[finger1.motor_idx]:.3f} {angles_12[finger2.motor_idx]:.3f} \
-                        \nangle range rad: {self.joint_angle_range[finger1.motor_idx]} {self.joint_angle_range[finger2.motor_idx]} \
-                        \nforce range: {self.joint_force_range[finger1.motor_idx]} {self.joint_force_range[finger2.motor_idx]} \
+                        \ntarget scaled: {angles_scaled_12[finger1.idx]} {angles_scaled_12[finger2.idx]} \
+                        \ntarget rad: {angles_12[finger1.idx]:.3f} {angles_12[finger2.idx]:.3f} \
+                        \nangle range rad: {self.joint_angle_range[finger1.idx]} {self.joint_angle_range[finger2.idx]} \
+                        \nforce range: {self.joint_force_range[finger1.idx]} {self.joint_force_range[finger2.idx]} \
                         \nctrl: {control:.3f}")
 
         except Exception as e:
@@ -111,9 +116,9 @@ class InspireBridge():
             return
         
         if self.l_r == "r":
-            joints = Joints.Fingers_R
+            joints = Joints.Hand_R
         else:
-            joints = Joints.Fingers_L
+            joints = Joints.Hand_L
         
         angles_12 = [0.0] * 12
         forces_12 = [0.0] * 12
@@ -125,9 +130,9 @@ class InspireBridge():
             tau_index = joint.mujoco_idx + 2 * self.num_motor
 
             try:
-                angles_12[joint.motor_idx] = self.mj_data.sensordata[q_index]
-                forces_12[joint.motor_idx] = self.mj_data.sensordata[dq_index]
-                speeds_12[joint.motor_idx] = self.mj_data.sensordata[tau_index]
+                angles_12[joint.idx] = self.mj_data.sensordata[q_index]
+                forces_12[joint.idx] = self.mj_data.sensordata[dq_index]
+                speeds_12[joint.idx] = self.mj_data.sensordata[tau_index]
 
             except IndexError as e:
                 print(f"[PublishHandState_{self.l_r}] error: {e} - {i=}, {q_index=}, {dq_index=}, {tau_index=}")
@@ -183,7 +188,7 @@ class InspireBridge():
 
         return
 
-        for i, joint_idx in enumerate(Joints.Fingers_R.mujoco_idx_list()):
+        for i, joint_idx in enumerate(Joints.Hand_R.mujoco_idx_list()):
             force_sensor_index = i + 3 * self.num_motor + joint_idx
 
             try:

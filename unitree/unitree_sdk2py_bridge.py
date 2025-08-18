@@ -130,7 +130,7 @@ class UnitreeSdk2Bridge:
                 q_index = joint_idx
                 dq_index = joint_idx + self.num_motor
 
-                self.mj_data.ctrl[cmd_idx] = (
+                self.mj_data.ctrl[joint_idx] = (
                     msg.motor_cmd[cmd_idx].tau
                     + msg.motor_cmd[cmd_idx].kp
                     * (msg.motor_cmd[cmd_idx].q - self.mj_data.sensordata[q_index])
