@@ -36,6 +36,10 @@ class InspireBridge():
             self.kp = Joints.Hand_L.default_kp_list()
             self.kd = Joints.Hand_L.default_kd_list()
 
+        if l_r == "r":
+            for i, angle in enumerate(self.joint_angle_range):
+                print(f"{Joints.Hand_R.from_idx(i)}: {angle}")
+
         # Inspire message
         self.l_r = l_r
         self.hand_state = inspire_defaults.state()

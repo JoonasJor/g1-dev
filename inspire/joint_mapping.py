@@ -35,14 +35,14 @@ def expand(angles_6, forces_6, speeds_6, l_r="r"):
     speeds_12 = [0.0] * 12
 
     for i, (j1, j2) in enumerate(joint_mapping):
-        angles_12[j1] = angles_6[i] #/ 2
-        angles_12[j2] = angles_6[i] #/ 2
+        angles_12[j1] = angles_6[i]
+        angles_12[j2] = angles_6[i]
 
-        forces_12[j1] = forces_6[i] #/ 2
-        forces_12[j2] = forces_6[i] #/ 2
+        forces_12[j1] = forces_6[i]
+        forces_12[j2] = forces_6[i]
 
-        speeds_12[j1] = speeds_6[i] #/ 2
-        speeds_12[j2] = speeds_6[i] #/ 2
+        speeds_12[j1] = speeds_6[i]
+        speeds_12[j2] = speeds_6[i]
 
     return angles_12, forces_12, speeds_12
 
@@ -60,10 +60,10 @@ def compress(angles_12, forces_12, l_r="r"):
     forces_6 = [0] * 6
 
     for i, (j1, j2) in enumerate(joint_mapping):
-        #angles_6[i] = round((angles_12[j1] + angles_12[j2]) / 2)
-        #forces_6[i] = round((forces_12[j1] + forces_12[j2]) / 2)
+        angles_6[i] = round((angles_12[j1] + angles_12[j2]) / 2)
+        forces_6[i] = round((forces_12[j1] + forces_12[j2]) / 2)
 
-        angles_6[i] = round((angles_12[j1] + angles_12[j2]))
-        forces_6[i] = round((forces_12[j1] + forces_12[j2]))
+        #angles_6[i] = round((angles_12[j1] + angles_12[j2]))
+        #forces_6[i] = round((forces_12[j1] + forces_12[j2]))
 
     return angles_6, forces_6

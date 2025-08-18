@@ -8,9 +8,18 @@ from unitree_sdk2py.core.channel import ChannelFactoryInitialize
 import config as Cfg
 import g1_joints as Joints
 
-def demo_hands(hand: HandController):
-    print("Closing hand...")
-    angles = [1000] * 6
+def pinch(hand: HandController):
+    print("Opening hand...")
+    angles = [0] * 6
+    hand.low_cmd_control(
+        target_angles=angles,
+        duration=3.0
+    )
+
+    print("Pinching with index and thumb...")
+    # Pinky, Ring, Middle, Index, Thumb-bend, Thumb-rotation
+    # 0 - 1000
+    angles = [0, 0, 0, 700, 700, 1000]
     hand.low_cmd_control(
         target_angles=angles,
         duration=3.0
@@ -67,4 +76,8 @@ if __name__ == '__main__':
         
     hand_controller_r = HandController("r")
     hand_controller_l = HandController("l")
+
     hands_loop(hand_controller_r, hand_controller_l)
+
+    #pinch(hand_controller_r)
+    #pinch(hand_controller_l)

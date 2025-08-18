@@ -26,6 +26,20 @@ class JointMixin:
         return joint_angle_range, joint_force_range
     
     @classmethod
+    def from_mujoco_idx(cls, mujoco_idx):
+        for joint in cls:
+            if joint.value.mujoco_idx == mujoco_idx:
+                return joint
+        raise ValueError(f"No joint with mujoco_idx={mujoco_idx}")
+
+    @classmethod
+    def from_idx(cls, idx):
+        for joint in cls:
+            if joint.value.idx == idx:
+                return joint
+        raise ValueError(f"No joint with idx={idx}")
+    
+    @classmethod
     def mujoco_idx_list(cls):
         """Return a list of mujoco indices in definition order."""
         return [joint.value.mujoco_idx for joint in cls]
@@ -106,32 +120,32 @@ class Body(JointMixin, Enum):
     RightWristYaw       = Joint(mujoco_idx=40, idx=28, default_angle=0.0,     default_kp=40,  default_kd=1)
 
 class Hand_L(JointMixin, Enum):
-    LeftThumb1          = Joint(mujoco_idx=22, idx=0,  default_angle=500,     default_kp=5, default_kd=0.5)
-    LeftThumb2          = Joint(mujoco_idx=23, idx=1,  default_angle=500,     default_kp=5, default_kd=0.5)
-    LeftThumb3          = Joint(mujoco_idx=24, idx=2,  default_angle=500,     default_kp=5, default_kd=0.5)
-    LeftThumb4          = Joint(mujoco_idx=25, idx=3,  default_angle=500,     default_kp=5, default_kd=0.5)
-    LeftIndex1          = Joint(mujoco_idx=26, idx=4,  default_angle=500,     default_kp=5, default_kd=0.5)
-    LeftIndex2          = Joint(mujoco_idx=27, idx=5,  default_angle=500,     default_kp=5, default_kd=0.5)
-    LeftMiddle1         = Joint(mujoco_idx=28, idx=6,  default_angle=500,     default_kp=5, default_kd=0.5)
-    LeftMiddle2         = Joint(mujoco_idx=29, idx=7,  default_angle=500,     default_kp=5, default_kd=0.5)
-    LeftRing1           = Joint(mujoco_idx=30, idx=8,  default_angle=500,     default_kp=5, default_kd=0.5)
-    LeftRing2           = Joint(mujoco_idx=31, idx=9,  default_angle=500,     default_kp=5, default_kd=0.5)
-    LeftLittle1         = Joint(mujoco_idx=32, idx=10, default_angle=500,     default_kp=5, default_kd=0.5)
-    LeftLittle2         = Joint(mujoco_idx=33, idx=11, default_angle=500,     default_kp=5, default_kd=0.5)
+    LeftThumb1          = Joint(mujoco_idx=22, idx=0,  default_angle=500,     default_kp=10, default_kd=0.5)
+    LeftThumb2          = Joint(mujoco_idx=23, idx=1,  default_angle=500,     default_kp=10, default_kd=0.5)
+    LeftThumb3          = Joint(mujoco_idx=24, idx=2,  default_angle=500,     default_kp=10, default_kd=0.5)
+    LeftThumb4          = Joint(mujoco_idx=25, idx=3,  default_angle=500,     default_kp=10, default_kd=0.5)
+    LeftIndex1          = Joint(mujoco_idx=26, idx=4,  default_angle=500,     default_kp=10, default_kd=0.5)
+    LeftIndex2          = Joint(mujoco_idx=27, idx=5,  default_angle=500,     default_kp=10, default_kd=0.5)
+    LeftMiddle1         = Joint(mujoco_idx=28, idx=6,  default_angle=500,     default_kp=10, default_kd=0.5)
+    LeftMiddle2         = Joint(mujoco_idx=29, idx=7,  default_angle=500,     default_kp=10, default_kd=0.5)
+    LeftRing1           = Joint(mujoco_idx=30, idx=8,  default_angle=500,     default_kp=10, default_kd=0.5)
+    LeftRing2           = Joint(mujoco_idx=31, idx=9,  default_angle=500,     default_kp=10, default_kd=0.5)
+    LeftLittle1         = Joint(mujoco_idx=32, idx=10, default_angle=500,     default_kp=10, default_kd=0.5)
+    LeftLittle2         = Joint(mujoco_idx=33, idx=11, default_angle=500,     default_kp=10, default_kd=0.5)
 
 class Hand_R(JointMixin, Enum):
-    RightThumb1         = Joint(mujoco_idx=41, idx=0,  default_angle=500,     default_kp=5, default_kd=0.5)
-    RightThumb2         = Joint(mujoco_idx=42, idx=1,  default_angle=500,     default_kp=5, default_kd=0.5)
-    RightThumb3         = Joint(mujoco_idx=43, idx=2,  default_angle=500,     default_kp=5, default_kd=0.5)
-    RightThumb4         = Joint(mujoco_idx=44, idx=3,  default_angle=500,     default_kp=5, default_kd=0.5)
-    RightIndex1         = Joint(mujoco_idx=45, idx=4,  default_angle=500,     default_kp=5, default_kd=0.5)
-    RightIndex2         = Joint(mujoco_idx=46, idx=5,  default_angle=500,     default_kp=5, default_kd=0.5)
-    RightMiddle1        = Joint(mujoco_idx=47, idx=6,  default_angle=500,     default_kp=5, default_kd=0.5)
-    RightMiddle2        = Joint(mujoco_idx=48, idx=7,  default_angle=500,     default_kp=5, default_kd=0.5)
-    RightRing1          = Joint(mujoco_idx=49, idx=8,  default_angle=500,     default_kp=5, default_kd=0.5)
-    RightRing2          = Joint(mujoco_idx=50, idx=9,  default_angle=500,     default_kp=5, default_kd=0.5)
-    RightLittle1        = Joint(mujoco_idx=51, idx=10, default_angle=500,     default_kp=5, default_kd=0.5)
-    RightLittle2        = Joint(mujoco_idx=52, idx=11, default_angle=500,     default_kp=5, default_kd=0.5)
+    RightThumb1         = Joint(mujoco_idx=41, idx=0,  default_angle=500,     default_kp=10, default_kd=0.5)
+    RightThumb2         = Joint(mujoco_idx=42, idx=1,  default_angle=500,     default_kp=10, default_kd=0.5)
+    RightThumb3         = Joint(mujoco_idx=43, idx=2,  default_angle=500,     default_kp=10, default_kd=0.5)
+    RightThumb4         = Joint(mujoco_idx=44, idx=3,  default_angle=500,     default_kp=10, default_kd=0.5)
+    RightIndex1         = Joint(mujoco_idx=45, idx=4,  default_angle=500,     default_kp=10, default_kd=0.5)
+    RightIndex2         = Joint(mujoco_idx=46, idx=5,  default_angle=500,     default_kp=10, default_kd=0.5)
+    RightMiddle1        = Joint(mujoco_idx=47, idx=6,  default_angle=500,     default_kp=10, default_kd=0.5)
+    RightMiddle2        = Joint(mujoco_idx=48, idx=7,  default_angle=500,     default_kp=10, default_kd=0.5)
+    RightRing1          = Joint(mujoco_idx=49, idx=8,  default_angle=500,     default_kp=10, default_kd=0.5)
+    RightRing2          = Joint(mujoco_idx=50, idx=9,  default_angle=500,     default_kp=10, default_kd=0.5)
+    RightLittle1        = Joint(mujoco_idx=51, idx=10, default_angle=500,     default_kp=10, default_kd=0.5)
+    RightLittle2        = Joint(mujoco_idx=52, idx=11, default_angle=500,     default_kp=10, default_kd=0.5)
 
 def get_joint_ranges(mj_model, l_r):
     """
