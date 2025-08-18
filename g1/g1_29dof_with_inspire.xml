@@ -283,13 +283,13 @@
 
                           <body name="left_thumb_1" pos="0.1104 -0.02101 0.0269" quat="3.17467e-11 0.707107 -3.17467e-11 0.707107">
                             <inertial pos="0.000892587 0.000344905 0.00159994" quat="0.985466 0.00605548 0.115048 0.124838" mass="0.00746" diaginertia="1.34891e-07 1.09691e-07 6.68155e-08"/>
-                            <joint name="left_thumb_1_joint" pos="0 0 0" axis="0 0 1" range="0 1.1641" actuatorfrcrange="-1.4 1.4" class="finger_motor"/>
+                            <joint name="left_thumb_1_joint" pos="0 0 0" axis="0 0 1" range="0 1.308" actuatorfrcrange="-2.4 2.4" class="finger_motor"/>
                             <geom type="mesh" contype="0" conaffinity="0" group="1" density="0" rgba="0.7 0.7 0.7 1" mesh="left_thumb_1"/>
                             <geom type="mesh" rgba="0.7 0.7 0.7 1" mesh="left_thumb_1"/>
 
                             <body name="left_thumb_2" pos="0.0073431 0.011232 0.0052" quat="0.0922934 0.0922938 -0.701059 -0.701056">
                               <inertial pos="-0.0137251 0.0122134 -0.00884794" quat="0.477951 0.518916 -0.481078 0.520435" mass="0.04364" diaginertia="1.5573e-06 1.25265e-06 1.02731e-06"/>
-                              <joint name="left_thumb_2_joint" pos="0 0 0" axis="0 0 -1" range="0 0.5864" actuatorfrcrange="-1.4 1.4" class="finger_motor"/>
+                              <joint name="left_thumb_2_joint" pos="0 0 0" axis="0 0 -1" range="0 0.6" actuatorfrcrange="-2.4 2.4" class="finger_motor"/>
                               <geom type="mesh" contype="0" conaffinity="0" group="1" density="0" rgba="0.7 0.7 0.7 1" mesh="left_thumb_2"/>
                               <geom type="mesh" rgba="0.7 0.7 0.7 1" mesh="left_thumb_2"/>
                               <geom pos="-0.0087121 0.026305 -0.0089605" quat="0.405917 -0.578993 -0.405916 -0.578991" type="mesh" contype="0" conaffinity="0" group="1" density="0" rgba="0.411765 0.411765 0.411765 1" mesh="left_thumb_force_sensor_1"/>
@@ -298,7 +298,7 @@
 
                               <body name="left_thumb_3" pos="-0.031403 0.021069 -0.001299">
                                 <inertial pos="-0.0109571 0.00498989 -0.00765497" quat="0.685507 0.683717 0.174884 0.178961" mass="0.01601" diaginertia="7.1124e-07 6.63577e-07 4.42249e-07"/>
-                                <joint name="left_thumb_3_joint" pos="0 0 0" axis="0 0 -1" range="0 0.5" actuatorfrcrange="-1.4 1.4" class="finger_motor"/>
+                                <joint name="left_thumb_3_joint" pos="0 0 0" axis="0 0 -1" range="0 0.8" actuatorfrcrange="-2.4 2.4" class="finger_motor"/>
                                 <geom type="mesh" contype="0" conaffinity="0" group="1" density="0" rgba="0.7 0.7 0.7 1" mesh="left_thumb_3"/>
                                 <geom type="mesh" rgba="0.7 0.7 0.7 1" mesh="left_thumb_3"/>
                                 <geom pos="-0.011771 0.01699 -0.0077514" quat="0.428302 -0.562766 -0.428175 -0.562599" type="mesh" contype="0" conaffinity="0" group="1" density="0" rgba="0.411765 0.411765 0.411765 1" mesh="left_thumb_force_sensor_2"/>
@@ -307,7 +307,7 @@
 
                                 <body name="left_thumb_4" pos="-0.021903 0.012816 -0.0003">
                                   <inertial pos="-0.0172132 0.0069311 -0.00734857" quat="0.642678 0.633963 0.31327 0.294819" mass="0.01172" diaginertia="1.21424e-06 1.211e-06 4.76312e-07"/>
-                                  <joint name="left_thumb_4_joint" pos="0 0 0" axis="0 0 -1" range="0 3.14" actuatorfrcrange="-1.4 1.4" class="finger_motor"/>
+                                  <joint name="left_thumb_4_joint" pos="0 0 0" axis="0 0 -1" range="0 0.4" actuatorfrcrange="-2.4 2.4" class="finger_motor"/>
                                   <geom type="mesh" contype="0" conaffinity="0" group="1" density="0" rgba="0.7 0.7 0.7 1" mesh="left_thumb_4"/>
                                   <geom type="mesh" rgba="0.7 0.7 0.7 1" mesh="left_thumb_4"/>
                                   <geom pos="-0.014598 0.014721 -0.0073103" quat="0.348432 -0.615302 -0.348433 -0.615299" type="mesh" contype="0" conaffinity="0" group="1" density="0" rgba="0.411765 0.411765 0.411765 1" mesh="left_thumb_force_sensor_3"/>
@@ -322,7 +322,7 @@
                           </body>
                           <body name="left_index_1" pos="0.1979 -0.00056467 0.038679" quat="0.0123384 0.706999 0.706999 0.0123358">
                             <inertial pos="-0.00250992 0.0129748 0.00664964" quat="0.439677 0.553751 -0.439774 0.553753" mass="0.02941" diaginertia="1.30721e-06 1.21401e-06 6.04123e-07"/>
-                            <joint name="left_index_1_joint" pos="0 0 0" axis="0 0 1" range="0 1.4381" actuatorfrcrange="-1.4 1.4" class="finger_motor"/>
+                            <joint name="left_index_1_joint" pos="0 0 0" axis="0 0 1" range="0 1.47" actuatorfrcrange="-1.4 1.4" class="finger_motor"/>
                             <geom type="mesh" contype="0" conaffinity="0" group="1" density="0" rgba="0.7 0.7 0.7 1" mesh="left_index_1"/>
                             <geom type="mesh" rgba="0.7 0.7 0.7 1" mesh="left_index_1"/>
                             <geom pos="-0.012046 0.019649 0.006651" quat="0.701686 -0.0622873 -0.704358 -0.0873853" type="mesh" contype="0" conaffinity="0" group="1" density="0" rgba="0.411765 0.411765 0.411765 1" mesh="left_index_force_sensor_1"/>
@@ -331,7 +331,7 @@
 
                             <body name="left_index_2" pos="-0.0034259 0.032596 0.00055">
                               <inertial pos="-0.000626474 0.0280667 0.00609282" quat="0.701665 0.701206 0.09417 0.0843125" mass="0.01418" diaginertia="3.02123e-06 2.99824e-06 3.20601e-07"/>
-                              <joint name="left_index_2_joint" pos="0 0 0" axis="0 0 1" range="0 3.14" actuatorfrcrange="-1.4 1.4" class="finger_motor"/>
+                              <joint name="left_index_2_joint" pos="0 0 0" axis="0 0 1" range="-0.04545 1.56" actuatorfrcrange="-1.4 1.4" class="finger_motor"/>
                               <geom type="mesh" contype="0" conaffinity="0" group="1" density="0" rgba="0.7 0.7 0.7 1" mesh="left_index_2"/>
                               <geom type="mesh" rgba="0.7 0.7 0.7 1" mesh="left_index_2"/>
                               <geom pos="-0.0081655 0.037446 0.0060795" quat="0.698536 0.13559 -0.693985 0.109758" type="mesh" contype="0" conaffinity="0" group="1" density="0" rgba="0.411765 0.411765 0.411765 1" mesh="left_index_force_sensor_2"/>
@@ -344,7 +344,7 @@
                           </body>
                           <body name="left_middle_1" pos="0.1985 -0.00056467 0.0171" quat="-3.35511e-11 0.707107 0.707107 -2.59738e-06">
                             <inertial pos="-0.00250992 0.0129748 0.00664964" quat="0.439677 0.553752 -0.439774 0.553753" mass="0.02941" diaginertia="1.30721e-06 1.21401e-06 6.04123e-07"/>
-                            <joint name="left_middle_1_joint" pos="0 0 0" axis="0 0 1" range="0 1.4381" actuatorfrcrange="-1.4 1.4" class="finger_motor"/>
+                            <joint name="left_middle_1_joint" pos="0 0 0" axis="0 0 1" range="0 1.47" actuatorfrcrange="-1.4 1.4" class="finger_motor"/>
                             <geom type="mesh" contype="0" conaffinity="0" group="1" density="0" rgba="0.7 0.7 0.7 1" mesh="left_middle_1"/>
                             <geom type="mesh" rgba="0.7 0.7 0.7 1" mesh="left_middle_1"/>
                             <geom pos="-0.012046 0.019649 0.006651" quat="0.703134 -0.0748456 -0.703135 -0.0748437" type="mesh" contype="0" conaffinity="0" group="1" density="0" rgba="0.411765 0.411765 0.411765 1" mesh="left_middle_force_sensor_1"/>
@@ -353,7 +353,7 @@
 
                             <body name="left_middle_2" pos="-0.0034259 0.032596 0.00055">
                               <inertial pos="-0.00107477 0.0294281 0.00610061" quat="0.701781 0.701802 0.0864606 0.0866151" mass="0.01761" diaginertia="3.67118e-06 3.64911e-06 3.507e-07"/>
-                              <joint name="left_middle_2_joint" pos="0 0 0" axis="0 0 1" range="0 3.14" actuatorfrcrange="-1.4 1.4" class="finger_motor"/>
+                              <joint name="left_middle_2_joint" pos="0 0 0" axis="0 0 1" range="-0.04545 1.56" actuatorfrcrange="-1.4 1.4" class="finger_motor"/>
                               <geom type="mesh" contype="0" conaffinity="0" group="1" density="0" rgba="0.7 0.7 0.7 1" mesh="left_middle_2"/>
                               <geom type="mesh" rgba="0.7 0.7 0.7 1" mesh="left_middle_2"/>
                               <geom pos="-0.009086 0.040962 0.0061003" quat="0.694858 0.131041 -0.694858 0.131044" type="mesh" contype="0" conaffinity="0" group="1" density="0" rgba="0.411765 0.411765 0.411765 1" mesh="left_middle_force_sensor_2"/>
@@ -366,7 +366,7 @@
                           </body>
                           <body name="left_ring_1" pos="0.19833 -0.00056467 -0.0045302" quat="-0.0185241 0.706864 0.706864 -0.0185267">
                             <inertial pos="-0.00250992 0.0129748 0.00664964" quat="0.439676 0.553751 -0.439774 0.553754" mass="0.02941" diaginertia="1.30721e-06 1.21401e-06 6.04123e-07"/>
-                            <joint name="left_ring_1_joint" pos="0 0 0" axis="0 0 1" range="0 1.4381" actuatorfrcrange="-1.4 1.4" class="finger_motor"/>
+                            <joint name="left_ring_1_joint" pos="0 0 0" axis="0 0 1" range="0 1.47" actuatorfrcrange="-1.4 1.4" class="finger_motor"/>
                             <geom type="mesh" contype="0" conaffinity="0" group="1" density="0" rgba="0.7 0.7 0.7 1" mesh="left_ring_1"/>
                             <geom type="mesh" rgba="0.7 0.7 0.7 1" mesh="left_ring_1"/>
                             <geom pos="-0.012046 0.019649 0.006651" quat="0.704887 -0.0936618 -0.700876 -0.0559809" type="mesh" contype="0" conaffinity="0" group="1" density="0" rgba="0.411765 0.411765 0.411765 1" mesh="left_ring_force_sensor_1"/>
@@ -375,7 +375,7 @@
 
                             <body name="left_ring_2" pos="-0.0034259 0.032596 0.00055">
                               <inertial pos="-0.000577147 0.0279507 0.00609282" quat="0.701659 0.701185 0.0943227 0.0843616" mass="0.01481" diaginertia="3.02641e-06 3.00354e-06 3.20717e-07"/>
-                              <joint name="left_ring_2_joint" pos="0 0 0" axis="0 0 1" range="0 3.14" actuatorfrcrange="-1.4 1.4" class="finger_motor"/>
+                              <joint name="left_ring_2_joint" pos="0 0 0" axis="0 0 1" range="-0.04545 1.56" actuatorfrcrange="-1.4 1.4" class="finger_motor"/>
                               <geom type="mesh" contype="0" conaffinity="0" group="1" density="0" rgba="0.7 0.7 0.7 1" mesh="left_ring_2"/>
                               <geom type="mesh" rgba="0.7 0.7 0.7 1" mesh="left_ring_2"/>
                               <geom pos="-0.0081655 0.037446 0.0060795" quat="0.692694 0.103257 -0.699527 0.142038" type="mesh" contype="0" conaffinity="0" group="1" density="0" rgba="0.411765 0.411765 0.411765 1" mesh="left_ring_force_sensor_2"/>
@@ -388,7 +388,7 @@
                           </body>
                           <body name="left_little_1" pos="0.19515 -0.00056467 -0.025916" quat="-0.0370001 0.706138 0.706138 -0.0370027">
                             <inertial pos="-0.00250992 0.0129748 0.00664964" quat="0.439676 0.553751 -0.439774 0.553754" mass="0.02941" diaginertia="1.30721e-06 1.21401e-06 6.04123e-07"/>
-                            <joint name="left_little_1_joint" pos="0 0 0" axis="0 0 1" range="0 1.4381" actuatorfrcrange="-1.4 1.4" class="finger_motor"/>
+                            <joint name="left_little_1_joint" pos="0 0 0" axis="0 0 1" range="0 1.47" actuatorfrcrange="-1.4 1.4" class="finger_motor"/>
                             <geom type="mesh" contype="0" conaffinity="0" group="1" density="0" rgba="0.7 0.7 0.7 1" mesh="left_little_1"/>
                             <geom type="mesh" rgba="0.7 0.7 0.7 1" mesh="left_little_1"/>
                             <geom pos="-0.012046 0.019649 0.006651" quat="0.706132 -0.112374 -0.69812 -0.0371073" type="mesh" contype="0" conaffinity="0" group="1" density="0" rgba="0.411765 0.411765 0.411765 1" mesh="left_little_force_sensor_1"/>
@@ -397,7 +397,7 @@
 
                             <body name="left_little_2" pos="-0.0034259 0.032596 0.00055">
                               <inertial pos="0.000187955 0.0230759 0.00610195" quat="0.699781 0.700085 0.0999008 0.10103" mass="0.01157" diaginertia="1.69359e-06 1.66542e-06 2.4011e-07"/>
-                              <joint name="left_little_2_joint" pos="0 0 0" axis="0 0 1" range="0 3.14" actuatorfrcrange="-1.4 1.4" class="finger_motor"/>
+                              <joint name="left_little_2_joint" pos="0 0 0" axis="0 0 1" range="-0.04545 1.56" actuatorfrcrange="-1.4 1.4" class="finger_motor"/>
                               <geom type="mesh" contype="0" conaffinity="0" group="1" density="0" rgba="0.7 0.7 0.7 1" mesh="left_little_2"/>
                               <geom type="mesh" rgba="0.7 0.7 0.7 1" mesh="left_little_2"/>
                               <geom pos="-0.0064514 0.027683 0.0061172" quat="0.689046 0.0814204 -0.702404 0.158792" type="mesh" contype="0" conaffinity="0" group="1" density="0" rgba="0.411765 0.411765 0.411765 1" mesh="left_little_force_sensor_2"/>
@@ -464,13 +464,13 @@
 
                           <body name="right_thumb_1" pos="0.1104 0.02101 0.0269" quat="0.707107 0 0.707107 0">
                             <inertial pos="-0.000892587 0.000344906 0.00159994" quat="0.985466 0.0060554 -0.115048 -0.124838" mass="0.00746" diaginertia="1.34891e-07 1.09691e-07 6.68155e-08"/>
-                            <joint name="right_thumb_1_joint" pos="0 0 0" axis="0 0 -1" range="0 1.1641" actuatorfrcrange="-1.4 1.4" class="finger_motor"/>
+                            <joint name="right_thumb_1_joint" pos="0 0 0" axis="0 0 -1" range="0 1.308" actuatorfrcrange="-2.4 2.4" class="finger_motor"/>
                             <geom type="mesh" contype="0" conaffinity="0" group="1" density="0" rgba="0.7 0.7 0.7 1" mesh="right_thumb_1"/>
                             <geom type="mesh" rgba="0.7 0.7 0.7 1" mesh="right_thumb_1"/>
 
                             <body name="right_thumb_2" pos="-0.0079252 0.0090599 0.0052" quat="0.0922934 0.0922938 0.701059 0.701056">
                               <inertial pos="0.0137224 0.0122221 -0.00660616" quat="0.520455 0.480802 -0.518888 0.478238" mass="0.04364" diaginertia="1.55793e-06 1.25338e-06 1.02798e-06"/>
-                              <joint name="right_thumb_2_joint" pos="0 0 0" axis="0 0 1" range="0 0.5864" actuatorfrcrange="-1.4 1.4" class="finger_motor"/>
+                              <joint name="right_thumb_2_joint" pos="0 0 0" axis="0 0 1" range="0 0.6" actuatorfrcrange="-2.4 2.4" class="finger_motor"/>
                               <geom type="mesh" contype="0" conaffinity="0" group="1" density="0" rgba="0.7 0.7 0.7 1" mesh="right_thumb_2"/>
                               <geom type="mesh" rgba="0.7 0.7 0.7 1" mesh="right_thumb_2"/>
                               <geom pos="0.0087121 0.026305 -0.0067115" quat="0.579327 -0.405437 -0.579328 -0.405439" type="mesh" contype="0" conaffinity="0" group="1" density="0" rgba="0.411765 0.411765 0.411765 1" mesh="right_thumb_force_sensor_1"/>
@@ -479,7 +479,7 @@
 
                               <body name="right_thumb_3" pos="0.031403 0.021069 0.00095">
                                 <inertial pos="0.0109569 0.00499005 -0.00765141" quat="0.684928 0.684293 -0.174121 -0.179721" mass="0.01601" diaginertia="7.11249e-07 6.63565e-07 4.4224e-07"/>
-                                <joint name="right_thumb_3_joint" pos="0 0 0" axis="0 0 1" range="0 0.5" actuatorfrcrange="-1.4 1.4" class="finger_motor"/>
+                                <joint name="right_thumb_3_joint" pos="0 0 0" axis="0 0 1" range="0 0.8" actuatorfrcrange="-2.4 2.4" class="finger_motor"/>
                                 <geom type="mesh" contype="0" conaffinity="0" group="1" density="0" rgba="0.7 0.7 0.7 1" mesh="right_thumb_3"/>
                                 <geom type="mesh" rgba="0.7 0.7 0.7 1" mesh="right_thumb_3"/>
                                 <geom pos="0.011771 0.01699 -0.0077514" quat="-0.562601 0.428173 0.562767 0.4283" type="mesh" contype="0" conaffinity="0" group="1" density="0" rgba="0.411765 0.411765 0.411765 1" mesh="right_thumb_force_sensor_2"/>
@@ -488,7 +488,7 @@
 
                                 <body name="right_thumb_4" pos="0.021903 0.012816 -0.0003">
                                   <inertial pos="0.0172139 0.00693067 -0.00734858" quat="0.313062 0.295147 0.642539 0.634053" mass="0.01172" diaginertia="1.21428e-06 1.21102e-06 4.76293e-07"/>
-                                  <joint name="right_thumb_4_joint" pos="0 0 0" axis="0 0 1" range="0 3.14" actuatorfrcrange="-1.4 1.4" class="finger_motor"/>
+                                  <joint name="right_thumb_4_joint" pos="0 0 0" axis="0 0 1" range="0 0.4" actuatorfrcrange="-2.4 2.4" class="finger_motor"/>
                                   <geom type="mesh" contype="0" conaffinity="0" group="1" density="0" rgba="0.7 0.7 0.7 1" mesh="right_thumb_4"/>
                                   <geom type="mesh" rgba="0.7 0.7 0.7 1" mesh="right_thumb_4"/>
                                   <geom pos="0.014598 0.01472 -0.0073103" quat="0.615658 -0.347798 -0.615661 -0.347797" type="mesh" contype="0" conaffinity="0" group="1" density="0" rgba="0.411765 0.411765 0.411765 1" mesh="right_thumb_force_sensor_3"/>
@@ -503,7 +503,7 @@
                           </body>
                           <body name="right_index_1" pos="0.1979 0.00056467 0.038679" quat="0.706999 0.0123384 -0.012341 -0.706999">
                             <inertial pos="-0.00250946 0.0129756 -0.00664945" quat="0.43978 0.553736 -0.43972 0.55373" mass="0.02941" diaginertia="1.3073e-06 1.21406e-06 6.04179e-07"/>
-                            <joint name="right_index_1_joint" pos="0 0 0" axis="0 0 1" range="0 1.4381" actuatorfrcrange="-1.4 1.4" class="finger_motor"/>
+                            <joint name="right_index_1_joint" pos="0 0 0" axis="0 0 1" range="0 1.47" actuatorfrcrange="-1.4 1.4" class="finger_motor"/>
                             <geom type="mesh" contype="0" conaffinity="0" group="1" density="0" rgba="0.7 0.7 0.7 1" mesh="right_index_1"/>
                             <geom type="mesh" rgba="0.7 0.7 0.7 1" mesh="right_index_1"/>
                             <geom pos="-0.012046 0.019649 -0.006651" quat="0.704358 -0.0873853 -0.701686 -0.0622873" type="mesh" contype="0" conaffinity="0" group="1" density="0" rgba="0.411765 0.411765 0.411765 1" mesh="right_index_force_sensor_1"/>
@@ -512,7 +512,7 @@
 
                             <body name="right_index_2" pos="-0.0034259 0.032596 -0.00055">
                               <inertial pos="-0.000626825 0.0280689 -0.00609305" quat="0.701206 0.701662 0.0843061 0.0941982" mass="0.01418" diaginertia="3.02061e-06 2.99764e-06 3.20605e-07"/>
-                              <joint name="right_index_2_joint" pos="0 0 0" axis="0 0 1" range="0 3.14" actuatorfrcrange="-1.4 1.4" class="finger_motor"/>
+                              <joint name="right_index_2_joint" pos="0 0 0" axis="0 0 1" range="-0.04545 1.56" actuatorfrcrange="-1.4 1.4" class="finger_motor"/>
                               <geom type="mesh" contype="0" conaffinity="0" group="1" density="0" rgba="0.7 0.7 0.7 1" mesh="right_index_2"/>
                               <geom type="mesh" rgba="0.7 0.7 0.7 1" mesh="right_index_2"/>
                               <geom pos="-0.0081655 0.037446 -0.0060795" quat="0.693985 0.109758 -0.698536 0.13559" type="mesh" contype="0" conaffinity="0" group="1" density="0" rgba="0.411765 0.411765 0.411765 1" mesh="right_index_force_sensor_2"/>
@@ -525,7 +525,7 @@
                           </body>
                           <body name="right_middle_1" pos="0.1985 0.00056467 0.0171" quat="0.707107 3.3551e-11 -2.59738e-06 -0.707107">
                             <inertial pos="-0.00250946 0.0129756 -0.00664945" quat="0.439783 0.553733 -0.439724 0.553727" mass="0.02941" diaginertia="1.30729e-06 1.21404e-06 6.04186e-07"/>
-                            <joint name="right_middle_1_joint" pos="0 0 0" axis="0 0 1" range="0 1.4381" actuatorfrcrange="-1.4 1.4" class="finger_motor"/>
+                            <joint name="right_middle_1_joint" pos="0 0 0" axis="0 0 1" range="0 1.47" actuatorfrcrange="-1.4 1.4" class="finger_motor"/>
                             <geom type="mesh" contype="0" conaffinity="0" group="1" density="0" rgba="0.7 0.7 0.7 1" mesh="right_middle_1"/>
                             <geom type="mesh" rgba="0.7 0.7 0.7 1" mesh="right_middle_1"/>
                             <geom pos="-0.012046 0.019649 -0.006651" quat="-0.703076 0.0754056 0.703073 0.0754054" type="mesh" contype="0" conaffinity="0" group="1" density="0" rgba="0.411765 0.411765 0.411765 1" mesh="right_middle_force_sensor_1"/>
@@ -534,7 +534,7 @@
 
                             <body name="right_middle_2" pos="-0.0034259 0.032596 -0.00055">
                               <inertial pos="-0.0010746 0.0294269 -0.00610055" quat="0.701777 0.701805 0.086359 0.0867275" mass="0.01761" diaginertia="3.67099e-06 3.64893e-06 3.50671e-07"/>
-                              <joint name="right_middle_2_joint" pos="0 0 0" axis="0 0 1" range="0 3.14" actuatorfrcrange="-1.4 1.4" class="finger_motor"/>
+                              <joint name="right_middle_2_joint" pos="0 0 0" axis="0 0 1" range="-0.04545 1.56" actuatorfrcrange="-1.4 1.4" class="finger_motor"/>
                               <geom type="mesh" contype="0" conaffinity="0" group="1" density="0" rgba="0.7 0.7 0.7 1" mesh="right_middle_2"/>
                               <geom type="mesh" rgba="0.7 0.7 0.7 1" mesh="right_middle_2"/>
                               <geom pos="-0.0090859 0.040963 -0.0061003" quat="-0.695008 -0.130248 0.695006 -0.130249" type="mesh" contype="0" conaffinity="0" group="1" density="0" rgba="0.411765 0.411765 0.411765 1" mesh="right_middle_force_sensor_2"/>
@@ -547,7 +547,7 @@
                           </body>
                           <body name="right_ring_1" pos="0.19833 0.00056467 -0.0045302" quat="0.706864 -0.0185241 0.0185215 -0.706864">
                             <inertial pos="-0.00250947 0.0129756 -0.00664945" quat="0.43978 0.553736 -0.43972 0.553729" mass="0.02941" diaginertia="1.3073e-06 1.21405e-06 6.04182e-07"/>
-                            <joint name="right_ring_1_joint" pos="0 0 0" axis="0 0 1" range="0 1.4381" actuatorfrcrange="-1.4 1.4" class="finger_motor"/>
+                            <joint name="right_ring_1_joint" pos="0 0 0" axis="0 0 1" range="0 1.47" actuatorfrcrange="-1.4 1.4" class="finger_motor"/>
                             <geom type="mesh" contype="0" conaffinity="0" group="1" density="0" rgba="0.7 0.7 0.7 1" mesh="right_ring_1"/>
                             <geom type="mesh" rgba="0.7 0.7 0.7 1" mesh="right_ring_1"/>
                             <geom pos="-0.0120462 0.0196485 -0.00665098" quat="0.700879 -0.0559904 -0.704887 -0.0936441" type="mesh" contype="0" conaffinity="0" group="1" density="0" rgba="0.411765 0.411765 0.411765 1" mesh="right_ring_force_sensor_1"/>
@@ -556,7 +556,7 @@
 
                             <body name="right_ring_2" pos="-0.0034259 0.032596 -0.00055">
                               <inertial pos="-0.000577496 0.0279529 -0.00609306" quat="0.701185 0.701656 0.0843613 0.0943445" mass="0.01481" diaginertia="3.02577e-06 3.00292e-06 3.20723e-07"/>
-                              <joint name="right_ring_2_joint" pos="0 0 0" axis="0 0 1" range="0 3.14" actuatorfrcrange="-1.4 1.4" class="finger_motor"/>
+                              <joint name="right_ring_2_joint" pos="0 0 0" axis="0 0 1" range="-0.04545 1.56" actuatorfrcrange="-1.4 1.4" class="finger_motor"/>
                               <geom type="mesh" contype="0" conaffinity="0" group="1" density="0" rgba="0.7 0.7 0.7 1" mesh="right_ring_2"/>
                               <geom type="mesh" rgba="0.7 0.7 0.7 1" mesh="right_ring_2"/>
                               <geom pos="-0.00816549 0.0374458 -0.00607949" quat="0.699529 0.14203 -0.692696 0.103242" type="mesh" contype="0" conaffinity="0" group="1" density="0" rgba="0.411765 0.411765 0.411765 1" mesh="right_ring_force_sensor_2"/>
@@ -569,7 +569,7 @@
                           </body>
                           <body name="right_little_1" pos="0.19515 0.00056467 -0.025916" quat="0.706138 -0.0370001 0.0369975 -0.706138">
                             <inertial pos="-0.00250947 0.0129756 -0.00664944" quat="0.439779 0.553734 -0.439722 0.553731" mass="0.02941" diaginertia="1.3073e-06 1.21405e-06 6.04181e-07"/>
-                            <joint name="right_little_1_joint" pos="0 0 0" axis="0 0 1" range="0 1.4381" actuatorfrcrange="-1.4 1.4" class="finger_motor"/>
+                            <joint name="right_little_1_joint" pos="0 0 0" axis="0 0 1" range="0 1.47" actuatorfrcrange="-1.4 1.4" class="finger_motor"/>
                             <geom type="mesh" contype="0" conaffinity="0" group="1" density="0" rgba="0.7 0.7 0.7 1" mesh="right_little_1"/>
                             <geom type="mesh" rgba="0.7 0.7 0.7 1" mesh="right_little_1"/>
                             <geom pos="-0.0120462 0.0196485 -0.00665098" quat="0.698121 -0.0371013 -0.706133 -0.112372" type="mesh" contype="0" conaffinity="0" group="1" density="0" rgba="0.411765 0.411765 0.411765 1" mesh="right_little_force_sensor_1"/>
@@ -578,7 +578,7 @@
 
                             <body name="right_little_2" pos="-0.0034259 0.032596 -0.00055">
                               <inertial pos="0.000187954 0.0230755 -0.00610157" quat="0.700064 0.699803 0.100851 0.100075" mass="0.01157" diaginertia="1.69363e-06 1.66546e-06 2.40121e-07"/>
-                              <joint name="right_little_2_joint" pos="0 0 0" axis="0 0 1" range="0 3.14" actuatorfrcrange="-1.4 1.4" class="finger_motor"/>
+                              <joint name="right_little_2_joint" pos="0 0 0" axis="0 0 1" range="-0.04545 1.56" actuatorfrcrange="-1.4 1.4" class="finger_motor"/>
                               <geom type="mesh" contype="0" conaffinity="0" group="1" density="0" rgba="0.7 0.7 0.7 1" mesh="right_little_2"/>
                               <geom type="mesh" rgba="0.7 0.7 0.7 1" mesh="right_little_2"/>
                               <geom pos="-0.00645124 0.0276833 -0.00611719" quat="0.702403 0.158797 -0.689045 0.0814212" type="mesh" contype="0" conaffinity="0" group="1" density="0" rgba="0.411765 0.411765 0.411765 1" mesh="right_little_force_sensor_2"/>
@@ -634,10 +634,10 @@
     <motor name="left_wrist_yaw_joint" joint="left_wrist_yaw_joint" ctrlrange="-5 5"/>
 
     <!-- Left fingers -->
-    <motor name="left_thumb_1_joint" joint="left_thumb_1_joint" ctrlrange="-1.4 1.4"/>
-    <motor name="left_thumb_2_joint" joint="left_thumb_2_joint" ctrlrange="-1.4 1.4"/>
-    <motor name="left_thumb_3_joint" joint="left_thumb_3_joint" ctrlrange="-1.4 1.4"/>
-    <motor name="left_thumb_4_joint" joint="left_thumb_4_joint" ctrlrange="-1.4 1.4"/>
+    <motor name="left_thumb_1_joint" joint="left_thumb_1_joint" ctrlrange="-2.4 2.4"/>
+    <motor name="left_thumb_2_joint" joint="left_thumb_2_joint" ctrlrange="-2.4 2.4"/>
+    <motor name="left_thumb_3_joint" joint="left_thumb_3_joint" ctrlrange="-2.4 2.4"/>
+    <motor name="left_thumb_4_joint" joint="left_thumb_4_joint" ctrlrange="-2.4 2.4"/>
     <motor name="left_index_1_joint" joint="left_index_1_joint" ctrlrange="-1.4 1.4"/>
     <motor name="left_index_2_joint" joint="left_index_2_joint" ctrlrange="-1.4 1.4"/>
     <motor name="left_middle_1_joint" joint="left_middle_1_joint" ctrlrange="-1.4 1.4"/>
@@ -657,10 +657,10 @@
     <motor name="right_wrist_yaw_joint" joint="right_wrist_yaw_joint" ctrlrange="-5 5"/>
 
     <!-- Right fingers -->
-    <motor name="right_thumb_1_joint" joint="right_thumb_1_joint" ctrlrange="-1.4 1.4"/>
-    <motor name="right_thumb_2_joint" joint="right_thumb_2_joint" ctrlrange="-1.4 1.4"/>
-    <motor name="right_thumb_3_joint" joint="right_thumb_3_joint" ctrlrange="-1.4 1.4"/>
-    <motor name="right_thumb_4_joint" joint="right_thumb_4_joint" ctrlrange="-1.4 1.4"/>
+    <motor name="right_thumb_1_joint" joint="right_thumb_1_joint" ctrlrange="-2.4 2.4"/>
+    <motor name="right_thumb_2_joint" joint="right_thumb_2_joint" ctrlrange="-2.4 2.4"/>
+    <motor name="right_thumb_3_joint" joint="right_thumb_3_joint" ctrlrange="-2.4 2.4"/>
+    <motor name="right_thumb_4_joint" joint="right_thumb_4_joint" ctrlrange="-2.4 2.4"/>
     <motor name="right_index_1_joint" joint="right_index_1_joint" ctrlrange="-1.4 1.4"/>
     <motor name="right_index_2_joint" joint="right_index_2_joint" ctrlrange="-1.4 1.4"/>
     <motor name="right_middle_1_joint" joint="right_middle_1_joint" ctrlrange="-1.4 1.4"/>
