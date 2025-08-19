@@ -20,7 +20,7 @@ TOPIC_STATE = "rt/inspire_hand/state"
 TOPIC_TOUCH = "rt/inspire_hand/touch"
 
 class InspireBridge():
-    def __init__(self, mj_model, mj_data, l_r = "r"): # l = left hand, r = right hand
+    def __init__(self, mj_model, mj_data, l_r = "r"):
         self.mj_model = mj_model
         self.mj_data = mj_data
         self.dt = self.mj_model.opt.timestep
@@ -54,7 +54,7 @@ class InspireBridge():
         self.hand_touch_pub = ChannelPublisher(f"{TOPIC_TOUCH}/{l_r}", inspire_dds.inspire_hand_touch)
         self.hand_touch_pub.Init()
         self.hand_touch_thread = RecurrentThread(
-            interval=self.dt, target=self.PublishHandTouch, name=f"sim_handstate_{l_r}"
+            interval=0.2, target=self.PublishHandTouch, name=f"sim_handstate_{l_r}" # remember to change interval back to dt
         )
         self.hand_touch_thread.Start()
 
@@ -178,34 +178,36 @@ class InspireBridge():
             print("[PublishHandTouch] mj_data is None")
             return
         
-        # TODO: msg = self.mj_data.sensordata[force_sensor_index]
+        if self.l_r == "r":
+            sensors = Joints.TouchSensor_R
+        else:
+            sensors = Joints.TouchSensor_L
+        
+        if self.l_r == "l":
+            return
+        
+        touch_sensor_values = []
+        for sensor in sensors:
+            value = self.mj_data.sensordata[sensor.mujoco_idx]
+            touch_sensor_values.append(value)
+
+            print(f"{sensor.mujoco_idx}\t{sensor}:\t{value}")
+        print()
 
         return
 
-        for (var, addr, length, size) in HAND_TOUCH_DATA:
-            value = getattr(msg, var)
-            if value is not None:
-                matrix = np.array(value).reshape(size)
-                self.hand_touch[var]=matrix
-
-        self.hand_state_pub.Write(self.hand_state)
-
-        return
-
-        for i, joint_idx in enumerate(Joints.Hand_R.mujoco_idx_list()):
-            force_sensor_index = i + 3 * self.num_motor + joint_idx
+        for joint in joints:
+            q_index = joint.mujoco_idx
+            dq_index = joint.mujoco_idx + self.num_motor
+            tau_index = joint.mujoco_idx + 2 * self.num_motor
 
             try:
-                # for testing
-                # TODO: check whether left_little_force_sensor_1 corresponds to tip top or palm
-                #self.hand_touch_r[test_idx[i]] = self.mj_data.sensordata[force_sensor_index]
-                pass
+                angles_12[joint.idx] = self.mj_data.sensordata[q_index]
+
             except IndexError as e:
-                print(f"[PublishHandTouch] error: {e} - {i=}, {force_sensor_index=}")
-                print(f"{len(self.hand_state.angle_act)=}")
+                print(f"[PublishHandState_{self.l_r}] error: {e} - {i=}, {q_index=}, {dq_index=}, {tau_index=}")
+                print(f"{len(angles_12)=}")
                 print(f"{len(self.mj_data.sensordata)=}")
                 print(f"{self.num_motor=}")
-                
             except Exception as e:
-                print(f"[PublishHandTouch] error: {type(e).__name__}: {e}")  
-        self.hand_state_pub.Write(self.hand_state)
+                print(f"[PublishHandState_{self.l_r}] error: {type(e).__name__}: {e}")

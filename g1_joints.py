@@ -9,6 +9,11 @@ class Joint:
     default_kp: float
     default_kd: float
 
+@dataclass(frozen=True)
+class Sensor:
+    mujoco_idx: int   # Mujoco actuator/sensor index
+    idx: int    # Ordered index
+
 class JointMixin:
     @classmethod
     def get_joint_ranges(cls, mj_model):
@@ -146,6 +151,44 @@ class Hand_R(JointMixin, Enum):
     RightRing2          = Joint(mujoco_idx=50, idx=9,  default_angle=500,     default_kp=10, default_kd=0.5)
     RightLittle1        = Joint(mujoco_idx=51, idx=10, default_angle=500,     default_kp=10, default_kd=0.5)
     RightLittle2        = Joint(mujoco_idx=52, idx=11, default_angle=500,     default_kp=10, default_kd=0.5)
+
+class TouchSensor_L(JointMixin, Enum):
+    LeftThumbForceSensor1     = Sensor(mujoco_idx=159, idx=0)
+    LeftThumbForceSensor2     = Sensor(mujoco_idx=160, idx=1)
+    LeftThumbForceSensor3     = Sensor(mujoco_idx=161, idx=2)
+    LeftThumbForceSensor4     = Sensor(mujoco_idx=162, idx=3)
+    LeftIndexForceSensor1     = Sensor(mujoco_idx=163, idx=4)
+    LeftIndexForceSensor2     = Sensor(mujoco_idx=164, idx=5)
+    LeftIndexForceSensor3     = Sensor(mujoco_idx=165, idx=6)
+    LeftMiddleForceSensor1    = Sensor(mujoco_idx=166, idx=7)
+    LeftMiddleForceSensor2    = Sensor(mujoco_idx=167, idx=8)
+    LeftMiddleForceSensor3    = Sensor(mujoco_idx=168, idx=9)
+    LeftRingForceSensor1      = Sensor(mujoco_idx=169, idx=10)
+    LeftRingForceSensor2      = Sensor(mujoco_idx=170, idx=11)
+    LeftRingForceSensor3      = Sensor(mujoco_idx=171, idx=12)
+    LeftLittleForceSensor1    = Sensor(mujoco_idx=172, idx=13)
+    LeftLittleForceSensor2    = Sensor(mujoco_idx=173, idx=14)
+    LeftLittleForceSensor3    = Sensor(mujoco_idx=174, idx=15)
+    LeftPalmForceSensor       = Sensor(mujoco_idx=175, idx=16)
+
+class TouchSensor_R(JointMixin, Enum):
+    RightThumbForceSensor1    = Sensor(mujoco_idx=176, idx=0)
+    RightThumbForceSensor2    = Sensor(mujoco_idx=177, idx=1)
+    RightThumbForceSensor3    = Sensor(mujoco_idx=178, idx=2)
+    RightThumbForceSensor4    = Sensor(mujoco_idx=179, idx=3)
+    RightIndexForceSensor1    = Sensor(mujoco_idx=180, idx=4)
+    RightIndexForceSensor2    = Sensor(mujoco_idx=181, idx=5)
+    RightIndexForceSensor3    = Sensor(mujoco_idx=182, idx=6)
+    RightMiddleForceSensor1   = Sensor(mujoco_idx=183, idx=7)
+    RightMiddleForceSensor2   = Sensor(mujoco_idx=184, idx=8)
+    RightMiddleForceSensor3   = Sensor(mujoco_idx=185, idx=9)
+    RightRingForceSensor1     = Sensor(mujoco_idx=186, idx=10)
+    RightRingForceSensor2     = Sensor(mujoco_idx=187, idx=11)
+    RightRingForceSensor3     = Sensor(mujoco_idx=188, idx=12)
+    RightLittleForceSensor1   = Sensor(mujoco_idx=189, idx=13)
+    RightLittleForceSensor2   = Sensor(mujoco_idx=190, idx=14)
+    RightLittleForceSensor3   = Sensor(mujoco_idx=191, idx=15)
+    RightPalmForceSensor      = Sensor(mujoco_idx=192, idx=16)
 
 def get_joint_ranges(mj_model, l_r):
     """

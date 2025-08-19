@@ -19,11 +19,14 @@ def pinch(hand: HandController):
     print("Pinching with index and thumb...")
     # Pinky, Ring, Middle, Index, Thumb-bend, Thumb-rotation
     # 0 - 1000
-    angles = [0, 0, 0, 700, 700, 1000]
+    angles = [0, 0, 0, 700, 750, 1000]
     hand.low_cmd_control(
         target_angles=angles,
-        duration=3.0
+        duration=3.0,
+        wait_for_user_input=False
     )
+
+    return
 
     print("Opening hand...")
     angles = [0] * 6
@@ -77,7 +80,7 @@ if __name__ == '__main__':
     hand_controller_r = HandController("r")
     hand_controller_l = HandController("l")
 
-    hands_loop(hand_controller_r, hand_controller_l)
+    #hands_loop(hand_controller_r, hand_controller_l)
 
-    #pinch(hand_controller_r)
-    #pinch(hand_controller_l)
+    pinch(hand_controller_r)
+    pinch(hand_controller_l)
