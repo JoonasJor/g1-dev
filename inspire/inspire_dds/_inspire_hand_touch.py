@@ -16,22 +16,27 @@ import cyclonedds.idl.types as types
 @annotate.final
 @annotate.autoid("sequential")
 class inspire_hand_touch(idl.IdlStruct, typename="inspire.inspire_hand_touch"):
-    fingerone_tip_touch: types.sequence[types.int16, 9]
-    fingerone_top_touch: types.sequence[types.int16, 96]
-    fingerone_palm_touch: types.sequence[types.int16, 80]
-    fingertwo_tip_touch: types.sequence[types.int16, 9]
-    fingertwo_top_touch: types.sequence[types.int16, 96]
-    fingertwo_palm_touch: types.sequence[types.int16, 80]
-    fingerthree_tip_touch: types.sequence[types.int16, 9]
-    fingerthree_top_touch: types.sequence[types.int16, 96]
-    fingerthree_palm_touch: types.sequence[types.int16, 80]
-    fingerfour_tip_touch: types.sequence[types.int16, 9]
-    fingerfour_top_touch: types.sequence[types.int16, 96]
-    fingerfour_palm_touch: types.sequence[types.int16, 80]
-    fingerfive_tip_touch: types.sequence[types.int16, 9]
-    fingerfive_top_touch: types.sequence[types.int16, 96]
-    fingerfive_middle_touch: types.sequence[types.int16, 9]
-    fingerfive_palm_touch: types.sequence[types.int16, 96]
-    palm_touch: types.sequence[types.int16, 112]
+    little_tip_3: types.sequence[types.int16, 9]
+    little_top_2: types.sequence[types.int16, 96]
+    little_palm_1: types.sequence[types.int16, 80]
+
+    ring_tip_3: types.sequence[types.int16, 9]
+    ring_top_2: types.sequence[types.int16, 96]
+    ring_palm_1: types.sequence[types.int16, 80]
+
+    middle_tip_3: types.sequence[types.int16, 9]
+    middle_top_2: types.sequence[types.int16, 96]
+    middle_palm_1: types.sequence[types.int16, 80]
+
+    index_tip_3: types.sequence[types.int16, 9]
+    index_top_2: types.sequence[types.int16, 96]
+    index_palm_1: types.sequence[types.int16, 80]
+
+    thumb_tip_4: types.sequence[types.int16, 9]
+    thumb_top_3: types.sequence[types.int16, 96]
+    thumb_middle_2: types.sequence[types.int16, 9]
+    thumb_palm_1: types.sequence[types.int16, 96]
+
+    palm: types.sequence[types.int16, 112]
 
 

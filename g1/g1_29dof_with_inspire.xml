@@ -21,6 +21,10 @@
         </default>      
     </default>
 
+  <extension>
+    <plugin plugin="mujoco.sensor.touch_grid"/>
+  </extension>
+
   <asset>
     <mesh name="pelvis" file="pelvis.STL"/>
     <mesh name="pelvis_contour_link" file="pelvis_contour_link.STL"/>
@@ -857,51 +861,221 @@
     <jointactuatorfrc name="right_little_2_joint_torque" joint="right_little_2_joint"/>
 
     <!-- Inspire force sensors -->
-    <touch name="left_thumb_force_sensor_1" site="left_thumb_force_sensor_1" />
-    <touch name="left_thumb_force_sensor_2" site="left_thumb_force_sensor_2" />
-    <touch name="left_thumb_force_sensor_3" site="left_thumb_force_sensor_3" />
-    <touch name="left_thumb_force_sensor_4" site="left_thumb_force_sensor_4" />
+    <plugin name="left_thumb_sensor_palm" plugin="mujoco.sensor.touch_grid" objtype="site" objname="left_thumb_force_sensor_1">
+      <config key="nchannel" value="1"/>
+      <config key="size" value="12 8"/>
+      <config key="fov" value="90 90"/>
+      <config key="gamma" value="0"/>
+    </plugin>
+    <plugin name="left_thumb_sensor_middle" plugin="mujoco.sensor.touch_grid" objtype="site" objname="left_thumb_force_sensor_2">
+      <config key="nchannel" value="1"/>
+      <config key="size" value="3 3"/>
+      <config key="fov" value="90 90"/>
+      <config key="gamma" value="0"/>
+    </plugin>
+    <plugin name="left_thumb_sensor_top" plugin="mujoco.sensor.touch_grid" objtype="site" objname="left_thumb_force_sensor_3">
+      <config key="nchannel" value="1"/>
+      <config key="size" value="12 8"/>
+      <config key="fov" value="90 90"/>
+      <config key="gamma" value="0"/>
+    </plugin>
+    <plugin name="left_thumb_sensor_tip" plugin="mujoco.sensor.touch_grid" objtype="site" objname="left_thumb_force_sensor_4">
+      <config key="nchannel" value="1"/>
+      <config key="size" value="3 3"/>
+      <config key="fov" value="90 90"/>
+      <config key="gamma" value="0"/>
+    </plugin>
 
-    <touch name="left_index_force_sensor_1" site="left_index_force_sensor_1" />
-    <touch name="left_index_force_sensor_2" site="left_index_force_sensor_2" />
-    <touch name="left_index_force_sensor_3" site="left_index_force_sensor_3" />
+    <plugin name="left_index_sensor_palm" plugin="mujoco.sensor.touch_grid" objtype="site" objname="left_index_force_sensor_1">
+      <config key="nchannel" value="1"/>
+      <config key="size" value="10 8"/>
+      <config key="fov" value="90 90"/>
+      <config key="gamma" value="0"/>
+    </plugin>
+    <plugin name="left_index_sensor_top" plugin="mujoco.sensor.touch_grid" objtype="site" objname="left_index_force_sensor_2">
+      <config key="nchannel" value="1"/>
+      <config key="size" value="12 8"/>
+      <config key="fov" value="90 90"/>
+      <config key="gamma" value="0"/>
+    </plugin>
+    <plugin name="left_index_sensor_tip" plugin="mujoco.sensor.touch_grid" objtype="site" objname="left_index_force_sensor_3">
+      <config key="nchannel" value="1"/>
+      <config key="size" value="3 3"/>
+      <config key="fov" value="90 90"/>
+      <config key="gamma" value="0"/>
+    </plugin>
 
-    <touch name="left_middle_force_sensor_1" site="left_middle_force_sensor_1" />
-    <touch name="left_middle_force_sensor_2" site="left_middle_force_sensor_2" />
-    <touch name="left_middle_force_sensor_3" site="left_middle_force_sensor_3" />
+    <plugin name="left_middle_sensor_palm" plugin="mujoco.sensor.touch_grid" objtype="site" objname="left_middle_force_sensor_1">
+      <config key="nchannel" value="1"/>
+      <config key="size" value="10 8"/>
+      <config key="fov" value="90 90"/>
+      <config key="gamma" value="0"/>
+    </plugin>
+    <plugin name="left_middle_sensor_top" plugin="mujoco.sensor.touch_grid" objtype="site" objname="left_middle_force_sensor_2">
+      <config key="nchannel" value="1"/>
+      <config key="size" value="12 8"/>
+      <config key="fov" value="90 90"/>
+      <config key="gamma" value="0"/>
+    </plugin>
+    <plugin name="left_middle_sensor_tip" plugin="mujoco.sensor.touch_grid" objtype="site" objname="left_middle_force_sensor_3">
+      <config key="nchannel" value="1"/>
+      <config key="size" value="3 3"/>
+      <config key="fov" value="90 90"/>
+      <config key="gamma" value="0"/>
+    </plugin>
 
-    <touch name="left_ring_force_sensor_1" site="left_ring_force_sensor_1" />
-    <touch name="left_ring_force_sensor_2" site="left_ring_force_sensor_2" />
-    <touch name="left_ring_force_sensor_3" site="left_ring_force_sensor_3" />
+    <plugin name="left_ring_sensor_palm" plugin="mujoco.sensor.touch_grid" objtype="site" objname="left_ring_force_sensor_1">
+      <config key="nchannel" value="1"/>
+      <config key="size" value="10 8"/>
+      <config key="fov" value="90 90"/>
+      <config key="gamma" value="0"/>
+    </plugin>
+    <plugin name="left_ring_sensor_top" plugin="mujoco.sensor.touch_grid" objtype="site" objname="left_ring_force_sensor_2">
+      <config key="nchannel" value="1"/>
+      <config key="size" value="12 8"/>
+      <config key="fov" value="90 90"/>
+      <config key="gamma" value="0"/>
+    </plugin>
+    <plugin name="left_ring_sensor_tip" plugin="mujoco.sensor.touch_grid" objtype="site" objname="left_ring_force_sensor_3">
+      <config key="nchannel" value="1"/>
+      <config key="size" value="3 3"/>
+      <config key="fov" value="90 90"/>
+      <config key="gamma" value="0"/>
+    </plugin>
 
-    <touch name="left_little_force_sensor_1" site="left_little_force_sensor_1" />
-    <touch name="left_little_force_sensor_2" site="left_little_force_sensor_2" />
-    <touch name="left_little_force_sensor_3" site="left_little_force_sensor_3" />
+    <plugin name="left_little_sensor_palm" plugin="mujoco.sensor.touch_grid" objtype="site" objname="left_little_force_sensor_1">
+      <config key="nchannel" value="1"/>
+      <config key="size" value="10 8"/>
+      <config key="fov" value="90 90"/>
+      <config key="gamma" value="0"/>
+    </plugin>
+    <plugin name="left_little_sensor_top" plugin="mujoco.sensor.touch_grid" objtype="site" objname="left_little_force_sensor_2">
+      <config key="nchannel" value="1"/>
+      <config key="size" value="12 8"/>
+      <config key="fov" value="90 90"/>
+      <config key="gamma" value="0"/>
+    </plugin>
+    <plugin name="left_little_sensor_tip" plugin="mujoco.sensor.touch_grid" objtype="site" objname="left_little_force_sensor_3">
+      <config key="nchannel" value="1"/>
+      <config key="size" value="3 3"/>
+      <config key="fov" value="90 90"/>
+      <config key="gamma" value="0"/>
+    </plugin>
+    
+    <plugin name="left_palm_sensor" plugin="mujoco.sensor.touch_grid" objtype="site" objname="left_palm_force_sensor">
+      <config key="nchannel" value="1"/>
+      <config key="size" value="14 8"/>
+      <config key="fov" value="90 90"/>
+      <config key="gamma" value="0"/>
+    </plugin>
 
-    <touch name="left_palm_force_sensor" site="left_palm_force_sensor" />
+    <plugin name="right_thumb_sensor_palm" plugin="mujoco.sensor.touch_grid" objtype="site" objname="right_thumb_force_sensor_1">
+      <config key="nchannel" value="1"/>
+      <config key="size" value="12 8"/>
+      <config key="fov" value="90 90"/>
+      <config key="gamma" value="0"/>
+    </plugin>
+    <plugin name="right_thumb_sensor_middle" plugin="mujoco.sensor.touch_grid" objtype="site" objname="right_thumb_force_sensor_2">
+      <config key="nchannel" value="1"/>
+      <config key="size" value="3 3"/>
+      <config key="fov" value="90 90"/>
+      <config key="gamma" value="0"/>
+    </plugin>
+    <plugin name="right_thumb_sensor_top" plugin="mujoco.sensor.touch_grid" objtype="site" objname="right_thumb_force_sensor_3">
+      <config key="nchannel" value="1"/>
+      <config key="size" value="12 8"/>
+      <config key="fov" value="90 90"/>
+      <config key="gamma" value="0"/>
+    </plugin>
+    <plugin name="right_thumb_sensor_tip" plugin="mujoco.sensor.touch_grid" objtype="site" objname="right_thumb_force_sensor_4">
+      <config key="nchannel" value="1"/>
+      <config key="size" value="3 3"/>
+      <config key="fov" value="90 90"/>
+      <config key="gamma" value="0"/>
+    </plugin>
 
-    <touch name="right_thumb_force_sensor_1" site="right_thumb_force_sensor_1" />
-    <touch name="right_thumb_force_sensor_2" site="right_thumb_force_sensor_2" />
-    <touch name="right_thumb_force_sensor_3" site="right_thumb_force_sensor_3" />
-    <touch name="right_thumb_force_sensor_4" site="right_thumb_force_sensor_4" />
+    <plugin name="right_index_sensor_palm" plugin="mujoco.sensor.touch_grid" objtype="site" objname="right_index_force_sensor_1">
+      <config key="nchannel" value="1"/>
+      <config key="size" value="10 8"/>
+      <config key="fov" value="90 90"/>
+      <config key="gamma" value="0"/>
+    </plugin>
+    <plugin name="right_index_sensor_top" plugin="mujoco.sensor.touch_grid" objtype="site" objname="right_index_force_sensor_2">
+      <config key="nchannel" value="1"/>
+      <config key="size" value="12 8"/>
+      <config key="fov" value="90 90"/>
+      <config key="gamma" value="0"/>
+    </plugin>
+    <plugin name="right_index_sensor_tip" plugin="mujoco.sensor.touch_grid" objtype="site" objname="right_index_force_sensor_3">
+      <config key="nchannel" value="1"/>
+      <config key="size" value="3 3"/>
+      <config key="fov" value="90 90"/>
+      <config key="gamma" value="0"/>
+    </plugin>
 
-    <touch name="right_index_force_sensor_1" site="right_index_force_sensor_1" />
-    <touch name="right_index_force_sensor_2" site="right_index_force_sensor_2" />
-    <touch name="right_index_force_sensor_3" site="right_index_force_sensor_3" />
+    <plugin name="right_middle_sensor_palm" plugin="mujoco.sensor.touch_grid" objtype="site" objname="right_middle_force_sensor_1">
+      <config key="nchannel" value="1"/>
+      <config key="size" value="10 8"/>
+      <config key="fov" value="90 90"/>
+      <config key="gamma" value="0"/>
+    </plugin>
+    <plugin name="right_middle_sensor_top" plugin="mujoco.sensor.touch_grid" objtype="site" objname="right_middle_force_sensor_2">
+      <config key="nchannel" value="1"/>
+      <config key="size" value="12 8"/>
+      <config key="fov" value="90 90"/>
+      <config key="gamma" value="0"/>
+    </plugin>
+    <plugin name="right_middle_sensor_tip" plugin="mujoco.sensor.touch_grid" objtype="site" objname="right_middle_force_sensor_3">
+      <config key="nchannel" value="1"/>
+      <config key="size" value="3 3"/>
+      <config key="fov" value="90 90"/>
+      <config key="gamma" value="0"/>
+    </plugin>
 
-    <touch name="right_middle_force_sensor_1" site="right_middle_force_sensor_1" />
-    <touch name="right_middle_force_sensor_2" site="right_middle_force_sensor_2" />
-    <touch name="right_middle_force_sensor_3" site="right_middle_force_sensor_3" />
+    <plugin name="right_ring_sensor_palm" plugin="mujoco.sensor.touch_grid" objtype="site" objname="right_ring_force_sensor_1">
+      <config key="nchannel" value="1"/>
+      <config key="size" value="10 8"/>
+      <config key="fov" value="90 90"/>
+      <config key="gamma" value="0"/>
+    </plugin>
+    <plugin name="right_ring_sensor_top" plugin="mujoco.sensor.touch_grid" objtype="site" objname="right_ring_force_sensor_2">
+      <config key="nchannel" value="1"/>
+      <config key="size" value="12 8"/>
+      <config key="fov" value="90 90"/>
+      <config key="gamma" value="0"/>
+    </plugin>
+    <plugin name="right_ring_sensor_tip" plugin="mujoco.sensor.touch_grid" objtype="site" objname="right_ring_force_sensor_3">
+      <config key="nchannel" value="1"/>
+      <config key="size" value="3 3"/>
+      <config key="fov" value="90 90"/>
+      <config key="gamma" value="0"/>
+    </plugin>
 
-    <touch name="right_ring_force_sensor_1" site="right_ring_force_sensor_1" />
-    <touch name="right_ring_force_sensor_2" site="right_ring_force_sensor_2" />
-    <touch name="right_ring_force_sensor_3" site="right_ring_force_sensor_3" />
-
-    <touch name="right_little_force_sensor_1" site="right_little_force_sensor_1" />
-    <touch name="right_little_force_sensor_2" site="right_little_force_sensor_2" />
-    <touch name="right_little_force_sensor_3" site="right_little_force_sensor_3" />
-
-    <touch name="right_palm_force_sensor" site="right_palm_force_sensor" />
+    <plugin name="right_little_sensor_palm" plugin="mujoco.sensor.touch_grid" objtype="site" objname="right_little_force_sensor_1">
+      <config key="nchannel" value="1"/>
+      <config key="size" value="10 8"/>
+      <config key="fov" value="90 90"/>
+      <config key="gamma" value="0"/>
+    </plugin>
+    <plugin name="right_little_sensor_top" plugin="mujoco.sensor.touch_grid" objtype="site" objname="right_little_force_sensor_2">
+      <config key="nchannel" value="1"/>
+      <config key="size" value="12 8"/>
+      <config key="fov" value="90 90"/>
+      <config key="gamma" value="0"/>
+    </plugin>
+    <plugin name="right_little_sensor_tip" plugin="mujoco.sensor.touch_grid" objtype="site" objname="right_little_force_sensor_3">
+      <config key="nchannel" value="1"/>
+      <config key="size" value="3 3"/>
+      <config key="fov" value="90 90"/>
+      <config key="gamma" value="0"/>
+    </plugin>
+    
+    <plugin name="right_palm_sensor" plugin="mujoco.sensor.touch_grid" objtype="site" objname="right_palm_force_sensor">
+      <config key="nchannel" value="1"/>
+      <config key="size" value="14 8"/>
+      <config key="fov" value="90 90"/>
+      <config key="gamma" value="0"/>
+    </plugin>
 
     <!-- IMU -->
     <framequat name="imu_quat" objtype="site" objname="imu"/>

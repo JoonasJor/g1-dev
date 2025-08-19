@@ -11,7 +11,7 @@ class Joint:
 
 @dataclass(frozen=True)
 class Sensor:
-    mujoco_idx: int   # Mujoco actuator/sensor index
+    mujoco_idx_range: tuple    # Mujoco grid sensor index range
     idx: int    # Ordered index
 
 class JointMixin:
@@ -152,60 +152,79 @@ class Hand_R(JointMixin, Enum):
     RightLittle1        = Joint(mujoco_idx=51, idx=10, default_angle=500,     default_kp=10, default_kd=0.5)
     RightLittle2        = Joint(mujoco_idx=52, idx=11, default_angle=500,     default_kp=10, default_kd=0.5)
 
-class TouchSensor_L(JointMixin, Enum):
-    ThumbForceSensor1     = Sensor(mujoco_idx=159, idx=0)
-    ThumbForceSensor2     = Sensor(mujoco_idx=160, idx=1)
-    ThumbForceSensor3     = Sensor(mujoco_idx=161, idx=2)
-    ThumbForceSensor4     = Sensor(mujoco_idx=162, idx=3)
-    IndexForceSensor1     = Sensor(mujoco_idx=163, idx=4)
-    IndexForceSensor2     = Sensor(mujoco_idx=164, idx=5)
-    IndexForceSensor3     = Sensor(mujoco_idx=165, idx=6)
-    MiddleForceSensor1    = Sensor(mujoco_idx=166, idx=7)
-    MiddleForceSensor2    = Sensor(mujoco_idx=167, idx=8)
-    MiddleForceSensor3    = Sensor(mujoco_idx=168, idx=9)
-    RingForceSensor1      = Sensor(mujoco_idx=169, idx=10)
-    RingForceSensor2      = Sensor(mujoco_idx=170, idx=11)
-    RingForceSensor3      = Sensor(mujoco_idx=171, idx=12)
-    LittleForceSensor1    = Sensor(mujoco_idx=172, idx=13)
-    LittleForceSensor2    = Sensor(mujoco_idx=173, idx=14)
-    LittleForceSensor3    = Sensor(mujoco_idx=174, idx=15)
-    PalmForceSensor       = Sensor(mujoco_idx=175, idx=16)
+class SensorMixin:
+    @classmethod
+    def from_mujoco_idx(cls, mujoco_idx):
+        for sensor in cls:
+            if sensor.value.mujoco_idx == mujoco_idx:
+                return sensor
+        raise ValueError(f"No joint with mujoco_idx={mujoco_idx}")
 
-class TouchSensor_R(JointMixin, Enum):
-    ThumbForceSensor1    = Sensor(mujoco_idx=176, idx=0)
-    ThumbForceSensor2    = Sensor(mujoco_idx=177, idx=1)
-    ThumbForceSensor3    = Sensor(mujoco_idx=178, idx=2)
-    ThumbForceSensor4    = Sensor(mujoco_idx=179, idx=3)
-    IndexForceSensor1    = Sensor(mujoco_idx=180, idx=4)
-    IndexForceSensor2    = Sensor(mujoco_idx=181, idx=5)
-    IndexForceSensor3    = Sensor(mujoco_idx=182, idx=6)
-    MiddleForceSensor1   = Sensor(mujoco_idx=183, idx=7)
-    MiddleForceSensor2   = Sensor(mujoco_idx=184, idx=8)
-    MiddleForceSensor3   = Sensor(mujoco_idx=185, idx=9)
-    RingForceSensor1     = Sensor(mujoco_idx=186, idx=10)
-    RingForceSensor2     = Sensor(mujoco_idx=187, idx=11)
-    RingForceSensor3     = Sensor(mujoco_idx=188, idx=12)
-    LittleForceSensor1   = Sensor(mujoco_idx=189, idx=13)
-    LittleForceSensor2   = Sensor(mujoco_idx=190, idx=14)
-    LittleForceSensor3   = Sensor(mujoco_idx=191, idx=15)
-    PalmForceSensor      = Sensor(mujoco_idx=192, idx=16)
+    @classmethod
+    def from_idx(cls, idx):
+        for sensor in cls:
+            if sensor.value.idx == idx:
+                return sensor
+        raise ValueError(f"No joint with idx={idx}")
+    
+    @classmethod
+    def mujoco_idx_range_list(cls):
+        """Return a list of tuples of mujoco indices in definition order."""
+        return [sensor.value.mujoco_idx_range for sensor in cls]
+    
+    @property
+    def mujoco_idx(self):
+        return self.value.mujoco_idx_range
 
-def get_joint_ranges(mj_model, l_r):
-    """
-    Returns (joint_angle_range, joint_force_range) for the finger joints
-    """
-    if l_r == "r":
-        joint_indices = Hand_R.mujoco_idx_list()
-    else:
-        joint_indices = Hand_L.mujoco_idx_list()
+    @property
+    def idx(self):
+        return self.value.idx
 
-    joint_angle_range = []
-    joint_force_range = []
+class TouchSensor_L(SensorMixin, Enum):
+    ThumbForceSensor1     = Sensor(mujoco_idx_range=(159, 254), idx=0)   # palm (96)
+    ThumbForceSensor2     = Sensor(mujoco_idx_range=(255, 263), idx=1)   # middle (9)
+    ThumbForceSensor3     = Sensor(mujoco_idx_range=(264, 359), idx=2)   # top (96)
+    ThumbForceSensor4     = Sensor(mujoco_idx_range=(360, 368), idx=3)   # tip (9)
 
-    for idx in joint_indices:
-        # offset by 1 to accommodate for (joint_index: 0 , name: floating_base_joint)
-        # this offset only applies to worldbody joints. not actuators or sensors.
-        joint_angle_range.append(tuple(mj_model.jnt_range[idx + 1]))
-        joint_force_range.append(tuple(mj_model.actuator_ctrlrange[idx]))
+    IndexForceSensor1     = Sensor(mujoco_idx_range=(369, 448), idx=4)   # palm (80)
+    IndexForceSensor2     = Sensor(mujoco_idx_range=(449, 544), idx=5)   # top (96)
+    IndexForceSensor3     = Sensor(mujoco_idx_range=(545, 553), idx=6)   # tip (9)
 
-    return joint_angle_range, joint_force_range
+    MiddleForceSensor1    = Sensor(mujoco_idx_range=(554, 633), idx=7)   # palm (80)
+    MiddleForceSensor2    = Sensor(mujoco_idx_range=(634, 729), idx=8)   # top (96)
+    MiddleForceSensor3    = Sensor(mujoco_idx_range=(730, 738), idx=9)   # tip (9)
+
+    RingForceSensor1      = Sensor(mujoco_idx_range=(739, 818), idx=10)  # palm (80)
+    RingForceSensor2      = Sensor(mujoco_idx_range=(819, 914), idx=11)  # top (96)
+    RingForceSensor3      = Sensor(mujoco_idx_range=(915, 923), idx=12)  # tip (9)
+
+    LittleForceSensor1    = Sensor(mujoco_idx_range=(924, 1003), idx=13) # palm (80)
+    LittleForceSensor2    = Sensor(mujoco_idx_range=(1004, 1099), idx=14)# top (96)
+    LittleForceSensor3    = Sensor(mujoco_idx_range=(1100, 1108), idx=15)# tip (9)
+
+    PalmForceSensor       = Sensor(mujoco_idx_range=(1109, 1220), idx=16)# palm (112)
+
+
+class TouchSensor_R(SensorMixin, Enum):
+    ThumbForceSensor1     = Sensor(mujoco_idx_range=(1221, 1316), idx=0) # palm (96)
+    ThumbForceSensor2     = Sensor(mujoco_idx_range=(1317, 1325), idx=1) # middle (9)
+    ThumbForceSensor3     = Sensor(mujoco_idx_range=(1326, 1421), idx=2) # top (96)
+    ThumbForceSensor4     = Sensor(mujoco_idx_range=(1422, 1430), idx=3) # tip (9)
+
+    IndexForceSensor1     = Sensor(mujoco_idx_range=(1431, 1510), idx=4) # palm (80)
+    IndexForceSensor2     = Sensor(mujoco_idx_range=(1511, 1606), idx=5) # top (96)
+    IndexForceSensor3     = Sensor(mujoco_idx_range=(1607, 1615), idx=6) # tip (9)
+
+    MiddleForceSensor1    = Sensor(mujoco_idx_range=(1616, 1695), idx=7) # palm (80)
+    MiddleForceSensor2    = Sensor(mujoco_idx_range=(1696, 1791), idx=8) # top (96)
+    MiddleForceSensor3    = Sensor(mujoco_idx_range=(1792, 1800), idx=9) # tip (9)
+
+    RingForceSensor1      = Sensor(mujoco_idx_range=(1801, 1880), idx=10)# palm (80)
+    RingForceSensor2      = Sensor(mujoco_idx_range=(1881, 1976), idx=11)# top (96)
+    RingForceSensor3      = Sensor(mujoco_idx_range=(1977, 1985), idx=12)# tip (9)
+
+    LittleForceSensor1    = Sensor(mujoco_idx_range=(1986, 2065), idx=13)# palm (80)
+    LittleForceSensor2    = Sensor(mujoco_idx_range=(2066, 2161), idx=14)# top (96)
+    LittleForceSensor3    = Sensor(mujoco_idx_range=(2162, 2170), idx=15)# tip (9)
+
+    PalmForceSensor       = Sensor(mujoco_idx_range=(2171, 2282), idx=16)# palm (112)

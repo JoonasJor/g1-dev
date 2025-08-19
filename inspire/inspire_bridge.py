@@ -183,41 +183,10 @@ class InspireBridge():
         else:
             sensors = Joints.TouchSensor_L
         
-        if self.l_r == "l":
-            return
-        
-        touch_sensor_values = []
         for sensor in sensors:
-            value = self.mj_data.sensordata[sensor.mujoco_idx]
-            touch_sensor_values.append(value)
-
-            print(f"{sensor.mujoco_idx} {sensor}:\t{value:>5}")
-        print()
+            start_idx, end_idx = sensor.mujoco_idx
+            print(f"{sensor}: {self.mj_data.sensordata[start_idx:end_idx]}")
 
         # dds range = 0-4095
 
-        self.hand_touch.fingerone_tip_touch[0] = int(self.mj_data.sensordata[sensors.LittleForceSensor3.mujoco_idx])
-        self.hand_touch.fingerone_top_touch[0] = int(self.mj_data.sensordata[sensors.LittleForceSensor2.mujoco_idx])
-        self.hand_touch.fingerone_palm_touch[0] = int(self.mj_data.sensordata[sensors.LittleForceSensor1.mujoco_idx])
-
-        self.hand_touch.fingertwo_tip_touch[0] = int(self.mj_data.sensordata[sensors.RingForceSensor3.mujoco_idx])
-        self.hand_touch.fingertwo_top_touch[0] = int(self.mj_data.sensordata[sensors.RingForceSensor2.mujoco_idx])
-        self.hand_touch.fingertwo_palm_touch[0] = int(self.mj_data.sensordata[sensors.RingForceSensor1.mujoco_idx])
-
-        self.hand_touch.fingerthree_tip_touch[0] = int(self.mj_data.sensordata[sensors.MiddleForceSensor3.mujoco_idx])
-        self.hand_touch.fingerthree_top_touch[0] = int(self.mj_data.sensordata[sensors.MiddleForceSensor2.mujoco_idx])
-        self.hand_touch.fingerthree_palm_touch[0] = int(self.mj_data.sensordata[sensors.MiddleForceSensor1.mujoco_idx])
-
-        self.hand_touch.fingerfour_tip_touch[0] = int(self.mj_data.sensordata[sensors.IndexForceSensor3.mujoco_idx])
-        self.hand_touch.fingerfour_top_touch[0] = int(self.mj_data.sensordata[sensors.IndexForceSensor2.mujoco_idx])
-        self.hand_touch.fingerfour_palm_touch[0] = int(self.mj_data.sensordata[sensors.IndexForceSensor1.mujoco_idx])
-
-        self.hand_touch.fingerfive_tip_touch[0] = int(self.mj_data.sensordata[sensors.ThumbForceSensor4.mujoco_idx])
-        self.hand_touch.fingerfive_top_touch[0] = int(self.mj_data.sensordata[sensors.ThumbForceSensor3.mujoco_idx])
-        self.hand_touch.fingerfive_middle_touch[0] = int(self.mj_data.sensordata[sensors.ThumbForceSensor2.mujoco_idx])
-        self.hand_touch.fingerfive_palm_touch[0] = int(self.mj_data.sensordata[sensors.ThumbForceSensor1.mujoco_idx])
-
-        self.hand_touch.palm_touch[0] = int(self.mj_data.sensordata[sensors.PalmForceSensor.mujoco_idx])
-
-
-        self.hand_touch_pub.Write(self.hand_touch)
+        return

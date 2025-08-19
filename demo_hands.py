@@ -83,4 +83,4 @@ if __name__ == '__main__':
     #hands_loop(hand_controller_r, hand_controller_l)
 
     pinch(hand_controller_r)
-    pinch(hand_controller_l)
+    #pinch(hand_controller_l)

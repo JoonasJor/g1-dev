@@ -31,8 +31,8 @@ class DDSHandler:
         pass
 
     def update_data_touch(self, msg: inspire_dds.inspire_hand_touch):
-        print(f"{msg.fingerfive_tip_touch=}")
-        print(f"{msg.fingerfour_tip_touch=}")
+        print(f"{msg.index_tip_3=}")
+        print(f"{msg.thumb_tip_4=}")
         print()
 
     def update_data_state(self, states_msg: inspire_dds.inspire_hand_state):
