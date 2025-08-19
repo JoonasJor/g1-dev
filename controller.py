@@ -166,7 +166,7 @@ class HandController(Controller):
         current_angles = self.low_state.angle_act
 
         while True:
-            self.cmd.angle_set = current_angles
+            self.cmd.angle_set = current_angles #[-1, -1, -1, -1, -1, -1] #current_angles
 
             self.cmd_pub.Write(self.cmd)
 

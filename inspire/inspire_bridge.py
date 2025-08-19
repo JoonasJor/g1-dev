@@ -191,23 +191,33 @@ class InspireBridge():
             value = self.mj_data.sensordata[sensor.mujoco_idx]
             touch_sensor_values.append(value)
 
-            print(f"{sensor.mujoco_idx}\t{sensor}:\t{value}")
+            print(f"{sensor.mujoco_idx} {sensor}:\t{value:>5}")
         print()
 
-        return
+        # dds range = 0-4095
 
-        for joint in joints:
-            q_index = joint.mujoco_idx
-            dq_index = joint.mujoco_idx + self.num_motor
-            tau_index = joint.mujoco_idx + 2 * self.num_motor
+        self.hand_touch.fingerone_tip_touch[0] = int(self.mj_data.sensordata[sensors.LittleForceSensor3.mujoco_idx])
+        self.hand_touch.fingerone_top_touch[0] = int(self.mj_data.sensordata[sensors.LittleForceSensor2.mujoco_idx])
+        self.hand_touch.fingerone_palm_touch[0] = int(self.mj_data.sensordata[sensors.LittleForceSensor1.mujoco_idx])
 
-            try:
-                angles_12[joint.idx] = self.mj_data.sensordata[q_index]
+        self.hand_touch.fingertwo_tip_touch[0] = int(self.mj_data.sensordata[sensors.RingForceSensor3.mujoco_idx])
+        self.hand_touch.fingertwo_top_touch[0] = int(self.mj_data.sensordata[sensors.RingForceSensor2.mujoco_idx])
+        self.hand_touch.fingertwo_palm_touch[0] = int(self.mj_data.sensordata[sensors.RingForceSensor1.mujoco_idx])
 
-            except IndexError as e:
-                print(f"[PublishHandState_{self.l_r}] error: {e} - {i=}, {q_index=}, {dq_index=}, {tau_index=}")
-                print(f"{len(angles_12)=}")
-                print(f"{len(self.mj_data.sensordata)=}")
-                print(f"{self.num_motor=}")
-            except Exception as e:
-                print(f"[PublishHandState_{self.l_r}] error: {type(e).__name__}: {e}")
+        self.hand_touch.fingerthree_tip_touch[0] = int(self.mj_data.sensordata[sensors.MiddleForceSensor3.mujoco_idx])
+        self.hand_touch.fingerthree_top_touch[0] = int(self.mj_data.sensordata[sensors.MiddleForceSensor2.mujoco_idx])
+        self.hand_touch.fingerthree_palm_touch[0] = int(self.mj_data.sensordata[sensors.MiddleForceSensor1.mujoco_idx])
+
+        self.hand_touch.fingerfour_tip_touch[0] = int(self.mj_data.sensordata[sensors.IndexForceSensor3.mujoco_idx])
+        self.hand_touch.fingerfour_top_touch[0] = int(self.mj_data.sensordata[sensors.IndexForceSensor2.mujoco_idx])
+        self.hand_touch.fingerfour_palm_touch[0] = int(self.mj_data.sensordata[sensors.IndexForceSensor1.mujoco_idx])
+
+        self.hand_touch.fingerfive_tip_touch[0] = int(self.mj_data.sensordata[sensors.ThumbForceSensor4.mujoco_idx])
+        self.hand_touch.fingerfive_top_touch[0] = int(self.mj_data.sensordata[sensors.ThumbForceSensor3.mujoco_idx])
+        self.hand_touch.fingerfive_middle_touch[0] = int(self.mj_data.sensordata[sensors.ThumbForceSensor2.mujoco_idx])
+        self.hand_touch.fingerfive_palm_touch[0] = int(self.mj_data.sensordata[sensors.ThumbForceSensor1.mujoco_idx])
+
+        self.hand_touch.palm_touch[0] = int(self.mj_data.sensordata[sensors.PalmForceSensor.mujoco_idx])
+
+
+        self.hand_touch_pub.Write(self.hand_touch)
