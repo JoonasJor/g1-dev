@@ -25,7 +25,7 @@ terminal 2:
 python demo_(body/hands).py
 ```
 ### Real robot:
-```
-python demo_(body/hands).py <network_interface_name>
-```
-
+1. Plug in ethernet cable
+2. Change network interface ip to 192.168.123.99
+3. Get network inferface name with ```ip addr```
+4. Run ```python demo_(body/hands).py <network_interface_name>```
