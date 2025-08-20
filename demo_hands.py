@@ -8,63 +8,51 @@ from unitree_sdk2py.core.channel import ChannelFactoryInitialize
 import config as Cfg
 import g1_joints as Joints
 
-def pinch(hand: HandController):
-    print("Opening hand...")
+def open_hand(hand: HandController):
+    angles = [1000] * 6
+    hand.low_cmd_control(
+        target_angles=angles,
+        duration=1.0,
+        wait_for_user_input=False
+    )
+
+def close_hand(hand: HandController):
     angles = [0] * 6
     hand.low_cmd_control(
         target_angles=angles,
-        duration=3.0
+        duration=1.0,
+        wait_for_user_input=False
     )
+
+def pinch(hand: HandController):
+    print("Opening hand...")
+    open_hand(hand)
 
     print("Pinching with index and thumb...")
     # Pinky, Ring, Middle, Index, Thumb-bend, Thumb-rotation
     # 0 - 1000
-    angles = [0, 0, 0, 700, 700, 1000]
+    angles = [1000, 1000, 1000, 300, 300, 0]
     hand.low_cmd_control(
         target_angles=angles,
         duration=3.0
     )
 
     print("Opening hand...")
-    angles = [0] * 6
-    hand.low_cmd_control(
-        target_angles=angles,
-        duration=3.0
-    )
+    open_hand(hand)
 
 def hands_loop(hand_r: HandController, hand_l: HandController):
     while True:
         print("Closing right hand...")
-        angles = [1000] * 6
-        hand_r.low_cmd_control(
-            target_angles=angles,
-            duration=2.0,
-            wait_for_user_input=False
-        )
+        close_hand(hand_r)
 
         print("Closing left hand...")
-        angles = [1000] * 6
-        hand_l.low_cmd_control(
-            target_angles=angles,
-            duration=2.0,
-            wait_for_user_input=False
-        )
+        close_hand(hand_l)
 
         print("Opening right hand...")
-        angles = [0] * 6
-        hand_r.low_cmd_control(
-            target_angles=angles,
-            duration=2.0,
-            wait_for_user_input=False
-        )
+        open_hand(hand_r)
 
         print("Opening left hand...")
-        angles = [0] * 6
-        hand_l.low_cmd_control(
-            target_angles=angles,
-            duration=2.0,
-            wait_for_user_input=False
-        )
+        open_hand(hand_l)
 
 if __name__ == '__main__':
     if len(sys.argv) > 1:
@@ -77,7 +65,10 @@ if __name__ == '__main__':
     hand_controller_r = HandController("r")
     hand_controller_l = HandController("l")
 
-    hands_loop(hand_controller_r, hand_controller_l)
+    while True:
+        time.sleep(1)
+
+    #hands_loop(hand_controller_r, hand_controller_l)
 
     #pinch(hand_controller_r)
     #pinch(hand_controller_l)

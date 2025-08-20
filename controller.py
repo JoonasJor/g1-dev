@@ -16,6 +16,10 @@ from unitree_sdk2py.comm.motion_switcher.motion_switcher_client import MotionSwi
 import inspire.inspire_dds as inspire_dds
 import inspire.inspire_defaults as inspire_defaults
 
+from unitree_sdk2py.utils.thread import RecurrentThread
+
+from inspire_sdkpy import inspire_sdk
+
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 import config as Cfg
 import g1_joints as Joints
@@ -57,6 +61,9 @@ class BodyController(Controller):
         if self.counter % 500 == 0:
             #print(self.low_state.imu_state.rpy)
             self.counter = 0
+
+        #for motor in self.low_state.motor_state:
+        #    print(motor.q)
 
     def hold_angles(self):
         current_angles = [motor.q for motor in self.low_state.motor_state]
@@ -135,7 +142,6 @@ class BodyController(Controller):
         self.msc.Init()
 
         status, result = self.msc.CheckMode()
-        print(f"{status=}\n{result=}")
 
         if result != None:
             while result['name']:
@@ -143,9 +149,19 @@ class BodyController(Controller):
                 status, result = self.msc.CheckMode()
                 time.sleep(1)
 
+        print(f"{status=}\n{result=}")
+
 class HandController(Controller):
     def __init__(self, l_r = "r"):
         super().__init__()
+
+        self.l_r = l_r
+
+        if self.l_r == "r":
+            self.handler = inspire_sdk.ModbusDataHandler(ip="192.168.123.211", LR = l_r, device_id = 1)
+        else:
+            self.handler = inspire_sdk.ModbusDataHandler(ip="192.168.123.210", LR = l_r, device_id = 1)
+
         self.num_motor_fingers = Cfg.NUM_MOTOR_FINGERS
 
         self.low_state = inspire_defaults.state()
@@ -158,6 +174,17 @@ class HandController(Controller):
 
         self.cmd_pub = ChannelPublisher(f"rt/inspire_hand/ctrl/{l_r}", inspire_dds.inspire_hand_ctrl)
         self.cmd_pub.Init()
+
+        self.handler_thread = RecurrentThread(
+            interval=self.dt, target=self.low_state_handler_test, name=f"sim_handtest_{l_r}"
+        )
+        self.handler_thread.Start()
+
+    def low_state_handler_test(self):
+        data = self.handler.read()
+        if self.l_r == "r":
+            print(data["touch"]["palm_touch"])
+            print()
 
     def low_state_handler(self, msg: inspire_dds.inspire_hand_state):
         self.low_state = msg
@@ -201,8 +228,10 @@ class HandController(Controller):
             if debug:
                 print(f"current={self.low_state.angle_act} \ttarget={target_angles} \tcommand={self.cmd.angle_set}")
 
-        print(f"current={self.low_state.angle_act} \ttarget={target_angles}")
-        print("Done.\n")
+        print("Done.")
+        print(f"current = {self.low_state.angle_act} target was = {target_angles}")
+        print()
+        
 
         if wait_for_user_input:
             print("Keeping joints at current position. Press Enter to continue...") 

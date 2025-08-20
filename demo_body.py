@@ -59,7 +59,7 @@ def demo_stand(body: BodyController):
         target_angles=Joints.Body.default_angles_list(),
         kp=body.kp,
         kd=body.kd,
-        duration=6.0
+        duration=1.0
     )
 
     print("Moving arm...")
@@ -69,7 +69,7 @@ def demo_stand(body: BodyController):
         target_angles=angles,
         kp=body.kp,
         kd=body.kd,
-        duration=6.0
+        duration=1.0
     )
 
     print("Setting body joints to start position...")
@@ -77,7 +77,7 @@ def demo_stand(body: BodyController):
         target_angles=start_angles,
         kp=body.kp,
         kd=body.kd,
-        duration=6.0
+        duration=1.0
     )
 
 if __name__ == '__main__':
