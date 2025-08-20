@@ -10,9 +10,9 @@ python3.8 -m venv venv
 source venv/bin/activate
 pip install mujoco pygame
 ```
-2. Install unitree sdk and inspire sdk
-https://github.com/unitreerobotics/unitree_sdk2_python
-https://github.com/NaCl-1374/inspire_hand_ws
+2. Install unitree sdk and inspire sdk  
+https://github.com/unitreerobotics/unitree_sdk2_python  
+https://github.com/NaCl-1374/inspire_hand_ws  
 
 ## Run
 ### Mujoco sim:  
