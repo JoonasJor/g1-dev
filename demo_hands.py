@@ -58,17 +58,23 @@ if __name__ == '__main__':
     if len(sys.argv) > 1:
         # Run on real robot
         ChannelFactoryInitialize(0, sys.argv[1])
+        hand_controller_r = HandController(l_r="r", mujoco=False)
+        hand_controller_l = HandController(l_r="l", mujoco=False)
     else:
         # Run in Mujoco
         ChannelFactoryInitialize(1, "lo")
+        hand_controller_r = HandController(l_r="r", mujoco=True)
+        hand_controller_l = HandController(l_r="l", mujoco=True)
         
-    hand_controller_r = HandController("r")
-    hand_controller_l = HandController("l")
+    #close_hand(hand_controller_l)
+    #close_hand(hand_controller_r)
 
-    while True:
-        time.sleep(1)
+    #open_hand(hand_controller_r)
+    #open_hand(hand_controller_l)
 
-    #hands_loop(hand_controller_r, hand_controller_l)
+    #while True: time.sleep(1)
+
+    hands_loop(hand_controller_r, hand_controller_l)
 
     #pinch(hand_controller_r)
     #pinch(hand_controller_l)

@@ -80,6 +80,17 @@ def demo_stand(body: BodyController):
         duration=1.0
     )
 
+def demo_test(body: BodyController):
+    print("Moving arm...")
+    angles = [motor.q for motor in body.low_state.motor_state]
+    angles[Joints.Body.LeftElbow.idx] = np.deg2rad(-45)
+    body.low_cmd_control(
+        target_angles=angles,
+        kp=body.kp,
+        kd=body.kd,
+        duration=1.0
+    )    
+
 if __name__ == '__main__':
     if len(sys.argv) > 1:
         # Run on real robot
@@ -94,4 +105,5 @@ if __name__ == '__main__':
     if Cfg.START_ON_FLOOR:
         demo_floor(body_controller)
     else:
+        #demo_test(body_controller)
         demo_stand(body_controller)
