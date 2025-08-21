@@ -37,13 +37,13 @@ class BodyController(Controller):
 
         self.low_state = None 
         
-        self.state_sub = ChannelSubscriber("rt/lowstate", LowState_)
+        self.state_sub = ChannelSubscriber(Cfg.TOPIC_BODY_LOW_STATE, LowState_)
         self.state_sub.Init(self.low_state_handler, 10)
 
         self.cmd = unitree_hg_msg_dds__LowCmd_()
         self.crc = CRC() 
 
-        self.cmd_pub = ChannelPublisher("rt/lowcmd", LowCmd_)
+        self.cmd_pub = ChannelPublisher(Cfg.TOPIC_BODY_CMD, LowCmd_)
         self.cmd_pub.Init()
 
     def low_state_handler(self, msg: LowState_):
@@ -156,13 +156,13 @@ class HandController(Controller):
 
         self.low_state = inspire_defaults.state()
 
-        self.state_sub = ChannelSubscriber(f"rt/inspire_hand/state/{l_r}", inspire_dds.inspire_hand_state)
+        self.state_sub = ChannelSubscriber(f"{Cfg.TOPIC_HAND_STATE}/{l_r}", inspire_dds.inspire_hand_state)
         self.state_sub.Init(self.low_state_handler, 10)
 
         self.cmd = inspire_defaults.ctrl()
         self.cmd.mode = 0b0001
 
-        self.cmd_pub = ChannelPublisher(f"rt/inspire_hand/ctrl/{l_r}", inspire_dds.inspire_hand_ctrl)
+        self.cmd_pub = ChannelPublisher(f"{Cfg.TOPIC_HAND_CMD}/{l_r}", inspire_dds.inspire_hand_ctrl)
         self.cmd_pub.Init()
 
     def low_state_handler(self, msg: inspire_dds.inspire_hand_state):
@@ -188,7 +188,7 @@ class HandController(Controller):
 
         while True:
             elapsed = time.time() - start_time
-            if elapsed >= duration + 1:
+            if elapsed >= duration + 0.5:
                 break
 
             ratio = elapsed / duration
