@@ -4,6 +4,7 @@ import sys
 
 from controller import HandController
 from unitree_sdk2py.core.channel import ChannelFactoryInitialize
+from inspire.modbus_data_handler import ModbusDataHandler
 
 import config as Cfg
 import g1_joints as Joints
@@ -58,13 +59,14 @@ if __name__ == '__main__':
     if len(sys.argv) > 1:
         # Run on real robot
         ChannelFactoryInitialize(0, sys.argv[1])
-        hand_controller_r = HandController(l_r="r", mujoco=False)
-        hand_controller_l = HandController(l_r="l", mujoco=False)
+        modbus_r = ModbusDataHandler(ip="192.168.123.211", device_id=1, l_r="r")
+        modbus_l = ModbusDataHandler(ip="192.168.123.210", device_id=2, l_r="l")
     else:
         # Run in Mujoco
         ChannelFactoryInitialize(1, "lo")
-        hand_controller_r = HandController(l_r="r", mujoco=True)
-        hand_controller_l = HandController(l_r="l", mujoco=True)
+
+    hand_controller_r = HandController(l_r="r")
+    hand_controller_l = HandController(l_r="l")
         
     #close_hand(hand_controller_l)
     #close_hand(hand_controller_r)

@@ -152,21 +152,10 @@ class BodyController(Controller):
         print(f"{status=}\n{result=}")
 
 class HandController(Controller):
-    def __init__(self, l_r = "r", mujoco = True):
+    def __init__(self, l_r = "r"):
         super().__init__()
 
         self.l_r = l_r
-
-        if not mujoco:
-            if self.l_r == "r":
-                self.handler = inspire_sdk.ModbusDataHandler(ip="192.168.123.211", LR = l_r, initDDS=False)
-            else:
-                self.handler = inspire_sdk.ModbusDataHandler(ip="192.168.123.210", LR = l_r, initDDS=False)
-
-            self.handler_thread = RecurrentThread(
-                interval=self.dt, target=self.low_state_handler_test, name=f"sim_handtest_{l_r}"
-            )
-            self.handler_thread.Start()
 
         self.num_motor_fingers = Cfg.NUM_MOTOR_FINGERS
 
@@ -180,13 +169,6 @@ class HandController(Controller):
 
         self.cmd_pub = ChannelPublisher(f"rt/inspire_hand/ctrl/{l_r}", inspire_dds.inspire_hand_ctrl)
         self.cmd_pub.Init()
-
-    def low_state_handler_test(self):
-        data = self.handler.read()
-        if self.l_r == "r":
-           sensor = "palm_touch"
-           #print(sensor)
-           #print(data["touch"][sensor])
 
     def low_state_handler(self, msg: inspire_dds.inspire_hand_state):
         self.low_state = msg
