@@ -8,7 +8,7 @@ from unitree_sdk2py.core.channel import ChannelFactoryInitialize
 import config as Cfg
 import g1_joints as Joints
 
-def open_hand(hand: HandController):
+def close_hand(hand: HandController):
     angles = [1000] * 6
     hand.low_cmd_control(
         target_angles=angles,
@@ -16,7 +16,7 @@ def open_hand(hand: HandController):
         wait_for_user_input=False
     )
 
-def close_hand(hand: HandController):
+def open_hand(hand: HandController):
     angles = [0] * 6
     hand.low_cmd_control(
         target_angles=angles,
