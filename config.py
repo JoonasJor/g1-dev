@@ -18,6 +18,15 @@ VIEWER_DT = 0.02  # 50 fps for viewer
 NUM_MOTOR_BODY = 29
 NUM_MOTOR_FINGERS = 12 # Single hand
 
+TOPIC_HAND_CMD = "rt/inspire_hand/ctrl"
+TOPIC_HAND_STATE = "rt/inspire_hand/state"
+TOPIC_HAND_TOUCH = "rt/inspire_hand/touch"
+
+TOPIC_BODY_CMD = "rt/lowcmd"
+TOPIC_BODY_LOW_STATE = "rt/lowstate"
+TOPIC_BODY_HIGH_STATE = "rt/sportmodestate"
+TOPIC_WIRELESS_CONTROLLER = "rt/wirelesscontroller"
+
 START_ON_FLOOR = False
 FLOOR_POSITION = [0.0, 0.0, 0.07]
 FLOOR_ORIENTATION = [-0.7071, 0, 0.7071, 0.0]

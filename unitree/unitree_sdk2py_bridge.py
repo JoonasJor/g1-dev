@@ -27,11 +27,6 @@ else:
     from unitree_sdk2py.idl.unitree_go.msg.dds_ import LowState_
     from unitree_sdk2py.idl.default import unitree_go_msg_dds__LowState_ as LowState_default
 
-TOPIC_LOWCMD = "rt/lowcmd"
-TOPIC_LOWSTATE = "rt/lowstate"
-TOPIC_HIGHSTATE = "rt/sportmodestate"
-TOPIC_WIRELESS_CONTROLLER = "rt/wirelesscontroller"
-
 MOTOR_SENSOR_NUM = 3
 NUM_MOTOR_IDL_GO = 20
 NUM_MOTOR_IDL_HG = 35
@@ -70,7 +65,7 @@ class UnitreeSdk2Bridge:
 
         # Unitree sdk2 message
         self.low_state = LowState_default()
-        self.low_state_puber = ChannelPublisher(TOPIC_LOWSTATE, LowState_)
+        self.low_state_puber = ChannelPublisher(Cfg.TOPIC_BODY_LOW_STATE, LowState_)
         self.low_state_puber.Init()
         self.lowStateThread = RecurrentThread(
             interval=self.dt, target=self.PublishLowState, name="sim_lowstate"
@@ -78,7 +73,7 @@ class UnitreeSdk2Bridge:
         self.lowStateThread.Start()
 
         self.high_state = unitree_go_msg_dds__SportModeState_()
-        self.high_state_puber = ChannelPublisher(TOPIC_HIGHSTATE, SportModeState_)
+        self.high_state_puber = ChannelPublisher(Cfg.TOPIC_BODY_HIGH_STATE, SportModeState_)
         self.high_state_puber.Init()
         self.HighStateThread = RecurrentThread(
             interval=self.dt, target=self.PublishHighState, name="sim_highstate"
@@ -87,7 +82,7 @@ class UnitreeSdk2Bridge:
 
         self.wireless_controller = unitree_go_msg_dds__WirelessController_()
         self.wireless_controller_puber = ChannelPublisher(
-            TOPIC_WIRELESS_CONTROLLER, WirelessController_
+            Cfg.TOPIC_WIRELESS_CONTROLLER, WirelessController_
         )
         self.wireless_controller_puber.Init()
         self.WirelessControllerThread = RecurrentThread(
@@ -97,7 +92,7 @@ class UnitreeSdk2Bridge:
         )
         self.WirelessControllerThread.Start()
 
-        self.low_cmd_suber = ChannelSubscriber(TOPIC_LOWCMD, LowCmd_)
+        self.low_cmd_suber = ChannelSubscriber(Cfg.TOPIC_BODY_CMD, LowCmd_)
         self.low_cmd_suber.Init(self.LowCmdHandler, 10)
 
         # joystick
