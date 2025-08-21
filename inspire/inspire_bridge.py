@@ -81,9 +81,9 @@ class InspireBridge():
             speeds_12 = [0.0] * 12
 
             for i, joint_idx in enumerate(joint_indice):
-                # 2. Convert angles from (0 - 1000) to radians and forces from (-4000 - 4000) to N
-                angles_12[i] = helpers.num_to_range(angles_scaled_12[i], 0, 1000, *self.joint_angle_range[i])
-                forces_12[i] = helpers.num_to_range(forces_scaled_12[i], -4000, 4000, *self.joint_force_range[i])
+                # 2. Convert angles from (1000 - 0) to radians and forces from (4000 - -4000) to N
+                angles_12[i] = helpers.num_to_range(angles_scaled_12[i], 1000, 0, *self.joint_angle_range[i])
+                forces_12[i] = helpers.num_to_range(forces_scaled_12[i], 4000, -4000, *self.joint_force_range[i])
                 speeds_12[i] = 0 # TODO: figure out later
 
                 # 3. Set the mujoco control command
@@ -147,15 +147,15 @@ class InspireBridge():
                 print(f"[PublishHandState_{self.l_r}] error: {type(e).__name__}: {e}")
 
         # Convert mujoco sensor data to inspire DDS format
-        # 1. Convert angles from radians to (0 - 1000) and forces from N to (-4000 - 4000)
+        # 1. Convert angles from radians to (1000 - 0) and forces from N to (4000 - -4000)
         angles_scaled_12 = []
         for i, angle in enumerate(angles_12):
-            scaled = helpers.num_to_range(angle, *self.joint_angle_range[i], 0, 1000)
+            scaled = helpers.num_to_range(angle, *self.joint_angle_range[i], 1000, 0)
             angles_scaled_12.append(scaled)
 
         forces_scaled_12 = []
         for i, force in enumerate(forces_12):
-            scaled = helpers.num_to_range(force, *self.joint_force_range[i], -4000, 4000)
+            scaled = helpers.num_to_range(force, *self.joint_force_range[i], 4000, -4000)
             forces_scaled_12.append(scaled)
 
         # 2. Compress 12 joints to 6 joints
