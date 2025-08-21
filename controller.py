@@ -5,8 +5,7 @@ import os
 import sys
 
 from inspire import inspire_dds
-from unitree_sdk2py.core.channel import ChannelPublisher, ChannelFactoryInitialize
-from unitree_sdk2py.core.channel import ChannelSubscriber, ChannelFactoryInitialize
+from unitree_sdk2py.core.channel import ChannelPublisher, ChannelSubscriber
 from unitree_sdk2py.idl.default import unitree_hg_msg_dds__LowCmd_
 from unitree_sdk2py.idl.unitree_hg.msg.dds_ import LowCmd_
 from unitree_sdk2py.idl.unitree_hg.msg.dds_ import LowState_
@@ -15,10 +14,6 @@ from unitree_sdk2py.comm.motion_switcher.motion_switcher_client import MotionSwi
 
 import inspire.inspire_dds as inspire_dds
 import inspire.inspire_defaults as inspire_defaults
-
-from unitree_sdk2py.utils.thread import RecurrentThread
-
-from inspire_sdkpy import inspire_sdk
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 import config as Cfg
