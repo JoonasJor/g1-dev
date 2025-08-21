@@ -9,7 +9,7 @@ import config as Cfg
 import g1_joints as Joints
 
 def close_hand(hand: HandController):
-    angles = [1000] * 6
+    angles = [1000] * 5 + [500]
     hand.low_cmd_control(
         target_angles=angles,
         duration=1.0,
