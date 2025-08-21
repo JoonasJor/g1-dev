@@ -9,6 +9,10 @@ from inspire.modbus_data_handler import ModbusDataHandler
 import config as Cfg
 import g1_joints as Joints
 
+# Index =   0       1       2       3       4           5
+# Joint =   Pinky   Ring    Middle  Index   Thumb-bend  Thumb-rotation
+# Range =   0-1000
+
 def open_hand(hand: HandController):
     angles = [1000] * 6
     hand.low_cmd_control(
@@ -18,7 +22,7 @@ def open_hand(hand: HandController):
     )
 
 def close_hand(hand: HandController):
-    angles = [0] * 6
+    angles = [0, 0, 0, 0, 0, 500]
     hand.low_cmd_control(
         target_angles=angles,
         duration=1.0,
@@ -26,20 +30,12 @@ def close_hand(hand: HandController):
     )
 
 def pinch(hand: HandController):
-    print("Opening hand...")
-    open_hand(hand)
-
     print("Pinching with index and thumb...")
-    # Pinky, Ring, Middle, Index, Thumb-bend, Thumb-rotation
-    # 0 - 1000
     angles = [1000, 1000, 1000, 300, 300, 0]
     hand.low_cmd_control(
         target_angles=angles,
         duration=3.0
     )
-
-    print("Opening hand...")
-    open_hand(hand)
 
 def hands_loop(hand_r: HandController, hand_l: HandController):
     while True:
