@@ -6,13 +6,16 @@
 ```
 git clone https://github.com/JoonasJor/g1-dev.git
 cd g1-dev
-python3.8 -m venv venv
+python3.10 -m venv venv
 source venv/bin/activate
-pip install mujoco pygame
+pip install mujoco pygame pymodbus
 ```
-2. Install unitree sdk and inspire sdk  
-https://github.com/unitreerobotics/unitree_sdk2_python  
-https://github.com/NaCl-1374/inspire_hand_ws  
+2. Install [Unitree SDK](https://github.com/unitreerobotics/unitree_sdk2_python  )
+```
+git clone https://github.com/unitreerobotics/unitree_sdk2_python.git
+cd unitree_sdk2_python
+pip install -e .
+```
 
 ## Run
 ### Mujoco sim:  
