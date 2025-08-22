@@ -15,12 +15,8 @@ import helpers as helpers
 import config as Cfg
 import g1_joints as Joints
 
-TOPIC_CMD = "rt/inspire_hand/ctrl"
-TOPIC_STATE = "rt/inspire_hand/state"
-TOPIC_TOUCH = "rt/inspire_hand/touch"
-
 class InspireBridge():
-    def __init__(self, mj_model, mj_data, l_r = "r"): # l = left hand, r = right hand
+    def __init__(self, mj_model, mj_data, l_r = "r"):
         self.mj_model = mj_model
         self.mj_data = mj_data
         self.dt = self.mj_model.opt.timestep
@@ -43,27 +39,27 @@ class InspireBridge():
         # Inspire message
         self.l_r = l_r
         self.hand_state = inspire_defaults.state()
-        self.hand_state_pub = ChannelPublisher(f"{TOPIC_STATE}/{l_r}", inspire_dds.inspire_hand_state)
+        self.hand_state_pub = ChannelPublisher(f"{Cfg.TOPIC_HAND_STATE}/{l_r}", inspire_dds.inspire_hand_state)
         self.hand_state_pub.Init()
         self.hand_state_thread = RecurrentThread(
-            interval=self.dt, target=self.PublishHandState, name=f"sim_handstate_{l_r}"
+            interval=self.dt, target=self.publish_hand_state, name=f"sim_handstate_{l_r}"
         )
         self.hand_state_thread.Start()
 
         self.hand_touch = inspire_defaults.touch()
-        self.hand_touch_pub = ChannelPublisher(f"{TOPIC_TOUCH}/{l_r}", inspire_dds.inspire_hand_touch)
+        self.hand_touch_pub = ChannelPublisher(f"{Cfg.TOPIC_HAND_TOUCH}/{l_r}", inspire_dds.inspire_hand_touch)
         self.hand_touch_pub.Init()
         self.hand_touch_thread = RecurrentThread(
-            interval=self.dt, target=self.PublishHandTouch, name=f"sim_handstate_{l_r}"
+            interval=self.dt, target=self.publish_hand_touch, name=f"sim_handtouch_{l_r}"
         )
         self.hand_touch_thread.Start()
 
-        self.hand_ctrl_sub = ChannelSubscriber(f"{TOPIC_CMD}/{l_r}", inspire_dds.inspire_hand_ctrl)
-        self.hand_ctrl_sub.Init(self.HandCmdHandler, 10)
+        self.hand_ctrl_sub = ChannelSubscriber(f"{Cfg.TOPIC_HAND_CMD}/{l_r}", inspire_dds.inspire_hand_ctrl)
+        self.hand_ctrl_sub.Init(self.hand_cmd_handler, 10)
 
-    def HandCmdHandler(self, msg: inspire_dds.inspire_hand_ctrl):
+    def hand_cmd_handler(self, msg: inspire_dds.inspire_hand_ctrl):
         if self.mj_data is None:
-            print(f"[HandCmdHandler_{self.l_r}] mj_data is None")
+            print(f"[hand_cmd_handler_{self.l_r}] mj_data is None")
             return
         
         if self.l_r == "r":
@@ -94,9 +90,6 @@ class InspireBridge():
                 )
                 self.mj_data.ctrl[joint_idx] = control
 
-                #print(f"[HandCmdHandler_{self.l_r}] {joint_idx=} {angle_set=} {force_set=} {speed_set=}")
-                #print(f"[HandCmdHandler_{self.l_r}] {joint_idx=} {self.mj_data.ctrl[joint_idx]=} {self.mj_data.sensordata[joint_idx]=}")
-
             if False:
                 finger1 = Joints.Hand_R.RightLittle1
                 finger2 = Joints.Hand_R.RightLittle2
@@ -109,14 +102,14 @@ class InspireBridge():
                         \nctrl: {control:.3f}")
 
         except Exception as e:
-            print(f"[HandCmdHandler_{self.l_r}] error: {type(e).__name__}: {e}")
+            print(f"[hand_cmd_handler_{self.l_r}] error: {type(e).__name__}: {e}")
             print(f"{len(self.mj_data.ctrl)=}")
             print(f"{self.num_motor=}")
             traceback.print_exc()
 
-    def PublishHandState(self):
+    def publish_hand_state(self):
         if self.mj_data is None:
-            print(f"[PublishHandState_{self.l_r}] mj_data is None")
+            print(f"[publish_hand_state_{self.l_r}] mj_data is None")
             return
         
         if self.l_r == "r":
@@ -139,12 +132,12 @@ class InspireBridge():
                 speeds_12[joint.idx] = self.mj_data.sensordata[tau_index]
 
             except IndexError as e:
-                print(f"[PublishHandState_{self.l_r}] error: {e} - {i=}, {q_index=}, {dq_index=}, {tau_index=}")
+                print(f"[publish_hand_state_{self.l_r}] error: {e} - {i=}, {q_index=}, {dq_index=}, {tau_index=}")
                 print(f"{len(angles_12)=}")
                 print(f"{len(self.mj_data.sensordata)=}")
                 print(f"{self.num_motor=}")
             except Exception as e:
-                print(f"[PublishHandState_{self.l_r}] error: {type(e).__name__}: {e}")
+                print(f"[publish_hand_state_{self.l_r}] error: {type(e).__name__}: {e}")
 
         # Convert mujoco sensor data to inspire DDS format
         # 1. Convert angles from radians to (1000 - 0) and forces from N to (4000 - -4000)
@@ -165,47 +158,15 @@ class InspireBridge():
         self.hand_state.angle_act = angles_scaled_6
         self.hand_state.force_act = forces_scaled_6
 
-        #print(f"[PublishHandState_{self.l_r}] {forces_scaled_6=}")
-        #print(f"[PublishHandState_{self.l_r}] {forces_scaled_12=}")
-        #print(f"[PublishHandState_{self.l_r}] {angles_scaled_6=}")
-        #print(f"[PublishHandState_{self.l_r}] {angles_scaled_12=}")
-
         # 4. Publish the hand state
         self.hand_state_pub.Write(self.hand_state)
-            
-    def PublishHandTouch(self):
+
+    def publish_hand_touch(self):
         if self.mj_data is None:
-            print("[PublishHandTouch] mj_data is None")
+            print("[publish_hand_touch] mj_data is None")
             return
         
         # TODO: msg = self.mj_data.sensordata[force_sensor_index]
 
         return
-
-        for (var, addr, length, size) in HAND_TOUCH_DATA:
-            value = getattr(msg, var)
-            if value is not None:
-                matrix = np.array(value).reshape(size)
-                self.hand_touch[var]=matrix
-
-        self.hand_state_pub.Write(self.hand_state)
-
-        return
-
-        for i, joint_idx in enumerate(Joints.Hand_R.mujoco_idx_list()):
-            force_sensor_index = i + 3 * self.num_motor + joint_idx
-
-            try:
-                # for testing
-                # TODO: check whether left_little_force_sensor_1 corresponds to tip top or palm
-                #self.hand_touch_r[test_idx[i]] = self.mj_data.sensordata[force_sensor_index]
-                pass
-            except IndexError as e:
-                print(f"[PublishHandTouch] error: {e} - {i=}, {force_sensor_index=}")
-                print(f"{len(self.hand_state.angle_act)=}")
-                print(f"{len(self.mj_data.sensordata)=}")
-                print(f"{self.num_motor=}")
-                
-            except Exception as e:
-                print(f"[PublishHandTouch] error: {type(e).__name__}: {e}")  
-        self.hand_state_pub.Write(self.hand_state)
+    
