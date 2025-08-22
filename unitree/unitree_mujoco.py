@@ -2,9 +2,13 @@ import time
 import mujoco
 import mujoco.viewer
 import threading
+import os
+import sys
+
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 from unitree_sdk2py.core.channel import ChannelFactoryInitialize
-from unitree_sdk2py_bridge import UnitreeSdk2Bridge, ElasticBand
+from unitree.unitree_bridge import UnitreeBridge, ElasticBand
 from inspire.inspire_bridge import InspireBridge
 
 import config as Cfg
@@ -28,7 +32,7 @@ if Cfg.ENABLE_ELASTIC_BAND and not Cfg.START_ON_FLOOR:
     else:
         band_attached_link = mj_model.body("base_link").id
     viewer = mujoco.viewer.launch_passive(
-        mj_model, mj_data, key_callback=elastic_band.MujuocoKeyCallback
+        mj_model, mj_data, key_callback=elastic_band.mujoco_key_callback
     )
 else:
     viewer = mujoco.viewer.launch_passive(mj_model, mj_data)
@@ -39,30 +43,29 @@ dim_motor_sensor_ = 3 * num_motor_
 
 time.sleep(0.2)
 
-
-def SimulationThread():
+def simulation_thread():
     global mj_data, mj_model
 
     if Cfg.START_ON_FLOOR:
-        print("[SimulationThread] Setting robot initial position...")
+        print("simulation_thread Setting robot initial position...")
 
 
     try:
-        print("[SimulationThread] Initializing Unitree SDK...")
+        print("simulation_thread Initializing Unitree SDK...")
         ChannelFactoryInitialize(Cfg.DOMAIN_ID, Cfg.INTERFACE)
-        unitree = UnitreeSdk2Bridge(mj_model, mj_data)
+        unitree = UnitreeBridge(mj_model, mj_data)
 
         inspire_r = InspireBridge(mj_model, mj_data, "r")
         inspire_l = InspireBridge(mj_model, mj_data, "l")
 
         if Cfg.USE_JOYSTICK:
-            print("[SimulationThread] Setting up joystick...")
-            unitree.SetupJoystick(device_id=0, js_type=Cfg.JOYSTICK_TYPE)
+            print("simulation_thread Setting up joystick...")
+            unitree.setup_joystick(device_id=0, js_type=Cfg.JOYSTICK_TYPE)
 
         if Cfg.PRINT_SCENE_INFORMATION:
-            unitree.PrintSceneInformation()
+            unitree.print_scene_info()
 
-        print("[SimulationThread] Starting simulation loop...")
+        print("simulation_thread Starting simulation loop...")
         while viewer.is_running():
             step_start = time.perf_counter()
 
@@ -72,18 +75,18 @@ def SimulationThread():
                 if Cfg.ENABLE_ELASTIC_BAND and not Cfg.START_ON_FLOOR:
                     # Check qpos and qvel lengths
                     if len(mj_data.qpos) < 3 or len(mj_data.qvel) < 3:
-                        print(f"[SimulationThread] qpos or qvel too short: qpos={mj_data.qpos}, qvel={mj_data.qvel}")
+                        print(f"simulation_thread qpos or qvel too short: qpos={mj_data.qpos}, qvel={mj_data.qvel}")
                     else:
-                        force = elastic_band.Advance(mj_data.qpos[:3], mj_data.qvel[:3])
+                        force = elastic_band.advance(mj_data.qpos[:3], mj_data.qvel[:3])
                         if band_attached_link >= mj_data.xfrc_applied.shape[0]:
-                            print(f"[SimulationThread] Invalid band_attached_link index: {band_attached_link}")
+                            print(f"simulation_thread Invalid band_attached_link index: {band_attached_link}")
                         else:
                             mj_data.xfrc_applied[band_attached_link, :3] = force
 
                 mujoco.mj_step(mj_model, mj_data)
 
             except Exception as e:
-                print(f"[SimulationThread] Inner loop error: {type(e).__name__}: {e}")
+                print(f"simulation_thread Inner loop error: {type(e).__name__}: {e}")
                 raise
 
             finally:
@@ -94,36 +97,36 @@ def SimulationThread():
                 time.sleep(time_until_next_step)
 
     except Exception as e:
-        print(f"[SimulationThread] Fatal error: {type(e).__name__}: {e}")
+        print(f"simulation_thread Fatal error: {type(e).__name__}: {e}")
         raise
 
 
 
-def PhysicsViewerThread():
-    print("[PhysicsViewerThread] Starting viewer loop...")
+def physics_viewer_thread():
+    print("[physics_viewer_thread] Starting viewer loop...")
     try:
         while viewer.is_running():
             locker.acquire()
             try:
                 viewer.sync()
             except IndexError as e:
-                print(f"[PhysicsViewerThread] IndexError during sync: {e}")
+                print(f"[physics_viewer_thread] IndexError during sync: {e}")
                 raise
             except Exception as e:
-                print(f"[PhysicsViewerThread] Unexpected error: {type(e).__name__}: {e}")
+                print(f"[physics_viewer_thread] Unexpected error: {type(e).__name__}: {e}")
                 raise
             finally:
                 locker.release()
 
             time.sleep(Cfg.VIEWER_DT)
     except Exception as e:
-        print(f"[PhysicsViewerThread] Fatal error: {type(e).__name__}: {e}")
+        print(f"[physics_viewer_thread] Fatal error: {type(e).__name__}: {e}")
         raise
 
 
 if __name__ == "__main__":
-    viewer_thread = threading.Thread(target=PhysicsViewerThread)
-    sim_thread = threading.Thread(target=SimulationThread)
+    viewer_thread = threading.Thread(target=physics_viewer_thread)
+    sim_thread = threading.Thread(target=simulation_thread)
 
     viewer_thread.start()
     sim_thread.start()

@@ -13,26 +13,18 @@ from unitree_sdk2py.idl.unitree_go.msg.dds_ import WirelessController_
 from unitree_sdk2py.idl.default import unitree_go_msg_dds__SportModeState_
 from unitree_sdk2py.idl.default import unitree_go_msg_dds__WirelessController_
 from unitree_sdk2py.utils.thread import RecurrentThread
+from unitree_sdk2py.idl.unitree_hg.msg.dds_ import LowCmd_
+from unitree_sdk2py.idl.unitree_hg.msg.dds_ import LowState_
+from unitree_sdk2py.idl.default import unitree_hg_msg_dds__LowState_ as LowState_default
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 import config as Cfg
 import g1_joints as Joints
 
-if Cfg.ROBOT=="g1":
-    from unitree_sdk2py.idl.unitree_hg.msg.dds_ import LowCmd_
-    from unitree_sdk2py.idl.unitree_hg.msg.dds_ import LowState_
-    from unitree_sdk2py.idl.default import unitree_hg_msg_dds__LowState_ as LowState_default
-else:
-    from unitree_sdk2py.idl.unitree_go.msg.dds_ import LowCmd_
-    from unitree_sdk2py.idl.unitree_go.msg.dds_ import LowState_
-    from unitree_sdk2py.idl.default import unitree_go_msg_dds__LowState_ as LowState_default
-
 MOTOR_SENSOR_NUM = 3
-NUM_MOTOR_IDL_GO = 20
 NUM_MOTOR_IDL_HG = 35
 
-class UnitreeSdk2Bridge:
-
+class UnitreeBridge:
     def __init__(self, mj_model, mj_data):
         self.mj_model = mj_model
         self.mj_data = mj_data
@@ -42,7 +34,6 @@ class UnitreeSdk2Bridge:
         self.have_imu = False
         self.have_frame_sensor = False
         self.dt = self.mj_model.opt.timestep
-        self.idl_type = (self.num_motor > NUM_MOTOR_IDL_GO) # 0: unitree_go, 1: unitree_hg
 
         self.joystick = None
 
@@ -68,7 +59,7 @@ class UnitreeSdk2Bridge:
         self.low_state_puber = ChannelPublisher(Cfg.TOPIC_BODY_LOW_STATE, LowState_)
         self.low_state_puber.Init()
         self.lowStateThread = RecurrentThread(
-            interval=self.dt, target=self.PublishLowState, name="sim_lowstate"
+            interval=self.dt, target=self.publish_low_state, name="sim_lowstate"
         )
         self.lowStateThread.Start()
 
@@ -76,7 +67,7 @@ class UnitreeSdk2Bridge:
         self.high_state_puber = ChannelPublisher(Cfg.TOPIC_BODY_HIGH_STATE, SportModeState_)
         self.high_state_puber.Init()
         self.HighStateThread = RecurrentThread(
-            interval=self.dt, target=self.PublishHighState, name="sim_highstate"
+            interval=self.dt, target=self.publish_high_state, name="sim_highstate"
         )
         self.HighStateThread.Start()
 
@@ -87,13 +78,13 @@ class UnitreeSdk2Bridge:
         self.wireless_controller_puber.Init()
         self.WirelessControllerThread = RecurrentThread(
             interval=0.01,
-            target=self.PublishWirelessController,
+            target=self.publish_wireless_controller,
             name="sim_wireless_controller",
         )
         self.WirelessControllerThread.Start()
 
         self.low_cmd_suber = ChannelSubscriber(Cfg.TOPIC_BODY_CMD, LowCmd_)
-        self.low_cmd_suber.Init(self.LowCmdHandler, 10)
+        self.low_cmd_suber.Init(self.low_cmd_handler, 10)
 
         # joystick
         self.key_map = {
@@ -115,9 +106,9 @@ class UnitreeSdk2Bridge:
             "left": 15,
         }
 
-    def LowCmdHandler(self, msg: LowCmd_):
+    def low_cmd_handler(self, msg: LowCmd_):
         if self.mj_data is None:
-            print("[LowCmdHandler] mj_data is None")
+            print("low_cmd_handler mj_data is None")
             return
         
         try:
@@ -136,22 +127,22 @@ class UnitreeSdk2Bridge:
                     )
                 )
         except Exception as e:
-            print(f"[LowCmdHandler] error: {type(e).__name__}: {e}")
+            print(f"low_cmd_handler error: {type(e).__name__}: {e}")
             print(f"{joint_idx=}, {q_index=}, {dq_index=}")
             print(f"{len(msg.motor_cmd)=}")
             print(f"{len(self.mj_data.ctrl)=}")
             print(f"{self.num_motor=}")
 
-    def PublishLowState(self):
+    def publish_low_state(self):
         try:
             if self.mj_data is None:
-                print("[PublishLowState] mj_data is None")
+                print("[publish_low_state] mj_data is None")
                 return
 
             sensor_len = len(self.mj_data.sensordata)
             expected_len = 3 * self.num_motor
             if sensor_len < expected_len:
-                print(f"[PublishLowState] sensordata too short: expected {expected_len}, got {sensor_len}")
+                print(f"[publish_low_state] sensordata too short: expected {expected_len}, got {sensor_len}")
                 return
 
             for state_idx, joint_idx in enumerate(Joints.Body.mujoco_idx_list()):
@@ -164,19 +155,19 @@ class UnitreeSdk2Bridge:
                     self.low_state.motor_state[state_idx].dq = self.mj_data.sensordata[dq_index]
                     self.low_state.motor_state[state_idx].tau_est = self.mj_data.sensordata[tau_index]
                 except IndexError as e:
-                    print(f"[PublishLowState] error: {type(e).__name__}: {e}")
+                    print(f"[publish_low_state] error: {type(e).__name__}: {e}")
                     print(f"{joint_idx=}, {q_index=}, {dq_index=}, {tau_index=}")
                     print(f"{len(self.low_state.motor_state)=}")
                     print(f"{len(self.mj_data.sensordata)=}")
                     print(f"{self.num_motor=}")
                     
                 except Exception as e:
-                    print(f"[PublishLowState] error: {type(e).__name__}: {e}")
+                    print(f"[publish_low_state] error: {type(e).__name__}: {e}")
 
             if self.have_frame_sensor_:
                 imu_offset = self.dim_motor_sensor
                 if sensor_len < imu_offset + 10:
-                    print(f"[PublishLowState] sensordata too short for IMU: expected {imu_offset + 10}, got {sensor_len}")
+                    print(f"[publish_low_state] sensordata too short for IMU: expected {imu_offset + 10}, got {sensor_len}")
                     return
 
                 self.low_state.imu_state.quaternion = self.mj_data.sensordata[imu_offset : imu_offset + 4]
@@ -219,13 +210,13 @@ class UnitreeSdk2Bridge:
                     self.low_state.wireless_remote[20:24] = packs[3]
 
                 except Exception as e:
-                    print(f"[PublishLowState] Joystick error: {type(e).__name__}: {e}")
+                    print(f"[publish_low_state] Joystick error: {type(e).__name__}: {e}")
 
             self.low_state_puber.Write(self.low_state)
         except Exception:
             traceback.print_exc()
 
-    def PublishHighState(self):
+    def publish_high_state(self):
 
         if self.mj_data != None:
             self.high_state.position[0] = self.mj_data.sensordata[
@@ -250,7 +241,7 @@ class UnitreeSdk2Bridge:
 
         self.high_state_puber.Write(self.high_state)
 
-    def PublishWirelessController(self):
+    def publish_wireless_controller(self):
         if self.joystick != None:
             pygame.event.get()
             key_state = [0] * 16
@@ -295,7 +286,7 @@ class UnitreeSdk2Bridge:
 
             self.wireless_controller_puber.Write(self.wireless_controller)
 
-    def SetupJoystick(self, device_id=0, js_type="xbox"):
+    def setup_joystick(self, device_id=0, js_type="xbox"):
         pygame.init()
         pygame.joystick.init()
         joystick_count = pygame.joystick.get_count()
@@ -354,7 +345,7 @@ class UnitreeSdk2Bridge:
         else:
             print("Unsupported gamepad. ")
 
-    def PrintSceneInformation(self):
+    def print_scene_info(self):
         print(" ")
 
         print("<<------------- Link ------------->> ")
@@ -408,7 +399,7 @@ class ElasticBand:
         self.length = 0
         self.enable = True
 
-    def Advance(self, x, dx):
+    def advance(self, x, dx):
         """
         Args:
           δx: desired position - current position
@@ -421,7 +412,7 @@ class ElasticBand:
         f = (self.stiffness * (distance - self.length) - self.damping * v) * direction
         return f
 
-    def MujuocoKeyCallback(self, key):
+    def mujoco_key_callback(self, key):
         glfw = mujoco.glfw.glfw
         if key == glfw.KEY_7:
             self.length -= 0.1

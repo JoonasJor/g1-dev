@@ -146,23 +146,3 @@ class Hand_R(JointMixin, Enum):
     Ring2          = Joint(mujoco_idx=50, idx=9,  default_angle=500,     default_kp=10, default_kd=0.5)
     Little1        = Joint(mujoco_idx=51, idx=10, default_angle=500,     default_kp=10, default_kd=0.5)
     Little2        = Joint(mujoco_idx=52, idx=11, default_angle=500,     default_kp=10, default_kd=0.5)
-
-def get_joint_ranges(mj_model, l_r):
-    """
-    Returns (joint_angle_range, joint_force_range) for the finger joints
-    """
-    if l_r == "r":
-        joint_indices = Hand_R.mujoco_idx_list()
-    else:
-        joint_indices = Hand_L.mujoco_idx_list()
-
-    joint_angle_range = []
-    joint_force_range = []
-
-    for idx in joint_indices:
-        # offset by 1 to accommodate for (joint_index: 0 , name: floating_base_joint)
-        # this offset only applies to worldbody joints. not actuators or sensors.
-        joint_angle_range.append(tuple(mj_model.jnt_range[idx + 1]))
-        joint_force_range.append(tuple(mj_model.actuator_ctrlrange[idx]))
-
-    return joint_angle_range, joint_force_range
