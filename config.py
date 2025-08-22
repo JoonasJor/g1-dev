@@ -25,6 +25,9 @@ TOPIC_HAND_TOUCH = "rt/inspire_hand/touch"
 TOPIC_BODY_CMD = "rt/lowcmd"
 TOPIC_BODY_LOW_STATE = "rt/lowstate"
 TOPIC_BODY_HIGH_STATE = "rt/sportmodestate"
+
+TOPIC_ARM_SDK = "rt/arm_sdk"
+
 TOPIC_WIRELESS_CONTROLLER = "rt/wirelesscontroller"
 
 START_ON_FLOOR = False

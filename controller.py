@@ -24,6 +24,10 @@ class Controller:
         self.dt = 0.002
 
 class BodyController(Controller):
+    """
+    Controls the whole body using DDS topic "rt/lowcmd"
+    """
+
     def __init__(self):
         super().__init__()
 
@@ -146,7 +150,133 @@ class BodyController(Controller):
 
         print(f"{status=}\n{result=}")
 
+class ArmController(Controller):
+    """
+    Controls only upper body using DDS topic "rt/arm_sdk"
+
+    Simultaneous high level control is possible while using this controller
+    """
+
+    arm_joints = [
+        Joints.Body.WaistYaw,
+        Joints.Body.WaistRoll,
+        Joints.Body.WaistPitch,
+
+        Joints.Body.LeftShoulderPitch,  
+        Joints.Body.LeftShoulderRoll,
+        Joints.Body.LeftShoulderYaw,    
+        Joints.Body.LeftElbow,
+        Joints.Body.LeftWristRoll,      
+        Joints.Body.LeftWristPitch, 
+        Joints.Body.LeftWristYaw,
+
+        Joints.Body.RightShoulderPitch, 
+        Joints.Body.RightShoulderRoll,
+        Joints.Body.RightShoulderYaw,   
+        Joints.Body.RightElbow,
+        Joints.Body.RightWristRoll,     
+        Joints.Body.RightWristPitch,
+        Joints.Body.RightWristYaw
+    ]
+
+    def __init__(self):
+        super().__init__()
+
+        self.kp = Joints.Body.default_kp_list()
+        self.kd = Joints.Body.default_kd_list()
+
+        self.low_state = None 
+        
+        self.state_sub = ChannelSubscriber(Cfg.TOPIC_BODY_LOW_STATE, LowState_)
+        self.state_sub.Init(self.low_state_handler, 10)
+
+        self.cmd = unitree_hg_msg_dds__LowCmd_()
+        self.crc = CRC() 
+
+        self.cmd_pub = ChannelPublisher(Cfg.TOPIC_ARM_SDK, LowCmd_)
+        self.cmd_pub.Init()
+
+    def low_state_handler(self, msg: LowState_):
+        self.low_state = msg
+
+    def hold_angles(self):
+        current_angles = [motor.q for motor in self.low_state.motor_state]
+
+        while True:
+            for joint in self.arm_joints:
+                self.cmd.motor_cmd[joint.idx].tau = 0.0
+                self.cmd.motor_cmd[joint.idx].dq = 0.0
+                self.cmd.motor_cmd[joint.idx].kp = self.kp[joint.idx]
+                self.cmd.motor_cmd[joint.idx].kd = self.kd[joint.idx]
+                self.cmd.motor_cmd[joint.idx].q = current_angles[joint.idx]
+
+            self.cmd.motor_cmd[29].q =  1.0
+
+            self.cmd.crc = self.crc.Crc(self.cmd)
+            self.cmd_pub.Write(self.cmd)
+
+            time.sleep(self.dt)
+
+            if sys.stdin in select.select([sys.stdin], [], [], 0)[0]:
+                input()
+                break
+
+    def low_cmd_control(self, target_angles, kp, kd, duration = 10.0, debug = False, wait_for_user_input = True):
+        start_angles = [motor.q for motor in self.low_state.motor_state]
+        start_time = time.time()
+
+        while True:
+            elapsed = time.time() - start_time
+            if elapsed >= duration + 1:
+                break
+
+            ratio = elapsed / duration
+            ratio = np.clip(ratio, 0.0, 1.0)
+
+            for joint in self.arm_joints:
+                self.cmd.motor_cmd[joint.idx].tau = 0.0
+                self.cmd.motor_cmd[joint.idx].dq = 0.0
+                self.cmd.motor_cmd[joint.idx].kp = kp[joint.idx]
+                self.cmd.motor_cmd[joint.idx].kd = kd[joint.idx]
+
+                # Interpolate the joint angle
+                q_interpolated = (1.0 - ratio) * start_angles[joint.idx] + ratio * target_angles[joint.idx]
+                self.cmd.motor_cmd[joint.idx].q = q_interpolated
+
+            # The documentation says this unused joint is used for gradual motor movement
+            # but the arm sdk example says this enables and disables the arm sdk?
+            self.cmd.motor_cmd[29].q =  1.0
+
+            self.cmd.crc = self.crc.Crc(self.cmd)
+            self.cmd_pub.Write(self.cmd)
+
+            if debug:
+                for joint in self.arm_joints:
+                    print(
+                        f"{joint.idx}: "
+                        f"current={self.low_state.motor_state[joint.idx].q:.5f} "
+                        f"target={target_angles[joint.idx]:.5f} "
+                        f"q={self.cmd.motor_cmd[joint.idx].q:.5f} "
+                        f"tau={self.cmd.motor_cmd[joint.idx].tau} "
+                        f"dq={self.cmd.motor_cmd[joint.idx].dq} "
+                        f"kp={self.cmd.motor_cmd[joint.idx].kp} "
+                        f"kd={self.cmd.motor_cmd[joint.idx].kd}"
+                    )
+                print()
+
+            time.sleep(self.dt) 
+        
+        print("Done.") 
+
+        if wait_for_user_input:
+            print("Keeping joints at current position. Press Enter to continue...") 
+            self.hold_angles()
+
 class HandController(Controller):
+    """
+    Controls the Inspire hands using DDS topic "rt/inspire_hand/ctrl"
+    """
+
     def __init__(self, l_r = "r"):
         super().__init__()
 
