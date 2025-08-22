@@ -1,7 +1,7 @@
 # g1-dev
 
 ## Installation
-
+Requires python 3.8 - 3.10
 1. Setup environment
 ```
 git clone https://github.com/JoonasJor/g1-dev.git
