@@ -17,16 +17,14 @@ def open_hand(hand: HandController):
     angles = [1000] * 6
     hand.low_cmd_control(
         target_angles=angles,
-        duration=1.0,
-        wait_for_user_input=False
+        duration=1.0
     )
 
 def close_hand(hand: HandController):
     angles = [0, 0, 0, 0, 0, 500]
     hand.low_cmd_control(
         target_angles=angles,
-        duration=1.0,
-        wait_for_user_input=False
+        duration=1.0
     )
 
 def pinch(hand: HandController):
