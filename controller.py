@@ -4,13 +4,16 @@ import select
 import os
 import sys
 
-from inspire import inspire_dds
+#from inspire import inspire_dds
 from unitree_sdk2py.core.channel import ChannelPublisher, ChannelSubscriber
 from unitree_sdk2py.idl.default import unitree_hg_msg_dds__LowCmd_
 from unitree_sdk2py.idl.unitree_hg.msg.dds_ import LowCmd_
 from unitree_sdk2py.idl.unitree_hg.msg.dds_ import LowState_
 from unitree_sdk2py.utils.crc import CRC
 from unitree_sdk2py.comm.motion_switcher.motion_switcher_client import MotionSwitcherClient
+
+from unitree_sdk2py.idl.default import unitree_go_msg_dds__SportModeState_
+from unitree_sdk2py.idl.unitree_go.msg.dds_ import SportModeState_
 
 import inspire.inspire_dds as inspire_dds
 import inspire.inspire_defaults as inspire_defaults
@@ -26,6 +29,8 @@ class Controller:
 class BodyController(Controller):
     """
     Controls the whole body using DDS topic "rt/lowcmd"
+
+    Do NOT use simultaneously with high level control
     """
 
     def __init__(self):
@@ -64,36 +69,13 @@ class BodyController(Controller):
         #for motor in self.low_state.motor_state:
         #    print(motor.q)
 
-    def hold_angles(self):
-        current_angles = [motor.q for motor in self.low_state.motor_state]
-
-        while True:
-            for i in range(self.num_motor_body):
-                self.cmd.mode_pr = 0
-                self.cmd.mode_machine = self.mode_machine_
-                self.cmd.motor_cmd[i].mode = 1
-                self.cmd.motor_cmd[i].tau = 0.0
-                self.cmd.motor_cmd[i].dq = 0.0
-                self.cmd.motor_cmd[i].kp = self.kp[i]
-                self.cmd.motor_cmd[i].kd = self.kd[i]
-                self.cmd.motor_cmd[i].q = current_angles[i]
-
-            self.cmd.crc = self.crc.Crc(self.cmd)
-            self.cmd_pub.Write(self.cmd)
-
-            time.sleep(self.dt)
-
-            if sys.stdin in select.select([sys.stdin], [], [], 0)[0]:
-                input()
-                break
-
-    def low_cmd_control(self, target_angles, kp, kd, duration = 10.0, debug = False, wait_for_user_input = True):
+    def low_cmd_control(self, target_angles, kp, kd, duration = 10.0, debug = False):
         start_angles = [motor.q for motor in self.low_state.motor_state]
         start_time = time.time()
 
         while True:
             elapsed = time.time() - start_time
-            if elapsed >= duration + 1:
+            if elapsed >= duration:
                 break
 
             ratio = elapsed / duration
@@ -131,10 +113,6 @@ class BodyController(Controller):
         
         print("Done.") 
 
-        if wait_for_user_input:
-            print("Keeping joints at current position. Press Enter to continue...") 
-            self.hold_angles()
-
     def init_msc(self):
         self.msc = MotionSwitcherClient()
         self.msc.SetTimeout(3.0)
@@ -154,7 +132,7 @@ class ArmController(Controller):
     """
     Controls only upper body using DDS topic "rt/arm_sdk"
 
-    Simultaneous high level control is possible while using this controller
+    Can be used simultaneously with high level control (balancing, walking, ...)
     """
 
     arm_joints = [
@@ -179,6 +157,8 @@ class ArmController(Controller):
         Joints.Body.RightWristYaw
     ]
 
+    arm_sdk_idx = 29
+
     def __init__(self):
         super().__init__()
 
@@ -186,9 +166,8 @@ class ArmController(Controller):
         self.kd = Joints.Body.default_kd_list()
 
         self.low_state = None 
-        
-        self.state_sub = ChannelSubscriber(Cfg.TOPIC_BODY_LOW_STATE, LowState_)
-        self.state_sub.Init(self.low_state_handler, 10)
+        self.low_state_sub = ChannelSubscriber(Cfg.TOPIC_BODY_LOW_STATE, LowState_)
+        self.low_state_sub.Init(self.low_state_handler, 10)
 
         self.cmd = unitree_hg_msg_dds__LowCmd_()
         self.crc = CRC() 
@@ -196,30 +175,26 @@ class ArmController(Controller):
         self.cmd_pub = ChannelPublisher(Cfg.TOPIC_ARM_SDK, LowCmd_)
         self.cmd_pub.Init()
 
+        self.high_state = unitree_go_msg_dds__SportModeState_()
+        self.high_state_sub = ChannelSubscriber(Cfg.TOPIC_BODY_HIGH_STATE, SportModeState_)
+        self.high_state_sub.Init(self.high_state_handler, 10)
+
+        self.ctrl_initialized = False
+
     def low_state_handler(self, msg: LowState_):
+        """
+        Updates low state.
+        """
+
         self.low_state = msg
 
-    def hold_angles(self):
-        current_angles = [motor.q for motor in self.low_state.motor_state]
+    def high_state_handler(self, msg: SportModeState_):
+        """
+        Updates high state.
+        G1 doesnt seem to send high state information. Figure out later.
+        """
 
-        while True:
-            for joint in self.arm_joints:
-                self.cmd.motor_cmd[joint.idx].tau = 0.0
-                self.cmd.motor_cmd[joint.idx].dq = 0.0
-                self.cmd.motor_cmd[joint.idx].kp = self.kp[joint.idx]
-                self.cmd.motor_cmd[joint.idx].kd = self.kd[joint.idx]
-                self.cmd.motor_cmd[joint.idx].q = current_angles[joint.idx]
-
-            self.cmd.motor_cmd[29].q =  1.0
-
-            self.cmd.crc = self.crc.Crc(self.cmd)
-            self.cmd_pub.Write(self.cmd)
-
-            time.sleep(self.dt)
-
-            if sys.stdin in select.select([sys.stdin], [], [], 0)[0]:
-                input()
-                break
+        self.high_state = msg
 
     def low_cmd_control(self, target_angles, kp, kd, duration = 10.0, debug = False, wait_for_user_input = True):
         start_angles = [motor.q for motor in self.low_state.motor_state]
@@ -227,7 +202,7 @@ class ArmController(Controller):
 
         while True:
             elapsed = time.time() - start_time
-            if elapsed >= duration + 1:
+            if elapsed >= duration:
                 break
 
             ratio = elapsed / duration
@@ -243,9 +218,8 @@ class ArmController(Controller):
                 q_interpolated = (1.0 - ratio) * start_angles[joint.idx] + ratio * target_angles[joint.idx]
                 self.cmd.motor_cmd[joint.idx].q = q_interpolated
 
-            # The documentation says this unused joint is used for gradual motor movement
-            # but the arm sdk example says this enables and disables the arm sdk?
-            self.cmd.motor_cmd[29].q =  1.0
+            # Enable upper body control
+            self.cmd.motor_cmd[self.arm_sdk_idx].q =  1.0
 
             self.cmd.crc = self.crc.Crc(self.cmd)
             self.cmd_pub.Write(self.cmd)
@@ -265,16 +239,40 @@ class ArmController(Controller):
                 print()
 
             time.sleep(self.dt) 
-        
-        print("Done.") 
 
-        if wait_for_user_input:
-            print("Keeping joints at current position. Press Enter to continue...") 
-            self.hold_angles()
+        print("Done.") 
+        self.ctrl_initialized = True
+
+    def release_control(self, duration = 3.0):
+        """
+        Gradually release control of the arms.
+        """
+
+        if not self.ctrl_initialized:
+            print("Control not initialized. Nothing to release.")
+            print("(The arms will violently jerk to default position if low_cmd_control has not been used yet)")
+            return
+
+        start_time = time.time()
+
+        while True:
+            elapsed = time.time() - start_time
+            if elapsed >= duration:
+                break
+
+            ratio = elapsed / duration
+            ratio = np.clip(ratio, 0.0, 1.0)  
+
+            self.cmd.motor_cmd[self.arm_sdk_idx].q =  (1 - ratio)  
+
+            self.cmd.crc = self.crc.Crc(self.cmd)
+            self.cmd_pub.Write(self.cmd) 
 
 class HandController(Controller):
     """
     Controls the Inspire hands using DDS topic "rt/inspire_hand/ctrl"
+
+    Can be used simultaneously with any other controller
     """
 
     def __init__(self, l_r = "r"):
@@ -298,27 +296,13 @@ class HandController(Controller):
     def low_state_handler(self, msg: inspire_dds.inspire_hand_state):
         self.low_state = msg
 
-    def hold_angles(self):
-        current_angles = self.low_state.angle_act
-
-        while True:
-            self.cmd.angle_set = current_angles
-
-            self.cmd_pub.Write(self.cmd)
-
-            time.sleep(self.dt)
-
-            if sys.stdin in select.select([sys.stdin], [], [], 0)[0]:
-                input()
-                break
-
-    def low_cmd_control(self, target_angles, duration = 5.0, wait_for_user_input = True, debug = False):
+    def low_cmd_control(self, target_angles, duration = 5.0, debug = False):
         start_angles = self.low_state.angle_act
         start_time = time.time()
 
         while True:
             elapsed = time.time() - start_time
-            if elapsed >= duration + 0.5:
+            if elapsed >= duration:
                 break
 
             ratio = elapsed / duration
@@ -340,8 +324,3 @@ class HandController(Controller):
         print("Done.")
         print(f"current = {self.low_state.angle_act} target was = {target_angles}")
         print()
-        
-
-        if wait_for_user_input:
-            print("Keeping joints at current position. Press Enter to continue...") 
-            self.hold_angles()
