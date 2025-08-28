@@ -1,7 +1,9 @@
 import time
-import sys
 import threading
+import sys
+import os
 
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from unitree_sdk2py.core.channel import ChannelSubscriber, ChannelFactoryInitialize
 import inspire.inspire_dds as inspire_dds
 import inspire.inspire_defaults as inspire_defaults

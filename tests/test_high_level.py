@@ -2,11 +2,11 @@
 
 import time
 import sys
-from unitree_sdk2py.core.channel import ChannelSubscriber, ChannelFactoryInitialize
-from unitree_sdk2py.idl.default import unitree_go_msg_dds__SportModeState_
-from unitree_sdk2py.idl.unitree_go.msg.dds_ import SportModeState_
+import os
+
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+from unitree_sdk2py.core.channel import ChannelFactoryInitialize
 from unitree_sdk2py.g1.loco.g1_loco_client import LocoClient
-import math
 from dataclasses import dataclass
 
 @dataclass
@@ -28,6 +28,7 @@ option_list = [
     TestOption(name="wave hand2", id=10), # wave hand and trun around  
     TestOption(name="shake hand", id=11),     
     TestOption(name="Lie2StandUp", id=12),     
+    TestOption(name="BalanceStand", id=13),    
 ]
 
 class UserInterface:
@@ -115,5 +116,7 @@ if __name__ == "__main__":
             sport_client.Damp()
             time.sleep(0.5)
             sport_client.Lie2StandUp() # When using the Lie2StandUp function, ensure that the robot faces up and the ground is hard, flat and rough.
+        elif test_option.id == 13:
+            sport_client.BalanceStand()
 
         time.sleep(1)
