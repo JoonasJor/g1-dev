@@ -1,10 +1,8 @@
 import time
 import numpy as np
-import select
 import os
 import sys
 
-#from inspire import inspire_dds
 from unitree_sdk2py.core.channel import ChannelPublisher, ChannelSubscriber
 from unitree_sdk2py.idl.default import unitree_hg_msg_dds__LowCmd_
 from unitree_sdk2py.idl.unitree_hg.msg.dds_ import LowCmd_
@@ -30,7 +28,7 @@ class BodyController(Controller):
     """
     Controls the whole body using DDS topic "rt/lowcmd"
 
-    Do NOT use simultaneously with high level control
+    Do NOT use simultaneously with high-level control
     """
 
     def __init__(self):
@@ -46,8 +44,8 @@ class BodyController(Controller):
 
         self.low_state = None 
         
-        self.state_sub = ChannelSubscriber(Cfg.TOPIC_BODY_LOW_STATE, LowState_)
-        self.state_sub.Init(self.low_state_handler, 10)
+        self.low_state_sub = ChannelSubscriber(Cfg.TOPIC_BODY_LOW_STATE, LowState_)
+        self.low_state_sub.Init(self._low_state_handler, 10)
 
         self.cmd = unitree_hg_msg_dds__LowCmd_()
         self.crc = CRC() 
@@ -55,21 +53,31 @@ class BodyController(Controller):
         self.cmd_pub = ChannelPublisher(Cfg.TOPIC_BODY_CMD, LowCmd_)
         self.cmd_pub.Init()
 
-    def low_state_handler(self, msg: LowState_):
+    def _low_state_handler(self, msg: LowState_):
         self.low_state = msg
+
         if self.update_mode_machine_ == False:
             self.mode_machine_ = self.low_state.mode_machine
             self.update_mode_machine_ = True
 
-        self.counter += 1
-        if self.counter % 500 == 0:
-            #print(self.low_state.imu_state.rpy)
-            self.counter = 0
+    def low_cmd_control(self, target_angles, kp=None, kd=None, duration=5.0, debug=False):
+        """
+        Controls the whole body by interpolating to target angles over a duration.
+        Using this will disable high-level control.
 
-        #for motor in self.low_state.motor_state:
-        #    print(motor.q)
+        Args:
+            target_angles (list of float): The target joint angles.
+            kp (list of float, optional): Joint stiffness coefficients.
+            kd (list of float, optional): Joint damping coefficients.
+            duration (float, optional): The time over which to interpolate.
+            debug (bool, optional): If True, print debug information.
+        """
 
-    def low_cmd_control(self, target_angles, kp, kd, duration = 10.0, debug = False):
+        if kp is None:
+            kp = self.kp
+        if kd is None:
+            kd = self.kd
+
         start_angles = [motor.q for motor in self.low_state.motor_state]
         start_time = time.time()
 
@@ -112,6 +120,32 @@ class BodyController(Controller):
             time.sleep(self.dt) 
         
         print("Done.") 
+
+
+#FOR TESTING
+    def lock_joints_mode(self):
+        for i in range(self.num_motor_body):
+            self.cmd.motor_cmd[i].mode = 0
+
+        self.cmd.crc = self.crc.Crc(self.cmd)
+        self.cmd_pub.Write(self.cmd)
+
+    def lock_joints_write_current(self):
+        for i in range(self.num_motor_body):
+            self.cmd.motor_cmd[i].q = self.low_state.motor_state[i].q
+
+        self.cmd.crc = self.crc.Crc(self.cmd)
+        self.cmd_pub.Write(self.cmd)
+
+    def lock_joints_both(self):
+        for i in range(self.num_motor_body):
+            self.cmd.motor_cmd[i].mode = 0
+            self.cmd.motor_cmd[i].q = self.low_state.motor_state[i].q
+
+        self.cmd.crc = self.crc.Crc(self.cmd)
+        self.cmd_pub.Write(self.cmd)
+#FOR TESTING
+
 
     def init_msc(self):
         self.msc = MotionSwitcherClient()
@@ -167,7 +201,7 @@ class ArmController(Controller):
 
         self.low_state = None 
         self.low_state_sub = ChannelSubscriber(Cfg.TOPIC_BODY_LOW_STATE, LowState_)
-        self.low_state_sub.Init(self.low_state_handler, 10)
+        self.low_state_sub.Init(self._low_state_handler, 10)
 
         self.cmd = unitree_hg_msg_dds__LowCmd_()
         self.crc = CRC() 
@@ -177,26 +211,35 @@ class ArmController(Controller):
 
         self.high_state = unitree_go_msg_dds__SportModeState_()
         self.high_state_sub = ChannelSubscriber(Cfg.TOPIC_BODY_HIGH_STATE, SportModeState_)
-        self.high_state_sub.Init(self.high_state_handler, 10)
+        self.high_state_sub.Init(self._high_state_handler, 10)
 
         self.ctrl_initialized = False
 
-    def low_state_handler(self, msg: LowState_):
-        """
-        Updates low state.
-        """
+    def _low_state_handler(self, msg: LowState_):
 
         self.low_state = msg
 
-    def high_state_handler(self, msg: SportModeState_):
-        """
-        Updates high state.
-        G1 doesnt seem to send high state information. Figure out later.
-        """
-
+    def _high_state_handler(self, msg: SportModeState_):
+        #TODO: G1 doesnt seem to send high state information. Figure out later.
         self.high_state = msg
 
-    def low_cmd_control(self, target_angles, kp, kd, duration = 10.0, debug = False, wait_for_user_input = True):
+    def low_cmd_control(self, target_angles, kp=None, kd=None, duration=5.0, debug=False):
+        """
+        Controls the upper body by interpolating to target angles over a duration.
+
+        Args:
+            target_angles (list of float): Target joint angles, in radians
+            kp (list of float, optional): Joint stiffness coefficient
+            kd (list of float, optional): Joint damping coefficient
+            duration (float, optional): The time over which to interpolate.
+            debug (bool, optional): If True, print debug information.
+        """
+
+        if kp is None:
+            kp = self.kp
+        if kd is None:
+            kd = self.kd
+
         start_angles = [motor.q for motor in self.low_state.motor_state]
         start_time = time.time()
 
@@ -243,9 +286,11 @@ class ArmController(Controller):
         print("Done.") 
         self.ctrl_initialized = True
 
-    def release_control(self, duration = 3.0):
+    def release_control(self, duration=3.0):
         """
         Gradually release control of the arms.
+        
+        TODO: Implement in mujoco side
         """
 
         if not self.ctrl_initialized:
@@ -285,7 +330,7 @@ class HandController(Controller):
         self.low_state = inspire_defaults.state()
 
         self.state_sub = ChannelSubscriber(f"{Cfg.TOPIC_HAND_STATE}/{l_r}", inspire_dds.inspire_hand_state)
-        self.state_sub.Init(self.low_state_handler, 10)
+        self.state_sub.Init(self._low_state_handler, 10)
 
         self.cmd = inspire_defaults.ctrl()
         self.cmd.mode = 0b0001
@@ -293,10 +338,22 @@ class HandController(Controller):
         self.cmd_pub = ChannelPublisher(f"{Cfg.TOPIC_HAND_CMD}/{l_r}", inspire_dds.inspire_hand_ctrl)
         self.cmd_pub.Init()
 
-    def low_state_handler(self, msg: inspire_dds.inspire_hand_state):
+    def _low_state_handler(self, msg: inspire_dds.inspire_hand_state):
         self.low_state = msg
 
-    def low_cmd_control(self, target_angles, duration = 5.0, debug = False):
+    def low_cmd_control(self, target_angles, duration=5.0, debug=False):
+        """
+        Controls the hand by interpolating to target angles over a duration.
+
+        Args:
+            target_angles (list of int): 
+                Target joint angles, in normalized units  
+                Order: [Pinky, Ring, Middle, Index, Thumb-bend, Thumb-rotation]  
+                Range: 0 (closed) to 1000 (open)   
+            duration (float, optional): The time over which to interpolate.
+            debug (bool, optional): If True, print debug information.
+        """
+
         start_angles = self.low_state.angle_act
         start_time = time.time()
 
