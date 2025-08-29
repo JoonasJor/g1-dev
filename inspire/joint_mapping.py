@@ -1,5 +1,7 @@
 import g1_joints as Joints
 
+NAMES = ["Pinky", "Ring", "Middle", "Index", "Thumb-bend", "Thumb-rotation"]
+
 def get_joint_mapping(l_r = "r"):
     """
     Map 12 physical joints to 6 Inspire joints for DDS communication

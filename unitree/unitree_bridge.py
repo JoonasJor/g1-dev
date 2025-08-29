@@ -115,8 +115,8 @@ class UnitreeBridge:
         self.arm_ctrl_sub = ChannelSubscriber(Cfg.TOPIC_ARM_SDK, LowCmd_)
         self.arm_ctrl_sub.Init(self.low_cmd_handler, 10)
 
-        self.cmd_lock = threading.Lock()
-        self.last_motor_cmd = None
+        self.msg_lock = threading.Lock()
+        self.last_ctrl_msg = None
 
         self.repeat_cmd_thread = RecurrentThread(
             interval=self.dt,
@@ -132,8 +132,8 @@ class UnitreeBridge:
         """
 
         try:
-            with self.cmd_lock:
-                self.last_motor_cmd = [cmd for cmd in msg.motor_cmd]
+            with self.msg_lock:
+                self.last_ctrl_msg = [cmd for cmd in msg.motor_cmd]
         except Exception as e:
             print(f"low_cmd_handler error: {type(e).__name__}: {e}")
 
@@ -144,8 +144,8 @@ class UnitreeBridge:
 
         if self.mj_data is None:
             return
-        with self.cmd_lock:
-            cmds = self.last_motor_cmd
+        with self.msg_lock:
+            cmds = self.last_ctrl_msg
         if cmds is None:
             return
         
