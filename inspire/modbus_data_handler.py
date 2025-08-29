@@ -108,6 +108,7 @@ class ModbusDataHandler:
                 self.client.write_registers(1522, msg.speed_set, self.device_id)
                 
     def read(self):
+        # Read the states for touch sensors
         touch_msg = inspire_defaults.touch()
         matrices = {}
         for i, (var, addr, length, size) in enumerate(self.data):
@@ -116,15 +117,14 @@ class ModbusDataHandler:
                 setattr(touch_msg, var, value)
                 matrix = np.array(value).reshape(size)
                 matrices[var]=matrix
-        self.pub.Write(touch_msg)
+        self.hand_touch_pub.Write(touch_msg)
 
         # Read the states for POS_ACT, ANGLE_ACT, etc.
         states_msg = inspire_defaults.state()
-
         for attr_name, start_address, length, data_type in self.states_structure:
             setattr(states_msg, attr_name, self.read_and_parse_registers(start_address, length, data_type))
             
-        self.state_pub.Write(states_msg)
+        self.hand_state_pub.Write(states_msg)
 
         return {
             "states":{

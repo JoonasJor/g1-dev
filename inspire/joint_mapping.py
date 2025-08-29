@@ -1,6 +1,8 @@
 import g1_joints as Joints
 
-def get_joint_mapping(l_r):
+NAMES = ["Pinky", "Ring", "Middle", "Index", "Thumb-bend", "Thumb-rotation"]
+
+def get_joint_mapping(l_r = "r"):
     """
     Map 12 physical joints to 6 Inspire joints for DDS communication
     """
@@ -13,12 +15,12 @@ def get_joint_mapping(l_r):
     # TODO: Check correct mapping for Thumb-bend and Thumb-rotation
     # TODO: Add this mapping to Joints class for easier access
     joint_mapping = [
-        [joints.Little1.idx, joints.Little2.idx], # Pinky
-        [joints.Ring1.idx,   joints.Ring2.idx],   # Ring
-        [joints.Middle1.idx, joints.Middle2.idx], # Middle
-        [joints.Index1.idx,  joints.Index2.idx],  # Index
-        [joints.Thumb3.idx,  joints.Thumb4.idx],  # Thumb-bend
-        [joints.Thumb1.idx,  joints.Thumb2.idx]   # Thumb-rotation
+        [joints.Little1, joints.Little2], # Pinky
+        [joints.Ring1,   joints.Ring2],   # Ring
+        [joints.Middle1, joints.Middle2], # Middle
+        [joints.Index1,  joints.Index2],  # Index
+        [joints.Thumb3,  joints.Thumb4],  # Thumb-bend
+        [joints.Thumb1,  joints.Thumb2]   # Thumb-rotation
     ]
 
     return joint_mapping
@@ -35,14 +37,14 @@ def expand(angles_6, forces_6, speeds_6, l_r):
     speeds_12 = [0.0] * 12
 
     for i, (j1, j2) in enumerate(joint_mapping):
-        angles_12[j1] = angles_6[i]
-        angles_12[j2] = angles_6[i]
+        angles_12[j1.idx] = angles_6[i]
+        angles_12[j2.idx] = angles_6[i]
 
-        forces_12[j1] = forces_6[i]
-        forces_12[j2] = forces_6[i]
+        forces_12[j1.idx] = forces_6[i]
+        forces_12[j2.idx] = forces_6[i]
 
-        speeds_12[j1] = speeds_6[i]
-        speeds_12[j2] = speeds_6[i]
+        speeds_12[j1.idx] = speeds_6[i]
+        speeds_12[j2.idx] = speeds_6[i]
 
     return angles_12, forces_12, speeds_12
 
@@ -57,7 +59,7 @@ def compress(angles_12, forces_12, l_r):
     forces_6 = [0] * 6
 
     for i, (j1, j2) in enumerate(joint_mapping):
-        angles_6[i] = round((angles_12[j1] + angles_12[j2]) / 2)
-        forces_6[i] = round((forces_12[j1] + forces_12[j2]) / 2)
+        angles_6[i] = round((angles_12[j1.idx] + angles_12[j2.idx]) / 2)
+        forces_6[i] = round((forces_12[j1.idx] + forces_12[j2.idx]) / 2)
 
     return angles_6, forces_6

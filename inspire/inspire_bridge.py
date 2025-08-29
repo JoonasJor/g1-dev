@@ -2,6 +2,7 @@ import traceback
 import numpy as np
 import os
 import sys
+import threading
 
 from unitree_sdk2py.core.channel import ChannelSubscriber, ChannelPublisher
 from unitree_sdk2py.utils.thread import RecurrentThread
@@ -42,7 +43,9 @@ class InspireBridge():
         self.hand_state_pub = ChannelPublisher(f"{Cfg.TOPIC_HAND_STATE}/{l_r}", inspire_dds.inspire_hand_state)
         self.hand_state_pub.Init()
         self.hand_state_thread = RecurrentThread(
-            interval=self.dt, target=self.publish_hand_state, name=f"sim_handstate_{l_r}"
+            interval=self.dt, 
+            target=self.publish_hand_state, 
+            name=f"sim_handstate_{l_r}"
         )
         self.hand_state_thread.Start()
 
@@ -50,16 +53,47 @@ class InspireBridge():
         self.hand_touch_pub = ChannelPublisher(f"{Cfg.TOPIC_HAND_TOUCH}/{l_r}", inspire_dds.inspire_hand_touch)
         self.hand_touch_pub.Init()
         self.hand_touch_thread = RecurrentThread(
-            interval=self.dt, target=self.publish_hand_touch, name=f"sim_handtouch_{l_r}"
+            interval=self.dt, 
+            target=self.publish_hand_touch, 
+            name=f"sim_handtouch_{l_r}"
         )
         self.hand_touch_thread.Start()
 
         self.hand_ctrl_sub = ChannelSubscriber(f"{Cfg.TOPIC_HAND_CMD}/{l_r}", inspire_dds.inspire_hand_ctrl)
         self.hand_ctrl_sub.Init(self.hand_cmd_handler, 10)
 
+        self.msg_lock = threading.Lock()
+        self.last_ctrl_msg = None
+
+        self.repeat_cmd_thread = RecurrentThread(
+            interval=self.dt,
+            target=self.repeat_last_cmd,
+            name=f"sim_repeat_last_cmd_{l_r}",
+        )
+        self.repeat_cmd_thread.Start()
+
     def hand_cmd_handler(self, msg: inspire_dds.inspire_hand_ctrl):
+        """
+        Save the last received control command. 
+        Repeat this command in repeat_last_cmd thread.
+        """
+
+        try:
+            with self.msg_lock:
+                self.last_ctrl_msg = msg
+        except Exception as e:
+            print(f"[hand_cmd_handler_{self.l_r}] error: {type(e).__name__}: {e}")
+
+    def repeat_last_cmd(self):
+        """
+        Repeat the last received control command to mimic real robot behaviour.
+        """
+
         if self.mj_data is None:
-            print(f"[hand_cmd_handler_{self.l_r}] mj_data is None")
+            return
+        with self.msg_lock:
+            cmds = self.last_ctrl_msg
+        if cmds is None:
             return
         
         if self.l_r == "r":
@@ -70,7 +104,7 @@ class InspireBridge():
         try:
             # Convert inspire dds message to mujoco control command
             # 1. Expand 6 joints to 12 joints
-            angles_scaled_12, forces_scaled_12, speeds_scaled_12 = joint_mapping.expand(msg.angle_set, msg.force_set, msg.speed_set, self.l_r)
+            angles_scaled_12, forces_scaled_12, speeds_scaled_12 = joint_mapping.expand(cmds.angle_set, cmds.force_set, cmds.speed_set, self.l_r)
 
             angles_12 = [0.0] * 12
             forces_12 = [0.0] * 12
@@ -93,7 +127,7 @@ class InspireBridge():
             if False:
                 finger1 = Joints.Hand_R.RightLittle1
                 finger2 = Joints.Hand_R.RightLittle2
-                print(f"[HandCmdHandler_{self.l_r}] {finger1.mujoco_idx} {finger2.mujoco_idx} \
+                print(f"[repeat_last_cmd_{self.l_r}] {finger1.mujoco_idx} {finger2.mujoco_idx} \
                         \ncurrent: {self.mj_data.sensordata[finger1.mujoco_idx]:.3f} {self.mj_data.sensordata[finger2.mujoco_idx]:.3f} \
                         \ntarget scaled: {angles_scaled_12[finger1.idx]} {angles_scaled_12[finger2.idx]} \
                         \ntarget rad: {angles_12[finger1.idx]:.3f} {angles_12[finger2.idx]:.3f} \
@@ -102,7 +136,7 @@ class InspireBridge():
                         \nctrl: {control:.3f}")
 
         except Exception as e:
-            print(f"[hand_cmd_handler_{self.l_r}] error: {type(e).__name__}: {e}")
+            print(f"[repeat_last_cmd_{self.l_r}] error: {type(e).__name__}: {e}")
             print(f"{len(self.mj_data.ctrl)=}")
             print(f"{self.num_motor=}")
             traceback.print_exc()

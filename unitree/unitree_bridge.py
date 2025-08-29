@@ -1,3 +1,4 @@
+
 import mujoco
 import numpy as np
 import pygame
@@ -6,6 +7,7 @@ import struct
 import traceback
 import os
 import sys
+import threading
 
 from unitree_sdk2py.core.channel import ChannelSubscriber, ChannelPublisher
 from unitree_sdk2py.idl.unitree_go.msg.dds_ import SportModeState_
@@ -35,58 +37,8 @@ class UnitreeBridge:
         self.have_frame_sensor = False
         self.dt = self.mj_model.opt.timestep
 
+        # Joystick
         self.joystick = None
-
-        joint_angle_range = []
-        for idx in Joints.Body.mujoco_idx_list():
-            # offset by 1 to accommodate for (joint_index: 0 , name: floating_base_joint)
-            # this offset only applies to worldbody joints. not actuators or sensors.
-            joint_angle_range.append(tuple(mj_model.jnt_range[idx + 1]))
-        print(joint_angle_range)
-
-        # Check sensor
-        for i in range(self.dim_motor_sensor, self.mj_model.nsensor):
-            name = mujoco.mj_id2name(
-                self.mj_model, mujoco._enums.mjtObj.mjOBJ_SENSOR, i
-            )
-            if name == "imu_quat":
-                self.have_imu_ = True
-            if name == "frame_pos":
-                self.have_frame_sensor_ = True
-
-        # Unitree sdk2 message
-        self.low_state = LowState_default()
-        self.low_state_puber = ChannelPublisher(Cfg.TOPIC_BODY_LOW_STATE, LowState_)
-        self.low_state_puber.Init()
-        self.lowStateThread = RecurrentThread(
-            interval=self.dt, target=self.publish_low_state, name="sim_lowstate"
-        )
-        self.lowStateThread.Start()
-
-        self.high_state = unitree_go_msg_dds__SportModeState_()
-        self.high_state_puber = ChannelPublisher(Cfg.TOPIC_BODY_HIGH_STATE, SportModeState_)
-        self.high_state_puber.Init()
-        self.HighStateThread = RecurrentThread(
-            interval=self.dt, target=self.publish_high_state, name="sim_highstate"
-        )
-        self.HighStateThread.Start()
-
-        self.wireless_controller = unitree_go_msg_dds__WirelessController_()
-        self.wireless_controller_puber = ChannelPublisher(
-            Cfg.TOPIC_WIRELESS_CONTROLLER, WirelessController_
-        )
-        self.wireless_controller_puber.Init()
-        self.WirelessControllerThread = RecurrentThread(
-            interval=0.01,
-            target=self.publish_wireless_controller,
-            name="sim_wireless_controller",
-        )
-        self.WirelessControllerThread.Start()
-
-        self.low_cmd_suber = ChannelSubscriber(Cfg.TOPIC_BODY_CMD, LowCmd_)
-        self.low_cmd_suber.Init(self.low_cmd_handler, 10)
-
-        # joystick
         self.key_map = {
             "R1": 0,
             "L1": 1,
@@ -104,32 +56,114 @@ class UnitreeBridge:
             "right": 13,
             "down": 14,
             "left": 15,
-        }
+        }        
+        
+        joint_angle_range = []
+        for idx in Joints.Body.mujoco_idx_list():
+            # offset by 1 to accommodate for (joint_index: 0 , name: floating_base_joint)
+            # this offset only applies to worldbody joints. not actuators or sensors.
+            joint_angle_range.append(tuple(mj_model.jnt_range[idx + 1]))
+        print(joint_angle_range)
+
+        # Check sensor
+        for i in range(self.dim_motor_sensor, self.mj_model.nsensor):
+            name = mujoco.mj_id2name(
+                self.mj_model, mujoco._enums.mjtObj.mjOBJ_SENSOR, i
+            )
+            if name == "imu_quat":
+                self.have_imu_ = True
+            if name == "frame_pos":
+                self.have_frame_sensor_ = True
+
+        # State handlers
+        self.low_state = LowState_default()
+        self.low_state_pub = ChannelPublisher(Cfg.TOPIC_BODY_LOW_STATE, LowState_)
+        self.low_state_pub.Init()
+        self.low_state_thread = RecurrentThread(
+            interval=self.dt, 
+            target=self.publish_low_state, 
+            name="sim_lowstate"
+        )
+        self.low_state_thread.Start()
+
+        self.high_state = unitree_go_msg_dds__SportModeState_()
+        self.high_state_pub = ChannelPublisher(Cfg.TOPIC_BODY_HIGH_STATE, SportModeState_)
+        self.high_state_pub.Init()
+        self.high_state_thread = RecurrentThread(
+            interval=self.dt, 
+            target=self.publish_high_state, 
+            name="sim_highstate"
+        )
+        self.high_state_thread.Start()
+
+        self.wireless_controller = unitree_go_msg_dds__WirelessController_()
+        self.wireless_controller_pub = ChannelPublisher(
+            Cfg.TOPIC_WIRELESS_CONTROLLER, WirelessController_
+        )
+        self.wireless_controller_pub.Init()
+        self.wireless_controller_thread = RecurrentThread(
+            interval=0.01,
+            target=self.publish_wireless_controller,
+            name="sim_wireless_controller",
+        )
+        self.wireless_controller_thread.Start()
+
+        # Control command handlers
+        self.low_ctrl_sub = ChannelSubscriber(Cfg.TOPIC_BODY_CMD, LowCmd_)
+        self.low_ctrl_sub.Init(self.low_cmd_handler, 10)
+
+        self.arm_ctrl_sub = ChannelSubscriber(Cfg.TOPIC_ARM_SDK, LowCmd_)
+        self.arm_ctrl_sub.Init(self.low_cmd_handler, 10)
+
+        self.msg_lock = threading.Lock()
+        self.last_ctrl_msg = None
+
+        self.repeat_cmd_thread = RecurrentThread(
+            interval=self.dt,
+            target=self.repeat_last_low_cmd,
+            name="sim_repeat_last_low_cmd",
+        )
+        self.repeat_cmd_thread.Start()
 
     def low_cmd_handler(self, msg: LowCmd_):
+        """
+        Save the last received control command. 
+        Repeat this command in repeat_last_low_cmd thread.
+        """
+
+        try:
+            with self.msg_lock:
+                self.last_ctrl_msg = [cmd for cmd in msg.motor_cmd]
+        except Exception as e:
+            print(f"low_cmd_handler error: {type(e).__name__}: {e}")
+
+    def repeat_last_low_cmd(self):
+        """
+        Repeat the last received control command to mimic real robot behaviour.
+        """
+
         if self.mj_data is None:
-            print("low_cmd_handler mj_data is None")
+            return
+        with self.msg_lock:
+            cmds = self.last_ctrl_msg
+        if cmds is None:
             return
         
         try:
-            for cmd_idx, joint_idx in enumerate(Joints.Body.mujoco_idx_list()):
+            for i, joint_idx in enumerate(Joints.Body.mujoco_idx_list()):
                 q_index = joint_idx
                 dq_index = joint_idx + self.num_motor
-
-                self.mj_data.ctrl[joint_idx] = (
-                    msg.motor_cmd[cmd_idx].tau
-                    + msg.motor_cmd[cmd_idx].kp
-                    * (msg.motor_cmd[cmd_idx].q - self.mj_data.sensordata[q_index])
-                    + msg.motor_cmd[cmd_idx].kd
-                    * (
-                        msg.motor_cmd[cmd_idx].dq
-                        - self.mj_data.sensordata[dq_index]
-                    )
+                cmd = cmds[i]
+                control = (
+                    cmd.tau + cmd.kp 
+                    * (cmd.q - self.mj_data.sensordata[q_index])+ cmd.kd 
+                    * (cmd.dq - self.mj_data.sensordata[dq_index])
                 )
+                self.mj_data.ctrl[joint_idx] = control
         except Exception as e:
-            print(f"low_cmd_handler error: {type(e).__name__}: {e}")
+            print(f"repeat_last_low_cmd error: {type(e).__name__}: {e}")
             print(f"{joint_idx=}, {q_index=}, {dq_index=}")
-            print(f"{len(msg.motor_cmd)=}")
+            print(f"{len(cmds)=}")
             print(f"{len(self.mj_data.ctrl)=}")
             print(f"{self.num_motor=}")
 
@@ -212,7 +246,7 @@ class UnitreeBridge:
                 except Exception as e:
                     print(f"[publish_low_state] Joystick error: {type(e).__name__}: {e}")
 
-            self.low_state_puber.Write(self.low_state)
+            self.low_state_pub.Write(self.low_state)
         except Exception:
             traceback.print_exc()
 
@@ -239,7 +273,7 @@ class UnitreeBridge:
                 self.dim_motor_sensor + 15
             ]
 
-        self.high_state_puber.Write(self.high_state)
+        self.high_state_pub.Write(self.high_state)
 
     def publish_wireless_controller(self):
         if self.joystick != None:
@@ -284,7 +318,7 @@ class UnitreeBridge:
             self.wireless_controller.rx = self.joystick.get_axis(self.axis_id["RX"])
             self.wireless_controller.ry = -self.joystick.get_axis(self.axis_id["RY"])
 
-            self.wireless_controller_puber.Write(self.wireless_controller)
+            self.wireless_controller_pub.Write(self.wireless_controller)
 
     def setup_joystick(self, device_id=0, js_type="xbox"):
         pygame.init()
