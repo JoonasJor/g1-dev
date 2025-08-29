@@ -153,11 +153,7 @@ class ControlSuite:
         )
 
     def arm_default(self):
-        angles = [0] * 29
-        angles[Joints.Body.LeftElbow.idx] = np.deg2rad(50)
-        angles[Joints.Body.RightElbow.idx] = np.deg2rad(50)
-        angles[Joints.Body.LeftShoulderRoll.idx] = np.deg2rad(30)
-        angles[Joints.Body.RightShoulderRoll.idx] = np.deg2rad(-30)
+        angles = Joints.Body.default_angles_list()
 
         self.arms.low_cmd_control(
             target_angles=angles,
@@ -182,6 +178,39 @@ class ControlSuite:
             target_angles=angles,
             duration=2.0
         )
+
+    def arm_loop(self):
+        angles_first = [0] * 29
+        angles_first[Joints.Body.LeftShoulderRoll.idx] = np.deg2rad(60)
+        angles_first[Joints.Body.LeftElbow.idx] = np.deg2rad(60)
+        angles_first[Joints.Body.RightShoulderRoll.idx] = np.deg2rad(-60)
+        angles_first[Joints.Body.RightElbow.idx] = np.deg2rad(60)
+
+        angles_second = [0] * 29
+        angles_second[Joints.Body.LeftShoulderRoll.idx] = np.deg2rad(30)
+        angles_second[Joints.Body.LeftElbow.idx] = np.deg2rad(30)
+        angles_second[Joints.Body.RightShoulderRoll.idx] = np.deg2rad(-30)
+        angles_second[Joints.Body.RightElbow.idx] = np.deg2rad(30)
+
+        while True:
+            print("Press Enter to stop...")
+            print()
+
+            print("Moving arms 60...")
+            self.arms.low_cmd_control(
+                target_angles=angles_first,
+                duration=4.0
+            )
+
+            print("Moving arms 30...")
+            self.arms.low_cmd_control(
+                target_angles=angles_second,
+                duration=4.0
+            )
+
+            if sys.stdin in select.select([sys.stdin], [], [], 0)[0]:
+                input()
+                break
 
     def arm_release_control(self):
         self.arms.release_control()
@@ -527,6 +556,7 @@ if __name__ == "__main__":
         ("Arm: default", suite.arm_default),
         ("Arm: bend elbow", suite.arm_bend_elbow),
         ("Arm: release control", suite.arm_release_control),
+        ("Arm: loop", suite.arm_loop),
         ("Arm: manual (relative)", suite.arm_manual_relative),
         ("Arm: manual (absolute)", suite.arm_manual_absolute),
 
