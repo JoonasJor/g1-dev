@@ -41,7 +41,7 @@ class ControlSuite:
         self.hand_l = HandController("l")
 
         self.body = BodyController()
-        self.body.init_msc()
+        self.body_initialized = False
 
     def wait_for_low_state(self):
         while self.arms.low_state is None:
@@ -248,7 +248,22 @@ class ControlSuite:
 #endregion
 
 #region Body Control
-    def body_zero(self):
+    def body_initialize(self):
+        print("Using BodyController will disable high-level control")
+
+        user_input = input("Type (y) to continue: ")
+        if user_input.lower() != "y":
+            print("Cancelled.")
+            return
+        
+        self.body.init_msc()
+        self.body_initialized = True
+
+    def body_zero(self): 
+        if not self.body_initialized:
+            print("Body Controller not initialized.")
+            return
+        
         angles = [0] * 29
 
         self.body.low_cmd_control(
@@ -257,6 +272,10 @@ class ControlSuite:
         )
 
     def body_default(self):
+        if not self.body_initialized:
+            print("Body Controller not initialized.")
+            return
+        
         angles = Joints.Body.default_angles_list()
 
         self.body.low_cmd_control(
@@ -265,11 +284,17 @@ class ControlSuite:
         )
 
     def body_lock_joints(self):
-        #self.body.lock_joints_mode()
-        self.body.lock_joints_write_current()
-        #self.body.lock_joints_both()
+        if not self.body_initialized:
+            print("Body Controller not initialized.")
+            return
+        
+        self.body.lock_joints()
 
     def body_manual_relative(self):
+        if not self.body_initialized:
+            print("Body Controller not initialized.")
+            return
+        
         for joint in Joints.Body:
             print(joint.idx, joint.name)
 
@@ -285,6 +310,10 @@ class ControlSuite:
         )
 
     def body_manual_absolute(self):
+        if not self.body_initialized:
+            print("Body Controller not initialized.")
+            return
+        
         for joint in Joints.Body:
             print(joint.idx, joint.name)
 
@@ -560,6 +589,7 @@ if __name__ == "__main__":
         ("Arm: manual (relative)", suite.arm_manual_relative),
         ("Arm: manual (absolute)", suite.arm_manual_absolute),
 
+        ("Body: initialize", suite.body_initialize),
         ("Body: zero", suite.body_zero),
         ("Body: default", suite.body_default),
         ("Body: lock joints", suite.body_lock_joints),
