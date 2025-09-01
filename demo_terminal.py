@@ -41,7 +41,6 @@ class ControlSuite:
         self.hand_l = HandController("l")
 
         self.body = BodyController()
-        self.body_initialized = False
 
     def wait_for_low_state(self):
         while self.arms.low_state is None:
@@ -257,13 +256,8 @@ class ControlSuite:
             return
         
         self.body.init_msc()
-        self.body_initialized = True
 
     def body_zero(self): 
-        if not self.body_initialized:
-            print("Body Controller not initialized.")
-            return
-        
         angles = [0] * 29
 
         self.body.low_cmd_control(
@@ -272,10 +266,6 @@ class ControlSuite:
         )
 
     def body_default(self):
-        if not self.body_initialized:
-            print("Body Controller not initialized.")
-            return
-        
         angles = Joints.Body.default_angles_list()
 
         self.body.low_cmd_control(
@@ -284,17 +274,9 @@ class ControlSuite:
         )
 
     def body_lock_joints(self):
-        if not self.body_initialized:
-            print("Body Controller not initialized.")
-            return
-        
         self.body.lock_joints()
 
     def body_manual_relative(self):
-        if not self.body_initialized:
-            print("Body Controller not initialized.")
-            return
-        
         for joint in Joints.Body:
             print(joint.idx, joint.name)
 
@@ -310,10 +292,6 @@ class ControlSuite:
         )
 
     def body_manual_absolute(self):
-        if not self.body_initialized:
-            print("Body Controller not initialized.")
-            return
-        
         for joint in Joints.Body:
             print(joint.idx, joint.name)
 
@@ -483,17 +461,10 @@ class ControlSuite:
 
 #region Misc
     def test(self):
-        sport_client = LocoClient()
-        sport_client.SetTimeout(10.0)
-        sport_client.Init()
+        self.body.disable_debug_mode()
 
-        sport_client.StandUp2Squat()
-
-        input("Press Enter to lock joints...")
-
-        #body_controller.lock_joints_mode()
-        self.body.lock_joints_write_current()
-        #body_controller.lock_joints_both()
+    def test2(self):
+        pass
 
     def print_hand_errors(self):
         error_bits = {
@@ -602,7 +573,8 @@ if __name__ == "__main__":
         ("Pose set: palm down", suite.pose_palm_down),
         ("Pose set: thumbs up", suite.pose_thumbs_up),
         
-        ("Test", suite.test),
+        ("Test 1", suite.test),
+        ("Test 2", suite.test2),
         ("Print: hand error info", suite.print_hand_errors),
         ("Print: high level status", suite.print_high_state),
     ]
