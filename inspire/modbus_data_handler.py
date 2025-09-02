@@ -3,6 +3,10 @@ import struct
 import time
 import threading
 from pymodbus.client import ModbusTcpClient
+import os
+import sys
+
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 import inspire.inspire_dds as inspire_dds
 import inspire.inspire_defaults as inspire_defaults
@@ -163,3 +167,18 @@ class ModbusDataHandler:
             else:
                 print("Error reading registers")
                 return None
+            
+if __name__ == "__main__":
+    from unitree_sdk2py.core.channel import ChannelFactoryInitialize
+    
+    if len(sys.argv) > 1:
+        # Run on real robot
+        ChannelFactoryInitialize(0, sys.argv[1])
+        modbus_r = ModbusDataHandler(ip="192.168.123.211", device_id=1, l_r="r")
+        modbus_l = ModbusDataHandler(ip="192.168.123.210", device_id=2, l_r="l")
+    else:
+        # Run in Mujoco
+        ChannelFactoryInitialize(1, "lo")
+
+    while True:
+        time.sleep(1)
