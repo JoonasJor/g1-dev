@@ -2,19 +2,19 @@
   <compiler angle="radian" meshdir="meshes_g1_inspire"/>
     <default>
         <default class="torso_motor">
-            <joint damping="0.5" armature="0.01" frictionloss="0.3"/>
+            <joint damping="2" armature="0.01" frictionloss="0.3"/>
         </default>
         <default class="leg_motor">
-            <joint damping="0.5" armature="0.01" frictionloss="0.3"/>
+            <joint damping="2" armature="0.01" frictionloss="0.3"/>
         </default>
         <default class="ankle_motor">
-            <joint damping="0.5" armature="0.01" frictionloss="0.3"/>
+            <joint damping="2" armature="0.01" frictionloss="0.3"/>
         </default>
         <default class="arm_motor">
-            <joint damping="0.5" armature="0.01" frictionloss="0.3"/>
+            <joint damping="2" armature="0.01" frictionloss="0.3"/>
         </default>
         <default class="wrist_motor">
-            <joint damping="0.5" armature="0.01" frictionloss="0.3"/>
+            <joint damping="1" armature="0.01" frictionloss="0.3"/>
         </default>
         <default class="finger_motor">
             <joint damping="0.5" armature="0.01" frictionloss="0.3"/>
