@@ -2,6 +2,7 @@ import time
 import numpy as np
 import os
 import sys
+import select
 
 from unitree_sdk2py.core.channel import ChannelPublisher, ChannelSubscriber
 from unitree_sdk2py.idl.default import unitree_hg_msg_dds__LowCmd_
@@ -41,6 +42,7 @@ class BodyController(Controller):
         self.kd = Joints.Body.default_kd_list()
         self.mode_machine_ = 0
         self.update_mode_machine_ = False
+        self.flg_initialized = False
 
         self.low_state = None 
         
@@ -63,7 +65,6 @@ class BodyController(Controller):
     def low_cmd_control(self, target_angles, kp=None, kd=None, duration=5.0, debug=False):
         """
         Controls the whole body by interpolating to target angles over a duration.
-        Using this will disable high-level control.
 
         Args:
             target_angles (list of float): The target joint angles.
@@ -72,6 +73,11 @@ class BodyController(Controller):
             duration (float, optional): The time over which to interpolate.
             debug (bool, optional): If True, print debug information.
         """
+
+        if not self.flg_initialized:
+            print("Not in debug mode.")
+            print("Call init_msc() to enable control.")
+            return
 
         if kp is None:
             kp = self.kp
@@ -121,33 +127,63 @@ class BodyController(Controller):
         
         print("Done.") 
 
+    def lock_joints(self):
+        """
+        Lock all joints by indefinitely sending current joint angles.  
+        Increased kp is needed to overpower the robot's own weight.
+        """
 
-#FOR TESTING
-    def lock_joints_mode(self):
+        if not self.flg_initialized:
+            print("Not in debug mode.")
+            print("Call init_msc() to enable control.")
+            return
+
+        print("Locking all joints...")
+        print("Press Enter to unlock joints...")
+
+        current_angles = [motor.q for motor in self.low_state.motor_state]
+
+        while True:
+            for i in range(self.num_motor_body):
+                self.cmd.mode_pr = 0
+                self.cmd.mode_machine = self.mode_machine_
+                self.cmd.motor_cmd[i].mode = 1
+                self.cmd.motor_cmd[i].tau = 0.0
+                self.cmd.motor_cmd[i].dq = 0.0
+                self.cmd.motor_cmd[i].kp = self.kp[i] * 2
+                self.cmd.motor_cmd[i].kd = self.kd[i] * 2
+                self.cmd.motor_cmd[i].q = current_angles[i]
+
+            self.cmd.crc = self.crc.Crc(self.cmd)
+            self.cmd_pub.Write(self.cmd)
+
+            time.sleep(self.dt)
+
+            if sys.stdin in select.select([sys.stdin], [], [], 0)[0]:
+                input()
+                break
+
+    def turn_off_motors(self):
+        if not self.flg_initialized:
+            print("Not in debug mode.")
+            print("Call init_msc() to enable control.")
+            return
+        
+        current_angles = [motor.q for motor in self.low_state.motor_state]
+
         for i in range(self.num_motor_body):
             self.cmd.motor_cmd[i].mode = 0
+            self.cmd.motor_cmd[i].q = current_angles[i]
 
         self.cmd.crc = self.crc.Crc(self.cmd)
         self.cmd_pub.Write(self.cmd)
-
-    def lock_joints_write_current(self):
-        for i in range(self.num_motor_body):
-            self.cmd.motor_cmd[i].q = self.low_state.motor_state[i].q
-
-        self.cmd.crc = self.crc.Crc(self.cmd)
-        self.cmd_pub.Write(self.cmd)
-
-    def lock_joints_both(self):
-        for i in range(self.num_motor_body):
-            self.cmd.motor_cmd[i].mode = 0
-            self.cmd.motor_cmd[i].q = self.low_state.motor_state[i].q
-
-        self.cmd.crc = self.crc.Crc(self.cmd)
-        self.cmd_pub.Write(self.cmd)
-#FOR TESTING
-
 
     def init_msc(self):
+        """
+        Initializes motion switcher client and enables debug mode.  
+        Calling this will disable high-level control.
+        """
+
         self.msc = MotionSwitcherClient()
         self.msc.SetTimeout(3.0)
         self.msc.Init()
@@ -161,6 +197,23 @@ class BodyController(Controller):
                 time.sleep(1)
 
         print(f"{status=}\n{result=}")
+
+        self.flg_initialized = True
+
+    def disable_debug_mode(self):
+        """
+        Disable debug mode and enter zero-torque mode.  
+        After calling this, do "damping -> locked standing -> regular mode" to enable high-level control.
+        """
+
+        if not self.flg_initialized:
+            print("Not in debug mode.")
+            print("Call init_msc() to enable control.")
+            return
+
+        # TODO: figure out how other modes work
+        self.msc.SelectMode("ai")
+        self.flg_initialized = False
 
 class ArmController(Controller):
     """
@@ -190,8 +243,6 @@ class ArmController(Controller):
         Joints.Body.RightWristPitch,
         Joints.Body.RightWristYaw
     ]
-
-    arm_sdk_idx = 29
 
     def __init__(self):
         super().__init__()
@@ -262,7 +313,7 @@ class ArmController(Controller):
                 self.cmd.motor_cmd[joint.idx].q = q_interpolated
 
             # Enable upper body control
-            self.cmd.motor_cmd[self.arm_sdk_idx].q =  1.0
+            self.cmd.motor_cmd[Cfg.ARM_SDK_IDX].q =  1.0
 
             self.cmd.crc = self.crc.Crc(self.cmd)
             self.cmd_pub.Write(self.cmd)
@@ -289,8 +340,6 @@ class ArmController(Controller):
     def release_control(self, duration=3.0):
         """
         Gradually release control of the arms.
-        
-        TODO: Implement in mujoco side
         """
 
         if not self.ctrl_initialized:
@@ -308,7 +357,7 @@ class ArmController(Controller):
             ratio = elapsed / duration
             ratio = np.clip(ratio, 0.0, 1.0)  
 
-            self.cmd.motor_cmd[self.arm_sdk_idx].q =  (1 - ratio)  
+            self.cmd.motor_cmd[Cfg.ARM_SDK_IDX].q =  (1 - ratio)  
 
             self.cmd.crc = self.crc.Crc(self.cmd)
             self.cmd_pub.Write(self.cmd) 

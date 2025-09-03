@@ -41,7 +41,6 @@ class ControlSuite:
         self.hand_l = HandController("l")
 
         self.body = BodyController()
-        self.body.init_msc()
 
     def wait_for_low_state(self):
         while self.arms.low_state is None:
@@ -248,13 +247,24 @@ class ControlSuite:
 #endregion
 
 #region Body Control
-    def body_zero(self):
+    def body_initialize(self):
+        print("Using BodyController will disable high-level control")
+
+        user_input = input("Type (y) to continue: ")
+        if user_input.lower() != "y":
+            print("Cancelled.")
+            return
+        
+        self.body.init_msc()
+
+    def body_zero(self): 
         angles = [0] * 29
 
         self.body.low_cmd_control(
             target_angles=angles,
             duration=2.0
         )
+        self.body.lock_joints()
 
     def body_default(self):
         angles = Joints.Body.default_angles_list()
@@ -263,11 +273,10 @@ class ControlSuite:
             target_angles=angles,
             duration=2.0
         )
+        self.body.lock_joints()
 
     def body_lock_joints(self):
-        #self.body.lock_joints_mode()
-        self.body.lock_joints_write_current()
-        #self.body.lock_joints_both()
+        self.body.lock_joints()
 
     def body_manual_relative(self):
         for joint in Joints.Body:
@@ -283,6 +292,7 @@ class ControlSuite:
             target_angles=angles,
             duration=2.0
         )
+        self.body.lock_joints()
 
     def body_manual_absolute(self):
         for joint in Joints.Body:
@@ -298,6 +308,14 @@ class ControlSuite:
             target_angles=angles,
             duration=2.0
         )
+        self.body.lock_joints()
+
+    def body_turn_off_motors(self):
+        self.body.turn_off_motors()
+
+    def body_disable_debug_mode(self):
+        self.body.disable_debug_mode()
+
 #endregion
 
 #region Pose Set 
@@ -314,7 +332,7 @@ class ControlSuite:
             duration=2.0
         )
 
-        angles_hand = [200] * 6
+        angles_hand = [800] * 6
         self.hand_r.low_cmd_control(
             target_angles=angles_hand,
             duration=1.0
@@ -454,17 +472,10 @@ class ControlSuite:
 
 #region Misc
     def test(self):
-        sport_client = LocoClient()
-        sport_client.SetTimeout(10.0)
-        sport_client.Init()
-
-        sport_client.StandUp2Squat()
-
-        input("Press Enter to lock joints...")
-
-        #body_controller.lock_joints_mode()
-        self.body.lock_joints_write_current()
-        #body_controller.lock_joints_both()
+        pass
+    
+    def test2(self):
+        pass
 
     def print_hand_errors(self):
         error_bits = {
@@ -560,11 +571,14 @@ if __name__ == "__main__":
         ("Arm: manual (relative)", suite.arm_manual_relative),
         ("Arm: manual (absolute)", suite.arm_manual_absolute),
 
+        ("Body: initialize", suite.body_initialize),
         ("Body: zero", suite.body_zero),
         ("Body: default", suite.body_default),
         ("Body: lock joints", suite.body_lock_joints),
         ("Body: manual (relative)", suite.body_manual_relative),
         ("Body: manual (absolute)", suite.body_manual_absolute),
+        ("Body: turn off motors", suite.body_turn_off_motors),
+        ("Body: disable debug mode", suite.body_disable_debug_mode),
 
         ("Pose set: cart push", suite.pose_cart_push),
         ("Pose set: button push", suite.pose_push_button),
@@ -572,7 +586,8 @@ if __name__ == "__main__":
         ("Pose set: palm down", suite.pose_palm_down),
         ("Pose set: thumbs up", suite.pose_thumbs_up),
         
-        ("Test", suite.test),
+        ("Test 1", suite.test),
+        ("Test 2", suite.test2),
         ("Print: hand error info", suite.print_hand_errors),
         ("Print: high level status", suite.print_high_state),
     ]

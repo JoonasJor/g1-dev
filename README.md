@@ -32,3 +32,12 @@ python demo_terminal.py
 2. Change network interface ip to 192.168.123.99
 3. Get network inferface name with ```ip addr```
 4. Run ```python demo_terminal.py <network_interface_name>```
+
+To use high-level control while simultaneously controlling upper body  
+from hanging position:
+1. Damping (L2+B) -> Locked Standing (L2+UP) -> Regular Mode (R1+X)
+
+from squatting position:
+1. Damping (L2+B) -> Squat-Stand (L2+A) -> Regular Mode (R1+X)
+
+2. In demo_terminal.py try any example named "Arm: x"

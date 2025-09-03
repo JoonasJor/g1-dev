@@ -27,6 +27,7 @@ TOPIC_BODY_LOW_STATE = "rt/lowstate"
 TOPIC_BODY_HIGH_STATE = "rt/sportmodestate"
 
 TOPIC_ARM_SDK = "rt/arm_sdk"
+ARM_SDK_IDX = 29
 
 TOPIC_WIRELESS_CONTROLLER = "rt/wirelesscontroller"
 

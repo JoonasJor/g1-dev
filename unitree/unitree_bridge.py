@@ -15,7 +15,7 @@ from unitree_sdk2py.idl.unitree_go.msg.dds_ import WirelessController_
 from unitree_sdk2py.idl.default import unitree_go_msg_dds__SportModeState_
 from unitree_sdk2py.idl.default import unitree_go_msg_dds__WirelessController_
 from unitree_sdk2py.utils.thread import RecurrentThread
-from unitree_sdk2py.idl.unitree_hg.msg.dds_ import LowCmd_
+from unitree_sdk2py.idl.unitree_hg.msg.dds_ import LowCmd_, MotorCmd_
 from unitree_sdk2py.idl.unitree_hg.msg.dds_ import LowState_
 from unitree_sdk2py.idl.default import unitree_hg_msg_dds__LowState_ as LowState_default
 
@@ -113,59 +113,90 @@ class UnitreeBridge:
         self.low_ctrl_sub.Init(self.low_cmd_handler, 10)
 
         self.arm_ctrl_sub = ChannelSubscriber(Cfg.TOPIC_ARM_SDK, LowCmd_)
-        self.arm_ctrl_sub.Init(self.low_cmd_handler, 10)
+        self.arm_ctrl_sub.Init(self.arm_cmd_handler, 10)
 
+        # Repeat the last received TOPIC_ARM_SDK control commands to replicate G1 behaviour
         self.msg_lock = threading.Lock()
-        self.last_ctrl_msg = None
+        self.last_arm_ctrl_msg = None
 
         self.repeat_cmd_thread = RecurrentThread(
             interval=self.dt,
-            target=self.repeat_last_low_cmd,
-            name="sim_repeat_last_low_cmd",
+            target=self.repeat_last_arm_cmd,
+            name="sim_repeat_last_arm_cmd",
         )
         self.repeat_cmd_thread.Start()
 
-    def low_cmd_handler(self, msg: LowCmd_):
-        """
-        Save the last received control command. 
-        Repeat this command in repeat_last_low_cmd thread.
-        """
-
-        try:
-            with self.msg_lock:
-                self.last_ctrl_msg = [cmd for cmd in msg.motor_cmd]
-        except Exception as e:
-            print(f"low_cmd_handler error: {type(e).__name__}: {e}")
-
-    def repeat_last_low_cmd(self):
-        """
-        Repeat the last received control command to mimic real robot behaviour.
-        """
-
-        if self.mj_data is None:
-            return
-        with self.msg_lock:
-            cmds = self.last_ctrl_msg
-        if cmds is None:
-            return
-        
+    def control_joints_body(self, cmds: list[MotorCmd_]):
         try:
             for i, joint_idx in enumerate(Joints.Body.mujoco_idx_list()):
                 q_index = joint_idx
                 dq_index = joint_idx + self.num_motor
                 cmd = cmds[i]
+
+                if cmd.mode == 1:
+                    control = (
+                        cmd.tau + cmd.kp
+                        * (cmd.q - self.mj_data.sensordata[q_index]) + cmd.kd
+                        * (cmd.dq - self.mj_data.sensordata[dq_index])
+                    )
+                    self.mj_data.ctrl[joint_idx] = control
+                else:
+                    self.mj_data.ctrl[joint_idx] = 0
+                    
+        except Exception as e:
+            print(f"[repeat_last_low_cmd] error: {type(e).__name__}: {e}")
+
+    def control_joints_arms(self, cmds: list[MotorCmd_]):
+        try:
+            for i, joint_idx in enumerate(Joints.Body.mujoco_idx_list()):
+                q_index = joint_idx
+                dq_index = joint_idx + self.num_motor
+                cmd = cmds[i]
+
                 control = (
-                    cmd.tau + cmd.kp 
-                    * (cmd.q - self.mj_data.sensordata[q_index])+ cmd.kd 
+                    cmd.tau + cmd.kp
+                    * (cmd.q - self.mj_data.sensordata[q_index]) + cmd.kd
                     * (cmd.dq - self.mj_data.sensordata[dq_index])
                 )
-                self.mj_data.ctrl[joint_idx] = control
+                self.mj_data.ctrl[joint_idx] = control * cmds[29].q
+   
         except Exception as e:
-            print(f"repeat_last_low_cmd error: {type(e).__name__}: {e}")
-            print(f"{joint_idx=}, {q_index=}, {dq_index=}")
-            print(f"{len(cmds)=}")
-            print(f"{len(self.mj_data.ctrl)=}")
-            print(f"{self.num_motor=}")
+            print(f"[repeat_last_low_cmd] error: {type(e).__name__}: {e}")
+
+    def low_cmd_handler(self, msg: LowCmd_):
+        """
+        Control joints once. Does not repeat the command.
+        """
+
+        cmds = [cmd for cmd in msg.motor_cmd]
+        self.control_joints_body(cmds)
+
+    def arm_cmd_handler(self, msg: LowCmd_):
+        """
+        Save the last received control command. 
+        Repeat this command in repeat_last_arm_cmd thread.
+        """
+
+        try:
+            with self.msg_lock:
+                self.last_arm_ctrl_msg = [cmd for cmd in msg.motor_cmd]
+        except Exception as e:
+            print(f"[arm_cmd_handler] error: {type(e).__name__}: {e}")
+
+    def repeat_last_arm_cmd(self):
+        """
+        Repeat the last received arm control command.  
+        """
+
+        if self.mj_data is None:
+            return
+        
+        with self.msg_lock:
+            cmds = self.last_arm_ctrl_msg
+        if cmds is None:
+            return
+        
+        self.control_joints_arms(cmds)
 
     def publish_low_state(self):
         try:
