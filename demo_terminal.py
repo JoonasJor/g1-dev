@@ -264,6 +264,7 @@ class ControlSuite:
             target_angles=angles,
             duration=2.0
         )
+        self.body.lock_joints()
 
     def body_default(self):
         angles = Joints.Body.default_angles_list()
@@ -272,6 +273,7 @@ class ControlSuite:
             target_angles=angles,
             duration=2.0
         )
+        self.body.lock_joints()
 
     def body_lock_joints(self):
         self.body.lock_joints()
@@ -290,6 +292,7 @@ class ControlSuite:
             target_angles=angles,
             duration=2.0
         )
+        self.body.lock_joints()
 
     def body_manual_absolute(self):
         for joint in Joints.Body:
@@ -305,6 +308,14 @@ class ControlSuite:
             target_angles=angles,
             duration=2.0
         )
+        self.body.lock_joints()
+
+    def body_turn_off_motors(self):
+        self.body.turn_off_motors()
+
+    def body_disable_debug_mode(self):
+        self.body.disable_debug_mode()
+
 #endregion
 
 #region Pose Set 
@@ -321,7 +332,7 @@ class ControlSuite:
             duration=2.0
         )
 
-        angles_hand = [200] * 6
+        angles_hand = [800] * 6
         self.hand_r.low_cmd_control(
             target_angles=angles_hand,
             duration=1.0
@@ -461,8 +472,8 @@ class ControlSuite:
 
 #region Misc
     def test(self):
-        self.body.disable_debug_mode()
-
+        pass
+    
     def test2(self):
         pass
 
@@ -566,6 +577,8 @@ if __name__ == "__main__":
         ("Body: lock joints", suite.body_lock_joints),
         ("Body: manual (relative)", suite.body_manual_relative),
         ("Body: manual (absolute)", suite.body_manual_absolute),
+        ("Body: turn off motors", suite.body_turn_off_motors),
+        ("Body: disable debug mode", suite.body_disable_debug_mode),
 
         ("Pose set: cart push", suite.pose_cart_push),
         ("Pose set: button push", suite.pose_push_button),

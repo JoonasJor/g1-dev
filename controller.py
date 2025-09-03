@@ -21,11 +21,6 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')
 import config as Cfg
 import g1_joints as Joints
 
-# rt/arm_sdk keeps the joints at last received position
-# rt/low_cmd does not do this
-# TODO: in bodycontroller, repeat last received command indefinitely, similar to mujoco implementation
-# TODO: in unitree_bridge, remove repeating for rt/low_cmd
-
 class Controller:
     def __init__(self):
         self.dt = 0.002
@@ -211,6 +206,11 @@ class BodyController(Controller):
         After calling this, do "damping -> locked standing -> regular mode" to enable high-level control.
         """
 
+        if not self.flg_initialized:
+            print("Not in debug mode.")
+            print("Call init_msc() to enable control.")
+            return
+
         # TODO: figure out how other modes work
         self.msc.SelectMode("ai")
         self.flg_initialized = False
@@ -243,8 +243,6 @@ class ArmController(Controller):
         Joints.Body.RightWristPitch,
         Joints.Body.RightWristYaw
     ]
-
-    arm_sdk_idx = 29
 
     def __init__(self):
         super().__init__()
@@ -315,7 +313,7 @@ class ArmController(Controller):
                 self.cmd.motor_cmd[joint.idx].q = q_interpolated
 
             # Enable upper body control
-            self.cmd.motor_cmd[self.arm_sdk_idx].q =  1.0
+            self.cmd.motor_cmd[Cfg.ARM_SDK_IDX].q =  1.0
 
             self.cmd.crc = self.crc.Crc(self.cmd)
             self.cmd_pub.Write(self.cmd)
@@ -342,8 +340,6 @@ class ArmController(Controller):
     def release_control(self, duration=3.0):
         """
         Gradually release control of the arms.
-        
-        TODO: Implement in mujoco side
         """
 
         if not self.ctrl_initialized:
@@ -361,7 +357,7 @@ class ArmController(Controller):
             ratio = elapsed / duration
             ratio = np.clip(ratio, 0.0, 1.0)  
 
-            self.cmd.motor_cmd[self.arm_sdk_idx].q =  (1 - ratio)  
+            self.cmd.motor_cmd[Cfg.ARM_SDK_IDX].q =  (1 - ratio)  
 
             self.cmd.crc = self.crc.Crc(self.cmd)
             self.cmd_pub.Write(self.cmd) 
