@@ -6,7 +6,7 @@
 
     <body name="sphere" pos="0.32 0.3 0.8">
       <joint type="free"/>
-      <geom type="sphere" size="0.3" rgba="1 0 0 1" mass="0.3" contype="1" conaffinity="1"/>
+      <geom type="sphere" size="0.03" rgba="1 0 0 1" mass="0.3" contype="1" conaffinity="1"/>
     </body>
 
     <body name="cube" pos="0.32 -0.3 0.8">
