@@ -1,24 +1,24 @@
 <mujoco model="g1_inspire">
   <compiler angle="radian" meshdir="meshes_g1_inspire"/>
     <default>
-        <default class="torso_motor">
-            <joint damping="2" armature="0.01" frictionloss="0.3"/>
-        </default>
-        <default class="leg_motor">
-            <joint damping="2" armature="0.01" frictionloss="0.3"/>
-        </default>
-        <default class="ankle_motor">
-            <joint damping="2" armature="0.01" frictionloss="0.3"/>
-        </default>
-        <default class="arm_motor">
-            <joint damping="2" armature="0.01" frictionloss="0.3"/>
-        </default>
-        <default class="wrist_motor">
-            <joint damping="1" armature="0.01" frictionloss="0.3"/>
-        </default>
-        <default class="finger_motor">
-            <joint damping="0.5" armature="0.01" frictionloss="0.3"/>
-        </default>      
+      <default class="torso_motor">
+        <joint damping="2" armature="0.01" frictionloss="0.3"/>
+      </default>
+      <default class="leg_motor">
+        <joint damping="2" armature="0.01" frictionloss="0.3"/>
+      </default>
+      <default class="ankle_motor">
+        <joint damping="2" armature="0.01" frictionloss="0.3"/>
+      </default>
+      <default class="arm_motor">
+        <joint damping="2" armature="0.01" frictionloss="0.3"/>
+      </default>
+      <default class="wrist_motor">
+        <joint damping="1" armature="0.01" frictionloss="0.3"/>
+      </default>
+      <default class="finger_motor">
+        <joint damping="0.5" armature="0.01" frictionloss="0.3"/>
+      </default>   
     </default>
 
   <asset>
@@ -120,7 +120,7 @@
   <worldbody>
     <body name="pelvis" pos="0 0 0.793">
         <site name="imu" size="0.01" pos="0.0 0.0 0.0"/>
-        <inertial pos="0 0 -0.07605" quat="1 0 -0.000399148 0" mass="3.813" diaginertia="0.010549 0.0093089 0.0079184"/>
+        <inertial pos="0 0 -0.07605" quat="1 0 0 0" mass="3.813" diaginertia="0.010549 0.0093089 0.0079184"/>
         <joint name="floating_base_joint" type="free" limited="false" actuatorfrclimited="false"/>
         <geom type="mesh" contype="0" conaffinity="0" group="1" density="0" rgba="0.2 0.2 0.2 1" mesh="pelvis"/>
         <geom type="mesh" contype="0" conaffinity="0" group="1" density="0" rgba="0.7 0.7 0.7 1" mesh="pelvis_contour_link"/>
@@ -233,6 +233,9 @@
             <geom pos="0.0039635 0 -0.044" quat="1 0 0 0" type="mesh" rgba="0.2 0.2 0.2 1" mesh="logo_link"/>
             <geom pos="0.0039635 0 -0.044" type="mesh" contype="0" conaffinity="0" group="1" density="0" rgba="0.2 0.2 0.2 1" mesh="head_link"/>
             <geom pos="0.0039635 0 -0.044" type="mesh" rgba="0.2 0.2 0.2 1" mesh="head_link"/>
+
+            <camera name="head_camera" pos="0.045 0 0.438" mode="fixed" quat="0.6408563820557887 0.2988362387301197 -0.2988362387301197 -0.6408563820557887"
+              focal="1.93e-3 1.93e-3" resolution="1280 720" sensorsize="3896e-6 2140e-6"/>
 
             <body name="left_shoulder_pitch_link" pos="0.0039563 0.10022 0.24778" quat="0.990264 0.139201 1.38722e-05 -9.86868e-05">
               <inertial pos="0 0.035892 -0.011628" quat="0.654152 0.0130458 -0.326267 0.68225" mass="0.718" diaginertia="0.000465864 0.000432842 0.000406394"/>
@@ -910,15 +913,4 @@
     <framepos name="frame_pos" objtype="site" objname="imu"/>
     <framelinvel name="frame_vel" objtype="site" objname="imu"/>
   </sensor>
-
-  <asset>
-    <texture type="skybox" builtin="flat" rgb1="0 0 0" rgb2="0 0 0" width="512" height="3072"/>
-    <texture type="2d" name="groundplane" builtin="checker" mark="edge" rgb1="0.2 0.3 0.4" rgb2="0.1 0.2 0.3" markrgb="0.8 0.8 0.8" width="300" height="300"/>
-    <material name="groundplane" texture="groundplane" texuniform="true" texrepeat="5 5" reflectance="0.2"/>
-  </asset>
-
-  <worldbody>
-    <light pos="1 0 3.5" dir="0 0 -1" directional="true"/>
-    <geom name="floor" size="0 0 0.05" type="plane" material="groundplane"/>
-  </worldbody>
 </mujoco>
