@@ -1,7 +1,7 @@
 import numpy as np
 
 ROBOT = "g1" # Robot name, "go2", "b2", "b2w", "h1", "go2w", "g1" 
-ROBOT_SCENE = "./g1/g1_29dof_with_inspire.xml" # Robot scene
+ROBOT_SCENE = "./g1/scene_29dof_with_inspire.xml" # Robot scene
 DOMAIN_ID = 1 # Domain id
 INTERFACE = "lo" # Interface 
 
