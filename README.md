@@ -41,3 +41,20 @@ from squatting position:
 1. Damping (L2+B) -> Squat-Stand (L2+A) -> Regular Mode (R1+X)
 
 2. In demo_terminal.py try any example named "Arm: x"
+
+## Teleoperation
+### Mujoco sim:  
+1. Install https://github.com/JoonasJor/xr_teleoperate
+2. In terminal 1 run ```python g1-dev/unitree/unitree_mujoco.py```
+3. In terminal 2 run ```python xr_teleoperate/teleop/teleop_hand_and_arm.py --xr-mode=hand --arm=G1_29 --sim --headless --ee=inspire1 --disable-img-passthrough --motion```
+4. Go to ```https://<host_ip>:8012?ws=wss://<host_ip>:8012``` and press VR or passthrough
+5. In terminal 2 press "r"
+   
+### Real robot:
+1. Install https://github.com/JoonasJor/xr_teleoperate
+2. In terminal 1 run ```python xr_teleoperate/teleop/teleop_hand_and_arm.py --xr-mode=hand --arm=G1_29 --headless --ee=inspire1 --motion```
+3. Go to ```https://<host_ip>:8012?ws=wss://<host_ip>:8012``` and press VR or passthrough
+4. In terminal 1 press "r"
+
+
+
