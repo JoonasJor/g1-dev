@@ -31,6 +31,8 @@ ARM_SDK_IDX = 29
 
 TOPIC_WIRELESS_CONTROLLER = "rt/wirelesscontroller"
 
+LOCK_LOWER_BODY = False # Lock lower body joints to default angles
+
 START_ON_FLOOR = False
 FLOOR_POSITION = [0.0, 0.0, 0.07]
 FLOOR_ORIENTATION = [-0.7071, 0, 0.7071, 0.0]

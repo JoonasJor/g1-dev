@@ -12,11 +12,19 @@ from unitree.unitree_bridge import UnitreeBridge, ElasticBand
 from inspire.inspire_bridge import InspireBridge
 
 import config as Cfg
+import g1_joints as Joints
 
 locker = threading.Lock()
 
 mj_model = mujoco.MjModel.from_xml_path(Cfg.ROBOT_SCENE)
 mj_data = mujoco.MjData(mj_model)
+
+"""
+for i in range(mj_model.njnt):
+    joint_type = mj_model.jnt_type[i]
+    joint_name = mj_model.joint(i).name
+    print(f"Joint {i}: {joint_name} — type: {joint_type}")
+"""
 
 if Cfg.START_ON_FLOOR:
     mj_data.qpos[0:3] = Cfg.FLOOR_POSITION
@@ -36,6 +44,9 @@ if Cfg.ENABLE_ELASTIC_BAND and not Cfg.START_ON_FLOOR:
     )
 else:
     viewer = mujoco.viewer.launch_passive(mj_model, mj_data)
+
+if Cfg.LOCK_LOWER_BODY:
+    lower_body_joints = Joints.Body.lower_body_joints()
 
 mj_model.opt.timestep = Cfg.SIMULATE_DT
 num_motor_ = mj_model.nu
@@ -83,6 +94,14 @@ def simulation_thread():
                         else:
                             mj_data.xfrc_applied[band_attached_link, :3] = force
 
+                if Cfg.LOCK_LOWER_BODY:
+                    for joint in lower_body_joints:
+                        jnt_index = joint.mujoco_idx + 1  # offset by 1 for floating base joint
+
+                        qpos_idx = int(mj_model.jnt_qposadr[jnt_index])
+
+                        mj_data.qpos[qpos_idx] = joint.default_angle
+
                 mujoco.mj_step(mj_model, mj_data)
 
             except Exception as e:
@@ -99,8 +118,6 @@ def simulation_thread():
     except Exception as e:
         print(f"simulation_thread Fatal error: {type(e).__name__}: {e}")
         raise
-
-
 
 def physics_viewer_thread():
     print("[physics_viewer_thread] Starting viewer loop...")

@@ -215,7 +215,7 @@ class ControlSuite:
         self.arms.release_control()
 
     def arm_manual_relative(self):
-        for joint in self.arms.arm_joints:
+        for joint in Joints.Body.upper_body_joints():
             print(joint.idx, joint)
 
         idx = int(input("Joint to move (index): "))
@@ -230,7 +230,7 @@ class ControlSuite:
         )
 
     def arm_manual_absolute(self):
-        for joint in self.arms.arm_joints:
+        for joint in Joints.Body.upper_body_joints():
             print(joint.idx, joint)
 
         idx = int(input("Joint to move (index): "))
