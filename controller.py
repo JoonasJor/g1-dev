@@ -377,9 +377,12 @@ class HandController(Controller):
         self.num_motor_fingers = Cfg.NUM_MOTOR_FINGERS
 
         self.low_state = inspire_defaults.state()
-
         self.state_sub = ChannelSubscriber(f"{Cfg.TOPIC_HAND_STATE}/{l_r}", inspire_dds.inspire_hand_state)
         self.state_sub.Init(self._low_state_handler, 10)
+
+        self.touch_state = inspire_defaults.touch()
+        self.touch_sub = ChannelSubscriber(f"{Cfg.TOPIC_HAND_TOUCH}/{l_r}", inspire_dds.inspire_hand_touch)
+        self.touch_sub.Init(self._touch_state_handler, 10)
 
         self.cmd = inspire_defaults.ctrl()
         self.cmd.mode = 0b0001
@@ -389,6 +392,9 @@ class HandController(Controller):
 
     def _low_state_handler(self, msg: inspire_dds.inspire_hand_state):
         self.low_state = msg
+
+    def _touch_state_handler(self, msg: inspire_dds.inspire_hand_touch):
+        self.touch_state = msg
 
     def low_cmd_control(self, target_angles, duration=5.0, debug=False):
         """

@@ -201,6 +201,5 @@ class InspireBridge():
             return
         
         # TODO: msg = self.mj_data.sensordata[force_sensor_index]
-
-        return
+        self.hand_touch_pub.Write(self.hand_touch)
     
