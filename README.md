@@ -16,6 +16,7 @@ git clone https://github.com/unitreerobotics/unitree_sdk2_python.git
 cd unitree_sdk2_python
 pip install -e .
 ```
+3. (Optional) For teleoperation install [xr_teleoperate](https://github.com/JoonasJor/xr_teleoperate)
 
 ## Run
 ### Mujoco sim:  
@@ -27,7 +28,7 @@ terminal 2:
 ```
 python demo_terminal.py
 ```
-### Real robot:
+### Physical deployment:
 1. Plug in ethernet cable
 2. Change network interface ip to 192.168.123.99
 3. Get network inferface name with ```ip addr```
@@ -44,17 +45,33 @@ from squatting position:
 
 ## Teleoperation
 ### Mujoco sim:  
-1. Install https://github.com/JoonasJor/xr_teleoperate
-2. In terminal 1 run ```python g1-dev/unitree/unitree_mujoco.py```
-3. In terminal 2 run ```python xr_teleoperate/teleop/teleop_hand_and_arm.py --xr-mode=hand --arm=G1_29 --sim --headless --ee=inspire1 --disable-img-passthrough --motion```
-4. Go to ```https://<host_ip>:8012?ws=wss://<host_ip>:8012``` and press VR or passthrough
-5. In terminal 2 press "r"
+
+1. Terminal 1:  
+   ```
+   cd xr_teleoperate/teleop/  
+   conda activate tv  
+   python teleop_hand_and_arm.py --xr-mode=hand --arm=G1_29 --sim --headless --ee=inspire1 --disable-img-passthrough --motion
+   ```
+2. Terminal 2:
+   ```
+   cd g1-dev  
+   source venv/bin/activate  
+   python unitree/unitree_mujoco.py  
+   ```  
+
+3. Go to ```https://<host_ip>:8012?ws=wss://<host_ip>:8012``` and click "passthrough"  
+4. Terminal 1: press "r"
    
-### Real robot:
-1. Install https://github.com/JoonasJor/xr_teleoperate
-2. In terminal 1 run ```python xr_teleoperate/teleop/teleop_hand_and_arm.py --xr-mode=hand --arm=G1_29 --headless --ee=inspire1 --motion```
-3. Go to ```https://<host_ip>:8012?ws=wss://<host_ip>:8012``` and press VR or passthrough
-4. In terminal 1 press "r"
+### Physical deployment:
+1. [Setup image service](https://github.com/JoonasJor/xr_teleoperate?tab=readme-ov-file#31-%EF%B8%8F-image-service)  
+2. Terminal 1:
+   ```
+   cd xr_teleoperate/teleop/  
+   conda activate tv 
+   python xr_teleoperate/teleop/teleop_hand_and_arm.py --xr-mode=hand --arm=G1_29 --headless --ee=inspire1 --motion
+   ```
+3. Go to ```https://<host_ip>:8012?ws=wss://<host_ip>:8012``` and click "VR" or "passthrough"
+4. Terminal 1: press "r"
 
 
 
