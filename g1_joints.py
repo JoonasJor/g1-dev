@@ -85,7 +85,7 @@ class Body(JointMixin, Enum):
     LeftHipRoll         = Joint(mujoco_idx=1,  idx=1,  default_angle=0.0,     default_kp=60,  default_kd=1)
     LeftHipYaw          = Joint(mujoco_idx=2,  idx=2,  default_angle=0.0,     default_kp=60,  default_kd=1)
     LeftKnee            = Joint(mujoco_idx=3,  idx=3,  default_angle=0.3,     default_kp=100, default_kd=2)
-    LeftAnklePitch      = Joint(mujoco_idx=4,  idx=4,  default_angle=-0.2,    default_kp=40,  default_kd=1)
+    LeftAnklePitch      = Joint(mujoco_idx=4,  idx=4,  default_angle=-0.25,    default_kp=40,  default_kd=1)
     LeftAnkleRoll       = Joint(mujoco_idx=5,  idx=5,  default_angle=0.0,     default_kp=40,  default_kd=1)
 
     # Right leg
@@ -93,7 +93,7 @@ class Body(JointMixin, Enum):
     RightHipRoll        = Joint(mujoco_idx=7,  idx=7,  default_angle=0.0,     default_kp=60,  default_kd=1)
     RightHipYaw         = Joint(mujoco_idx=8,  idx=8,  default_angle=0.0,     default_kp=60,  default_kd=1)
     RightKnee           = Joint(mujoco_idx=9,  idx=9,  default_angle=0.3,     default_kp=100, default_kd=2)
-    RightAnklePitch     = Joint(mujoco_idx=10, idx=10, default_angle=-0.2,    default_kp=40,  default_kd=1)
+    RightAnklePitch     = Joint(mujoco_idx=10, idx=10, default_angle=-0.25,    default_kp=40,  default_kd=1)
     RightAnkleRoll      = Joint(mujoco_idx=11, idx=11, default_angle=0.0,     default_kp=40,  default_kd=1)
 
     # Waist
@@ -118,6 +118,64 @@ class Body(JointMixin, Enum):
     RightWristRoll      = Joint(mujoco_idx=38, idx=26, default_angle=0.0,     default_kp=40,  default_kd=1)
     RightWristPitch     = Joint(mujoco_idx=39, idx=27, default_angle=0.0,     default_kp=40,  default_kd=1)
     RightWristYaw       = Joint(mujoco_idx=40, idx=28, default_angle=0.0,     default_kp=40,  default_kd=1)
+
+    @classmethod
+    def lower_body_joints(cls):
+        """
+        Return Body enum members that belong to the lower body (legs + waist).
+        """
+        return [
+            cls.LeftHipPitch,
+            cls.LeftHipRoll,
+            cls.LeftHipYaw,
+            cls.LeftKnee,
+            cls.LeftAnklePitch,
+            cls.LeftAnkleRoll,
+
+            cls.RightHipPitch,
+            cls.RightHipRoll,
+            cls.RightHipYaw,
+            cls.RightKnee,
+            cls.RightAnklePitch,
+            cls.RightAnkleRoll,
+
+            cls.WaistYaw,
+            cls.WaistRoll,
+            cls.WaistPitch
+        ]
+
+    @classmethod
+    def upper_body_joints(cls):
+        """
+        Return Body enum members that belong to the upper body (arms).
+        """
+        return [
+            cls.LeftShoulderPitch,
+            cls.LeftShoulderRoll,
+            cls.LeftShoulderYaw,
+            cls.LeftElbow,
+            cls.LeftWristRoll,
+            cls.LeftWristPitch,
+            cls.LeftWristYaw,
+
+            cls.RightShoulderPitch,
+            cls.RightShoulderRoll,
+            cls.RightShoulderYaw,
+            cls.RightElbow,
+            cls.RightWristRoll,
+            cls.RightWristPitch,
+            cls.RightWristYaw
+        ]
+
+    @classmethod
+    def lower_body_idx_list(cls):
+        """Return the ordered idx values for lower-body joints."""
+        return [j.value.idx for j in cls.lower_body_joints()]
+
+    @classmethod
+    def upper_body_idx_list(cls):
+        """Return the ordered idx values for upper-body joints."""
+        return [j.value.idx for j in cls.upper_body_joints()]
 
 class Hand_L(JointMixin, Enum):
     Thumb1          = Joint(mujoco_idx=22, idx=0,  default_angle=500,     default_kp=10, default_kd=0.5)
