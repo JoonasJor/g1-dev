@@ -207,7 +207,4 @@ marimo/_lsp/
 __marimo__/
 
 .vscode/
-inspire_hand_ws/
-unitree_sdk2py/
-MUJOCO_LOG.TXT
-todo.txt
+log/*
