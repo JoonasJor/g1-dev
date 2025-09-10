@@ -8,14 +8,16 @@ git clone https://github.com/JoonasJor/g1-dev.git
 cd g1-dev
 python3.10 -m venv venv
 source venv/bin/activate
-pip install mujoco pygame pymodbus
+pip install -e .
 ```
 2. Install [Unitree SDK](https://github.com/unitreerobotics/unitree_sdk2_python  )
 ```
-git clone https://github.com/unitreerobotics/unitree_sdk2_python.git
-cd unitree_sdk2_python
+git submodule init
+git submodule update
+cd external/unitree_sdk2_python
 pip install -e .
 ```
+
 3. (Optional) For teleoperation install [xr_teleoperate](https://github.com/JoonasJor/xr_teleoperate)
 
 ## Run
