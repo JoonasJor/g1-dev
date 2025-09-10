@@ -27,6 +27,14 @@ MOTOR_SENSOR_NUM = 3
 NUM_MOTOR_IDL_HG = 35
 
 class UnitreeBridge:
+    """
+    Publishes joint states and controls the G1 in MuJoCo simulation using DDS communication.
+
+    Args:
+        mj_model: MuJoCo model
+        mj_data: MuJoCo data
+    """
+
     def __init__(self, mj_model, mj_data):
         self.mj_model = mj_model
         self.mj_data = mj_data
@@ -63,7 +71,7 @@ class UnitreeBridge:
             # offset by 1 to accommodate for (joint_index: 0 , name: floating_base_joint)
             # this offset only applies to worldbody joints. not actuators or sensors.
             joint_angle_range.append(tuple(mj_model.jnt_range[idx + 1]))
-        print(joint_angle_range)
+        #print(joint_angle_range)
 
         # Check sensor
         for i in range(self.dim_motor_sensor, self.mj_model.nsensor):

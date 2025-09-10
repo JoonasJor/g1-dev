@@ -17,6 +17,15 @@ import config as Cfg
 import g1_joints as Joints
 
 class InspireBridge():
+    """
+    Publishes joint states and controls the Inspire hands in MuJoCo simulation using DDS communication.
+
+    Args:
+        mj_model: MuJoCo model
+        mj_data: MuJoCo data
+        l_r (str): "l" for left hand, "r" for right hand
+    """
+
     def __init__(self, mj_model, mj_data, l_r = "r"):
         self.mj_model = mj_model
         self.mj_data = mj_data
