@@ -29,6 +29,8 @@ TOPIC_BODY_HIGH_STATE = "rt/sportmodestate"
 TOPIC_ARM_SDK = "rt/arm_sdk"
 ARM_SDK_IDX = 29
 
+TOPIC_CAMERA_IMAGE = "rt/camera_image"
+
 TOPIC_WIRELESS_CONTROLLER = "rt/wirelesscontroller"
 
 LOCK_LOWER_BODY = False # Lock lower body joints to default angles
