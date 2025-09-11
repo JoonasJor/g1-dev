@@ -10,6 +10,7 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')
 from unitree_sdk2py.core.channel import ChannelFactoryInitialize
 from unitree.unitree_bridge import UnitreeBridge, ElasticBand
 from inspire.inspire_bridge import InspireBridge
+from camera.camera_bridge import CameraBridge
 
 import config as Cfg
 import g1_joints as Joints
@@ -59,7 +60,6 @@ def simulation_thread():
 
     if Cfg.START_ON_FLOOR:
         print("simulation_thread Setting robot initial position...")
-
 
     try:
         print("simulation_thread Initializing Unitree SDK...")
@@ -120,12 +120,22 @@ def simulation_thread():
         raise
 
 def physics_viewer_thread():
+    camera_bridge = CameraBridge(mj_model, mj_data, (640, 480), "head_camera")
+
+    counter = 0
+
     print("[physics_viewer_thread] Starting viewer loop...")
     try:
         while viewer.is_running():
             locker.acquire()
             try:
                 viewer.sync()
+
+                if counter >= 10:
+                    camera_bridge.capture_and_publish()
+                    counter = 0
+                counter += 1
+
             except IndexError as e:
                 print(f"[physics_viewer_thread] IndexError during sync: {e}")
                 raise
