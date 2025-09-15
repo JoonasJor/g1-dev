@@ -58,7 +58,7 @@ class ModbusDataHandler:
         self.device_id = device_id
         self.modbus_lock = threading.Lock()
 
-        self.client.write_register(1004, 1, self.device_id) #reset error
+        self.client.write_register(1004, 1, device_id=self.device_id) #reset error
 
         self.l_r = l_r
         self.hand_state = inspire_defaults.state()
@@ -98,18 +98,34 @@ class ModbusDataHandler:
     def write_registers_callback(self, msg: inspire_dds.inspire_hand_ctrl):
         with self.modbus_lock:
             if msg.mode & 0b0001:  # mode 1 - angle
-                self.client.write_registers(1486, msg.angle_set, self.device_id)
+                self.client.write_registers(
+                    address=1486, 
+                    values=msg.angle_set, 
+                    device_id=self.device_id
+                )
                 # print("angle_set")
             if msg.mode & 0b0010:  # mode 2 - position
-                self.client.write_registers(1474, msg.pos_set, self.device_id)
+                self.client.write_registers(
+                    address=11474, 
+                    values=msg.pos_set, 
+                    device_id=self.device_id
+                )
                 # print("pos_set")
 
             if msg.mode & 0b0100:  # mode 4 - force
-                self.client.write_registers(1498, msg.force_set, self.device_id)
+                self.client.write_registers(
+                    address=11498, 
+                    values=msg.force_set,
+                    device_id=self.device_id
+                )
                 # print("force_set")
 
             if msg.mode & 0b1000:  # mode 8 - speed
-                self.client.write_registers(1522, msg.speed_set, self.device_id)
+                self.client.write_registers(
+                    address=11522, 
+                    values=msg.speed_set, 
+                    device_id=self.device_id
+                )
                 
     def read(self):
         # Read the states for touch sensors
@@ -146,7 +162,11 @@ class ModbusDataHandler:
     def read_and_parse_registers(self, start_address, num_registers, data_type="short"):
          with self.modbus_lock:
             # Read the register
-            response = self.client.read_holding_registers(start_address, num_registers, self.device_id)
+            response = self.client.read_holding_registers(
+                address=start_address, 
+                count=num_registers, 
+                device_id=self.device_id
+            )
 
             if not response.isError():
                 if data_type == "short":
