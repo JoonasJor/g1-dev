@@ -264,7 +264,7 @@ class ControlSuite:
             target_angles=angles,
             duration=2.0
         )
-        self.body.lock_joints()
+        self.body.repeat_last_command()
 
     def body_default(self):
         angles = Joints.Body.default_angles_list()
@@ -273,7 +273,7 @@ class ControlSuite:
             target_angles=angles,
             duration=2.0
         )
-        self.body.lock_joints()
+        self.body.repeat_last_command()
 
     def body_lock_joints(self):
         self.body.lock_joints()
@@ -292,7 +292,7 @@ class ControlSuite:
             target_angles=angles,
             duration=2.0
         )
-        self.body.lock_joints()
+        self.body.repeat_last_command()
 
     def body_manual_absolute(self):
         for joint in Joints.Body:
@@ -308,7 +308,7 @@ class ControlSuite:
             target_angles=angles,
             duration=2.0
         )
-        self.body.lock_joints()
+        self.body.repeat_last_command()
 
     def body_turn_off_motors(self):
         self.body.turn_off_motors()
