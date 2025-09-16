@@ -73,7 +73,7 @@ class ModbusDataHandler:
         self.sub.Init(self.write_registers_callback, 10)
 
         self.register_read_thread = RecurrentThread(
-            interval=0.002, target=self.read, name=f"register_read_{l_r}"
+            interval=0.02, target=self.read, name=f"register_read_{l_r}"
         )
         self.register_read_thread.Start()
 
