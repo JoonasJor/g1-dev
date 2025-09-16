@@ -72,6 +72,12 @@ from squatting position:
    conda activate tv 
    python xr_teleoperate/teleop/teleop_hand_and_arm.py --xr-mode=hand --arm=G1_29 --headless --ee=inspire1 --motion
    ```
+3. Terminal 2:
+   ```
+   cd g1-dev  
+   source venv/bin/activate  
+   python inspire/modbus_data_handler.py
+   ```
 3. Go to ```https://<host_ip>:8012?ws=wss://<host_ip>:8012``` and click "VR" or "passthrough"
 4. Terminal 1: press "r"
 
