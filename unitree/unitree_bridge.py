@@ -8,6 +8,7 @@ import traceback
 import os
 import sys
 import threading
+import time
 
 from unitree_sdk2py.core.channel import ChannelSubscriber, ChannelPublisher
 from unitree_sdk2py.idl.unitree_go.msg.dds_ import SportModeState_
@@ -118,10 +119,10 @@ class UnitreeBridge:
 
         # Control command handlers
         self.low_ctrl_sub = ChannelSubscriber(Cfg.TOPIC_BODY_CMD, LowCmd_)
-        self.low_ctrl_sub.Init(self.low_cmd_handler, 10)
+        self.low_ctrl_sub.Init(self.low_cmd_handler)
 
         self.arm_ctrl_sub = ChannelSubscriber(Cfg.TOPIC_ARM_SDK, LowCmd_)
-        self.arm_ctrl_sub.Init(self.arm_cmd_handler, 10)
+        self.arm_ctrl_sub.Init(self.arm_cmd_handler)
 
         # Repeat the last received TOPIC_ARM_SDK control commands to replicate G1 behaviour
         self.msg_lock = threading.Lock()
@@ -133,6 +134,18 @@ class UnitreeBridge:
             name="sim_repeat_last_arm_cmd",
         )
         self.repeat_cmd_thread.Start()
+
+        # Control reset timer: zero controls only if no low command has been
+        # received for 0.5 seconds. The timer is reset each time
+        # `low_cmd_handler` is called.
+        self.last_low_cmd_time = 0.0
+        self.ctrl_reset_lock = threading.Lock()
+        self.ctrl_reset_thread = RecurrentThread(
+            interval=0.05,
+            target=self._ctrl_reset_check,
+            name="sim_ctrl_reset_checker",
+        )
+        self.ctrl_reset_thread.Start()
 
     def control_joints_body(self, cmds: list[MotorCmd_]):
         try:
@@ -178,6 +191,11 @@ class UnitreeBridge:
 
         cmds = [cmd for cmd in msg.motor_cmd]
         self.control_joints_body(cmds)
+        # Record time of this low-level command; the ctrl reset thread
+        # will zero controls if 0.5s pass without another low command.
+        with self.ctrl_reset_lock:
+            self.last_low_cmd_time = time.monotonic()
+
 
     def arm_cmd_handler(self, msg: LowCmd_):
         """
@@ -205,6 +223,25 @@ class UnitreeBridge:
             return
         
         self.control_joints_arms(cmds)
+
+    def _ctrl_reset_check(self):
+        """
+        Periodic check run by a RecurrentThread. If more than 0.5s have
+        passed since the last low command, zero the mj_data.ctrl array.
+        """
+        try:
+            with self.ctrl_reset_lock:
+                last = self.last_low_cmd_time
+            if last == 0.0:
+                return
+            if time.monotonic() - last >= 0.5:
+                # zero controls atomically
+                self.mj_data.ctrl[:] = 0
+                # reset last_low_cmd_time to avoid repeated zeroing
+                with self.ctrl_reset_lock:
+                    self.last_low_cmd_time = 0.0
+        except Exception as e:
+            print(f"[_ctrl_reset_check] error: {type(e).__name__}: {e}")
 
     def publish_low_state(self):
         try:
