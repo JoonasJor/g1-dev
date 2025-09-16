@@ -32,7 +32,7 @@ class BodyController(Controller):
     Do NOT use simultaneously with high-level control
     """
 
-    def __init__(self):
+    def __init__(self, flg_initialized=False):
         super().__init__()
 
         self.counter = 0
@@ -42,12 +42,12 @@ class BodyController(Controller):
         self.kd = Joints.Body.default_kd_list()
         self.mode_machine_ = 0
         self.update_mode_machine_ = False
-        self.flg_initialized = False
+        self.flg_initialized = flg_initialized
 
         self.low_state = None 
         
         self.low_state_sub = ChannelSubscriber(Cfg.TOPIC_BODY_LOW_STATE, LowState_)
-        self.low_state_sub.Init(self._low_state_handler, 10)
+        self.low_state_sub.Init(self._low_state_handler)
 
         self.cmd = unitree_hg_msg_dds__LowCmd_()
         self.crc = CRC() 
@@ -62,7 +62,7 @@ class BodyController(Controller):
             self.mode_machine_ = self.low_state.mode_machine
             self.update_mode_machine_ = True
 
-    def low_cmd_control(self, target_angles, kp=None, kd=None, duration=5.0, debug=False):
+    def low_cmd_control(self, target_angles, kp=None, kd=None, duration=5.0, interpolate=True, debug=False):
         """
         Controls the whole body by interpolating to target angles over a duration.
 
@@ -103,8 +103,12 @@ class BodyController(Controller):
                 self.cmd.motor_cmd[i].dq = 0.0
                 self.cmd.motor_cmd[i].kp = kp[i]
                 self.cmd.motor_cmd[i].kd = kd[i]
-                q_interpolated = (1.0 - ratio) * start_angles[i] + ratio * target_angles[i]
-                self.cmd.motor_cmd[i].q = q_interpolated
+
+                if interpolate:
+                    q_interpolated = (1.0 - ratio) * start_angles[i] + ratio * target_angles[i]
+                    self.cmd.motor_cmd[i].q = q_interpolated
+                else:
+                    self.cmd.motor_cmd[i].q = target_angles[i]
 
             self.cmd.crc = self.crc.Crc(self.cmd)
             self.cmd_pub.Write(self.cmd)
@@ -126,6 +130,24 @@ class BodyController(Controller):
             time.sleep(self.dt) 
         
         print("Done.") 
+
+    def repeat_last_command(self):
+        if not self.flg_initialized:
+            print("Not in debug mode.")
+            print("Call init_msc() to enable control.")
+            return
+        
+        print("Repeating last command. Press Enter to stop...")
+
+        while True:
+            self.cmd.crc = self.crc.Crc(self.cmd)
+            self.cmd_pub.Write(self.cmd)
+
+            time.sleep(self.dt)
+
+            if sys.stdin in select.select([sys.stdin], [], [], 0)[0]:
+                input()
+                break
 
     def lock_joints(self):
         """
@@ -252,7 +274,7 @@ class ArmController(Controller):
 
         self.low_state = None 
         self.low_state_sub = ChannelSubscriber(Cfg.TOPIC_BODY_LOW_STATE, LowState_)
-        self.low_state_sub.Init(self._low_state_handler, 10)
+        self.low_state_sub.Init(self._low_state_handler)
 
         self.cmd = unitree_hg_msg_dds__LowCmd_()
         self.crc = CRC() 
@@ -262,7 +284,7 @@ class ArmController(Controller):
 
         self.high_state = unitree_go_msg_dds__SportModeState_()
         self.high_state_sub = ChannelSubscriber(Cfg.TOPIC_BODY_HIGH_STATE, SportModeState_)
-        self.high_state_sub.Init(self._high_state_handler, 10)
+        self.high_state_sub.Init(self._high_state_handler)
 
         self.ctrl_initialized = False
 
