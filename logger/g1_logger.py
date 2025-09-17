@@ -88,8 +88,8 @@ if __name__ == "__main__":
     if len(sys.argv) > 1:
         # Run on real robot
         ChannelFactoryInitialize(0, sys.argv[1])
-        modbus_r = ModbusDataHandler(ip="192.168.123.211", device_id=1, l_r="r")
-        modbus_l = ModbusDataHandler(ip="192.168.123.210", device_id=2, l_r="l")
+        #modbus_r = ModbusDataHandler(ip="192.168.123.211", device_id=1, l_r="r")
+        #modbus_l = ModbusDataHandler(ip="192.168.123.210", device_id=2, l_r="l")
     else:
         # Run in Mujoco
         ChannelFactoryInitialize(1, "lo")
@@ -144,13 +144,17 @@ if __name__ == "__main__":
             hand_l_joint_angles = hand_l_state.angle_act
 
             camera_data: camera_dds.camera_image = data["camera"]
+            
+            try:
+                # Decode and save images
+                camera_rgb_decoded = decode_image(camera_data.rgb)
+                cv2.imwrite(f"log/img/{camera_data.timestamp}_rgb.jpg", cv2.cvtColor(camera_rgb_decoded, cv2.COLOR_RGB2BGR))
 
-            # Decode and save images
-            camera_rgb_decoded = decode_image(camera_data.rgb)
-            cv2.imwrite(f"log/img/{camera_data.timestamp}_rgb.jpg", cv2.cvtColor(camera_rgb_decoded, cv2.COLOR_RGB2BGR))
-
-            camera_depth_decoded = decode_image(camera_data.depth)
-            np.save(f"log/img/{camera_data.timestamp}_depth.npy", camera_depth_decoded)
+                camera_depth_decoded = decode_image(camera_data.depth)
+                np.save(f"log/img/{camera_data.timestamp}_depth.npy", camera_depth_decoded)
+            except Exception as e:
+                print(f"Error decoding/saving images: {e}")
+                continue
 
             print(f"Timestamp (data saved):   {timestamp}")
             print(f"Timestamp (images taken): {camera_data.timestamp}")

@@ -546,8 +546,8 @@ if __name__ == "__main__":
     if len(sys.argv) > 1:
         # Run on real robot
         ChannelFactoryInitialize(0, sys.argv[1])
-        modbus_r = ModbusDataHandler(ip="192.168.123.211", device_id=1, l_r="r")
-        modbus_l = ModbusDataHandler(ip="192.168.123.210", device_id=2, l_r="l")
+        #modbus_r = ModbusDataHandler(ip="192.168.123.211", device_id=1, l_r="r")
+        #modbus_l = ModbusDataHandler(ip="192.168.123.210", device_id=2, l_r="l")
     else:
         # Run in Mujoco
         ChannelFactoryInitialize(1, "lo")

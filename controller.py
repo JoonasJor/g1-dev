@@ -62,7 +62,7 @@ class BodyController(Controller):
             self.mode_machine_ = self.low_state.mode_machine
             self.update_mode_machine_ = True
 
-    def low_cmd_control(self, target_angles, kp=None, kd=None, duration=5.0, interpolate=True, debug=False):
+    def low_cmd_control(self, target_angles, target_torques=None, target_velocities=None, kp=None, kd=None, duration=5.0, interpolate=True, debug=False):
         """
         Controls the whole body by interpolating to target angles over a duration.
 
@@ -99,8 +99,17 @@ class BodyController(Controller):
                 self.cmd.mode_pr = 0
                 self.cmd.mode_machine = self.mode_machine_
                 self.cmd.motor_cmd[i].mode = 1
-                self.cmd.motor_cmd[i].tau = 0.0
-                self.cmd.motor_cmd[i].dq = 0.0
+
+                if target_torques is not None:
+                    self.cmd.motor_cmd[i].tau = target_torques[i]
+                else:
+                    self.cmd.motor_cmd[i].tau = 0.0
+
+                if target_velocities is not None:
+                    self.cmd.motor_cmd[i].dq = target_velocities[i]
+                else:
+                    self.cmd.motor_cmd[i].dq = 0.0
+
                 self.cmd.motor_cmd[i].kp = kp[i]
                 self.cmd.motor_cmd[i].kd = kd[i]
 

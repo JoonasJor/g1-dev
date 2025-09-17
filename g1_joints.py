@@ -85,7 +85,7 @@ class Body(JointMixin, Enum):
     LeftHipRoll         = Joint(mujoco_idx=1,  idx=1,  default_angle=0.0,     default_kp=60,  default_kd=1)
     LeftHipYaw          = Joint(mujoco_idx=2,  idx=2,  default_angle=0.0,     default_kp=60,  default_kd=1)
     LeftKnee            = Joint(mujoco_idx=3,  idx=3,  default_angle=0.3,     default_kp=100, default_kd=2)
-    LeftAnklePitch      = Joint(mujoco_idx=4,  idx=4,  default_angle=-0.25,    default_kp=40,  default_kd=1)
+    LeftAnklePitch      = Joint(mujoco_idx=4,  idx=4,  default_angle=-0.25,   default_kp=40,  default_kd=1)
     LeftAnkleRoll       = Joint(mujoco_idx=5,  idx=5,  default_angle=0.0,     default_kp=40,  default_kd=1)
 
     # Right leg
@@ -93,7 +93,7 @@ class Body(JointMixin, Enum):
     RightHipRoll        = Joint(mujoco_idx=7,  idx=7,  default_angle=0.0,     default_kp=60,  default_kd=1)
     RightHipYaw         = Joint(mujoco_idx=8,  idx=8,  default_angle=0.0,     default_kp=60,  default_kd=1)
     RightKnee           = Joint(mujoco_idx=9,  idx=9,  default_angle=0.3,     default_kp=100, default_kd=2)
-    RightAnklePitch     = Joint(mujoco_idx=10, idx=10, default_angle=-0.25,    default_kp=40,  default_kd=1)
+    RightAnklePitch     = Joint(mujoco_idx=10, idx=10, default_angle=-0.25,   default_kp=40,  default_kd=1)
     RightAnkleRoll      = Joint(mujoco_idx=11, idx=11, default_angle=0.0,     default_kp=40,  default_kd=1)
 
     # Waist

@@ -1,7 +1,7 @@
 <mujoco model="g1_29dof scene">
   <include file="g1_29dof_with_inspire.xml"/>
   <!-- <include file="d435i.xml"/> -->
-  <include file="table_with_objects.xml"/>
+  <!-- <include file="table_with_objects.xml"/>-->
 
   <statistic center="0 0 0.5" extent="2.0"/>
 
