@@ -28,7 +28,7 @@ if __name__ == "__main__":
     hand_r = HandController(l_r="r")
     hand_l = HandController(l_r="l")
 
-    data_list = G1_Logger.load_data_from_file("log/data_latest.pkl")
+    data_list = G1_Logger.load_data_from_file("log/data_20250916_151924.pkl")
     
     for i, data in enumerate(data_list):
         timestamp = data_list[i]["timestamp"]
@@ -38,8 +38,6 @@ if __name__ == "__main__":
         body_joint_angles = [motor.q for motor in body_low_state.motor_state]
         body_joint_torques = [motor.tau_est for motor in body_low_state.motor_state]
         body_joint_velocities = [motor.dq for motor in body_low_state.motor_state]
-        body_joint_kp = [motor.kp for motor in body_low_state.motor_state]
-        body_joint_kd = [motor.kd for motor in body_low_state.motor_state]
 
         hand_r_state: inspire_dds.inspire_hand_state = data["hand_r"]["state"]
         hand_r_joint_angles = hand_r_state.angle_act
@@ -64,17 +62,24 @@ if __name__ == "__main__":
 
         if timestamp_next is not None:
             threads = [
-                threading.Thread(target=body.low_cmd_control, args=(body_joint_angles,), 
-                                 kwargs={"target_torques": body_joint_torques, 
-                                         "target_velocities": body_joint_velocities,
-                                         "kp": body_joint_kp,
-                                         "kd": body_joint_kd,
-                                         "duration": timestamp_delta, 
-                                         "interpolate": False}),
-                threading.Thread(target=hand_r.low_cmd_control, args=(hand_r_joint_angles,), kwargs={"duration": timestamp_delta}),
-                threading.Thread(target=hand_l.low_cmd_control, args=(hand_l_joint_angles,), kwargs={"duration": timestamp_delta}),
+                threading.Thread(
+                    target=body.low_cmd_control, 
+                    args=(body_joint_angles,), 
+                    kwargs={"target_torques": body_joint_torques, 
+                            "target_velocities": body_joint_velocities,
+                            "duration": timestamp_delta, 
+                            "interpolate": False}),
+                threading.Thread(
+                    target=hand_r.low_cmd_control, 
+                    args=(hand_r_joint_angles,), 
+                    kwargs={"duration": timestamp_delta,
+                            "interpolate": False}),
+                threading.Thread(
+                    target=hand_l.low_cmd_control, 
+                    args=(hand_l_joint_angles,), 
+                    kwargs={"duration": timestamp_delta,
+                    "interpolate": False}),
             ]
-
             for thread in threads:
                 thread.start()
             for thread in threads:
