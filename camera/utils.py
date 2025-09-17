@@ -1,8 +1,8 @@
 import cv2
 import numpy as np
 
-def encode_image(image_array):
-    success, encoded_image = cv2.imencode('.jpg', image_array, [cv2.IMWRITE_JPEG_QUALITY, 90])
+def encode_image(image_array, quality=50):
+    success, encoded_image = cv2.imencode('.jpg', image_array, [cv2.IMWRITE_JPEG_QUALITY, quality])
     if not success:
         print("Image encoding failed")
         return b''
