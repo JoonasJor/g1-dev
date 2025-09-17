@@ -28,7 +28,7 @@ if __name__ == "__main__":
     hand_r = HandController(l_r="r")
     hand_l = HandController(l_r="l")
 
-    data_list = G1_Logger.load_data_from_file("log/data_20250916_151924.pkl")
+    data_list = G1_Logger.load_data_from_file("log/data_latest.pkl")
     
     for i, data in enumerate(data_list):
         timestamp = data_list[i]["timestamp"]
@@ -47,8 +47,6 @@ if __name__ == "__main__":
 
         camera_data: camera_dds.camera_image = data["camera"]
 
-        timestamp_delta = timestamp_next - timestamp
-
         ankle_motor_state: MotorState_ = body_low_state.motor_state[Joints.Body.LeftAnklePitch.idx]
         print(f"{ankle_motor_state.tau_est=}")
 
@@ -61,9 +59,11 @@ if __name__ == "__main__":
             continue
 
         if timestamp_next is not None:
+            #TODO: keep the timing consistent with the original recording
+            timestamp_delta = timestamp_next - timestamp
             threads = [
                 threading.Thread(
-                    target=body.low_cmd_control, 
+                    target=arms.low_cmd_control, 
                     args=(body_joint_angles,), 
                     kwargs={"target_torques": body_joint_torques, 
                             "target_velocities": body_joint_velocities,

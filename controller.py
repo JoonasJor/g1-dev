@@ -286,8 +286,8 @@ class ArmController(Controller):
     def __init__(self):
         super().__init__()
 
-        self.kp = Joints.Body.default_kp_list()
-        self.kd = Joints.Body.default_kd_list()
+        self.kp_default = Joints.Body.default_kp_list()
+        self.kd_default = Joints.Body.default_kd_list()
 
         self.low_state = None 
         self.low_state_sub = ChannelSubscriber(Cfg.TOPIC_BODY_LOW_STATE, LowState_)
@@ -313,7 +313,7 @@ class ArmController(Controller):
         #TODO: G1 doesnt seem to send high state information. Figure out later.
         self.high_state = msg
 
-    def low_cmd_control(self, target_angles, kp=None, kd=None, duration=5.0, debug=False):
+    def low_cmd_control(self, target_angles, target_torques=None, target_velocities=None, kp=None, kd=None, duration=5.0, interpolate=True, debug=False):
         """
         Controls the upper body by interpolating to target angles over a duration.
 
@@ -324,11 +324,6 @@ class ArmController(Controller):
             duration (float, optional): The time over which to interpolate.
             debug (bool, optional): If True, print debug information.
         """
-
-        if kp is None:
-            kp = self.kp
-        if kd is None:
-            kd = self.kd
 
         start_angles = [motor.q for motor in self.low_state.motor_state]
         start_time = time.time()
@@ -341,15 +336,37 @@ class ArmController(Controller):
             ratio = elapsed / duration
             ratio = np.clip(ratio, 0.0, 1.0)
 
-            for joint in self.arm_joints:
-                self.cmd.motor_cmd[joint.idx].tau = 0.0
-                self.cmd.motor_cmd[joint.idx].dq = 0.0
-                self.cmd.motor_cmd[joint.idx].kp = kp[joint.idx]
-                self.cmd.motor_cmd[joint.idx].kd = kd[joint.idx]
+            for joint in self.arm_joints:   
+                # Set torques if provided
+                if target_torques is not None:
+                    self.cmd.motor_cmd[joint.idx].tau = target_torques[joint.idx]
+                else:
+                    self.cmd.motor_cmd[joint.idx].tau = 0.0
 
-                # Interpolate the joint angle
-                q_interpolated = (1.0 - ratio) * start_angles[joint.idx] + ratio * target_angles[joint.idx]
-                self.cmd.motor_cmd[joint.idx].q = q_interpolated
+                # Set velocities if provided
+                if target_velocities is not None:
+                    self.cmd.motor_cmd[joint.idx].dq = target_velocities[joint.idx]
+                else:
+                    self.cmd.motor_cmd[joint.idx].dq = 0.0
+
+                # Set stiffness coefficient. Use default if not provided.
+                if kp is not None:
+                    self.cmd.motor_cmd[joint.idx].kp = kp[joint.idx]
+                else:
+                    self.cmd.motor_cmd[joint.idx].kp = self.kp_default[joint.idx]
+
+                # Set damping coefficient. Use default if not provided.
+                if kd is not None:
+                    self.cmd.motor_cmd[joint.idx].kd = kd[joint.idx]
+                else:
+                    self.cmd.motor_cmd[joint.idx].kd = self.kd_default[joint.idx]
+
+                # Interpolate the joint angles if specified. Otherwise drive joints directly to target for the duration.
+                if interpolate:
+                    q_interpolated = (1.0 - ratio) * start_angles[joint.idx] + ratio * target_angles[joint.idx]
+                    self.cmd.motor_cmd[joint.idx].q = q_interpolated
+                else:
+                    self.cmd.motor_cmd[joint.idx].q = target_angles[joint.idx]
 
             # Enable upper body control
             self.cmd.motor_cmd[Cfg.ARM_SDK_IDX].q =  1.0
