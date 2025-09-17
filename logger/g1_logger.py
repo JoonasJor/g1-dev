@@ -43,7 +43,7 @@ class G1_Logger():
         self.datetime_stamp = time.strftime(f"%Y%m%d_%H%M%S")
 
         self.logger_thread = RecurrentThread(
-            interval=0.2, 
+            interval=1/80,
             target=self.save_data_to_file, 
             name=f"logger"
         )
