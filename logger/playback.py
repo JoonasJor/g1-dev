@@ -1,23 +1,16 @@
 import os 
 import sys
 import threading
-import numpy as np
-import time
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 from unitree_sdk2py.core.channel import ChannelFactoryInitialize
-from unitree_sdk2py.utils.thread import RecurrentThread
 from unitree_sdk2py.idl.unitree_hg.msg.dds_ import LowState_, MotorState_
 
 from controller import BodyController, ArmController, HandController
 import g1_joints as Joints
 
 import inspire.inspire_dds as inspire_dds
-from inspire.modbus_data_handler import ModbusDataHandler
-
-from camera.camera_subscriber import CameraSubscriber
-from camera.utils import decode_image
 import camera.camera_dds as camera_dds
 
 from logger.g1_logger import G1_Logger
@@ -26,8 +19,6 @@ if __name__ == "__main__":
     if len(sys.argv) > 1:
         # Run on real robot
         ChannelFactoryInitialize(0, sys.argv[1])
-        #modbus_r = ModbusDataHandler(ip="192.168.123.211", device_id=1, l_r="r")
-        #modbus_l = ModbusDataHandler(ip="192.168.123.210", device_id=2, l_r="l")
     else:
         # Run in Mujoco
         ChannelFactoryInitialize(1, "lo")
@@ -46,7 +37,7 @@ if __name__ == "__main__":
         body_low_state: LowState_ = data["body"]
         body_joint_angles = [motor.q for motor in body_low_state.motor_state]
         body_joint_torques = [motor.tau_est for motor in body_low_state.motor_state]
-        body_joint_velocities = [motor.dq for motor in body_low_state.motor_state] # TODO: not implemented in mujoco
+        body_joint_velocities = [motor.dq for motor in body_low_state.motor_state]
         body_joint_kp = [motor.kp for motor in body_low_state.motor_state]
         body_joint_kd = [motor.kd for motor in body_low_state.motor_state]
 
@@ -84,8 +75,8 @@ if __name__ == "__main__":
                 threading.Thread(target=hand_l.low_cmd_control, args=(hand_l_joint_angles,), kwargs={"duration": timestamp_delta}),
             ]
 
-            for t in threads:
-                t.start()
-            for t in threads:
-                t.join()
+            for thread in threads:
+                thread.start()
+            for thread in threads:
+                thread.join()
 
