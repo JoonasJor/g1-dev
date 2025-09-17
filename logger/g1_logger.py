@@ -43,7 +43,7 @@ class G1_Logger():
         self.datetime_stamp = time.strftime(f"%Y%m%d_%H%M%S")
 
         self.logger_thread = RecurrentThread(
-            interval=0.2, 
+            interval=1/80,
             target=self.save_data_to_file, 
             name=f"logger"
         )
@@ -53,14 +53,15 @@ class G1_Logger():
             "timestamp": time.time(),
             "body": self.body.low_state, # unitree_hg.msg.dds_.LowState_
             "hand_r": {
-                "state": self.hand_r.low_state, # inspire.inspire_hand_state
-                "touch": self.hand_l.touch_state # inspire.inspire_hand_touch
+                "state": self.hand_r.low_state, # inspire.inspire_dds.inspire_hand_state
+                "touch": self.hand_l.touch_state # inspire.inspire_dds.inspire_hand_touch
             },
             "hand_l": {
                 "state": self.hand_r.low_state,
                 "touch": self.hand_l.touch_state
             },
-            "camera": self.camera.camera_msg # TODO: save only when new images are available
+            # TODO: save only when new images are available
+            "camera": self.camera.camera_msg # camera.camera_dds.camera_image
         }
 
         with open(f"log/data_{self.datetime_stamp}.pkl", "ab") as file:
@@ -81,15 +82,31 @@ class G1_Logger():
 
         return data_list
     
-if __name__ == "__main__":
-    # Example usage
-    write_logs = True
+    def stop(self):
+        if not self.logger_thread._Thread__thread.is_alive():
+            print("Logger is not running. Exiting.")
+            return
+        
+        self.logger_thread.Wait()
+        print("Logging stopped.")
 
+        while True:
+            user_input = input("Keep the log file? (y/n): ").strip().lower()
+            if user_input in ["y", "n"]:
+                break
+            else:
+                print("Invalid input.")
+
+        if user_input == "y":
+            print(f"Log file saved as log/data_{self.datetime_stamp}.pkl")
+            create_symlink(f"log/data_{self.datetime_stamp}.pkl", "log/data_latest.pkl")
+        if user_input == "n":
+            os.remove(f"log/data_{self.datetime_stamp}.pkl")
+    
+if __name__ == "__main__":
     if len(sys.argv) > 1:
         # Run on real robot
         ChannelFactoryInitialize(0, sys.argv[1])
-        modbus_r = ModbusDataHandler(ip="192.168.123.211", device_id=1, l_r="r")
-        modbus_l = ModbusDataHandler(ip="192.168.123.210", device_id=2, l_r="l")
     else:
         # Run in Mujoco
         ChannelFactoryInitialize(1, "lo")
@@ -101,57 +118,28 @@ if __name__ == "__main__":
 
     camera = CameraSubscriber()
 
-    if write_logs:
-        while body.low_state is None:
-            print(f"Waiting for body low state")
-            time.sleep(1)
+    while body.low_state is None:
+        print(f"Waiting for body low state")
+        time.sleep(1)
 
-    g1_logger = G1_Logger(body, hand_r, hand_l, camera)
-    
-    # Write
-    if write_logs: 
-        while True:
+    while True:
+        try:
+            g1_logger = G1_Logger(body, hand_r, hand_l, camera)
+
             input("Press Enter to start logging:")
 
-            create_symlink(f"log/data_{g1_logger.datetime_stamp}.pkl", "log/data_latest.pkl")
-
             g1_logger.logger_thread.Start()
-            print("Logging started. Press Enter again to exit...")
+            print("Logging started. Press Enter again to stop...")
 
             while True:
-                time.sleep(1)
+                time.sleep(0.5)
                 if sys.stdin in select.select([sys.stdin], [], [], 0)[0]:
                     input()
-                    print("Exiting.")
-                    g1_logger.logger_thread.Wait()
-                    sys.exit()
-    # Read
-    else:
-        data_list = g1_logger.load_data_from_file("log/data_latest.pkl")
-        for data in data_list:
-            # Unpack data
-            timestamp = data["timestamp"]
+                    g1_logger.stop()
+                    break
+        except KeyboardInterrupt:
+            print("KeyboardInterrupt. Stopping logger...")
+            g1_logger.stop()
+            break
 
-            body_low_state: LowState_ = data["body"]
-            body_joint_angles = [motor.q for motor in body_low_state.motor_state]
-
-            hand_r_state: inspire_dds.inspire_hand_state = data["hand_r"]["state"]
-            hand_r_touch: inspire_dds.inspire_hand_touch = data["hand_r"]["touch"]
-            hand_r_joint_angles = hand_r_state.angle_act
-
-            hand_l_state: inspire_dds.inspire_hand_state = data["hand_l"]["state"]
-            hand_l_touch: inspire_dds.inspire_hand_touch = data["hand_l"]["touch"]
-            hand_l_joint_angles = hand_l_state.angle_act
-
-            camera_data: camera_dds.camera_image = data["camera"]
-
-            # Decode and save images
-            camera_rgb_decoded = decode_image(camera_data.rgb)
-            cv2.imwrite(f"log/img/{camera_data.timestamp}_rgb.jpg", cv2.cvtColor(camera_rgb_decoded, cv2.COLOR_RGB2BGR))
-
-            camera_depth_decoded = decode_image(camera_data.depth)
-            np.save(f"log/img/{camera_data.timestamp}_depth.npy", camera_depth_decoded)
-
-            print(f"Timestamp (data saved):   {timestamp}")
-            print(f"Timestamp (images taken): {camera_data.timestamp}")
 

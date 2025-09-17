@@ -96,6 +96,25 @@ class ModbusDataHandler:
                     raise
 
     def write_registers_callback(self, msg: inspire_dds.inspire_hand_ctrl):
+        """
+        - mode 0: 0000 (no operation)
+        - mode 1: 0001 (angle)
+        - mode 2: 0010 (position)
+        - mode 3: 0011 (angle + position)
+        - mode 4: 0100 (force control)
+        - mode 5: 0101 (angle + force control)
+        - mode 6: 0110 (position + force control)
+        - mode 7: 0111 (angle + position + force control)
+        - mode 8: 1000 (speed)
+        - mode 9: 1001 (angle + speed)
+        - mode 10: 1010 (position + speed)
+        - mode 11: 1011 (angle + position + speed)
+        - mode 12: 1100 (force control + speed)
+        - mode 13: 1101 (angle + force control + speed)
+        - mode 14: 1110 (position + force control + speed)
+        - mode 15: 1111 (angle + position + force control + speed)  
+        """
+        
         with self.modbus_lock:
             if msg.mode & 0b0001:  # mode 1 - angle
                 self.client.write_registers(
@@ -106,7 +125,7 @@ class ModbusDataHandler:
                 # print("angle_set")
             if msg.mode & 0b0010:  # mode 2 - position
                 self.client.write_registers(
-                    address=11474, 
+                    address=1474, 
                     values=msg.pos_set, 
                     device_id=self.device_id
                 )
@@ -114,7 +133,7 @@ class ModbusDataHandler:
 
             if msg.mode & 0b0100:  # mode 4 - force
                 self.client.write_registers(
-                    address=11498, 
+                    address=1498, 
                     values=msg.force_set,
                     device_id=self.device_id
                 )
@@ -122,7 +141,7 @@ class ModbusDataHandler:
 
             if msg.mode & 0b1000:  # mode 8 - speed
                 self.client.write_registers(
-                    address=11522, 
+                    address=1522, 
                     values=msg.speed_set, 
                     device_id=self.device_id
                 )

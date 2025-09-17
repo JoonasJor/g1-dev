@@ -38,8 +38,8 @@ class BodyController(Controller):
         self.counter = 0
 
         self.num_motor_body = Cfg.NUM_MOTOR_BODY
-        self.kp = Joints.Body.default_kp_list()
-        self.kd = Joints.Body.default_kd_list()
+        self.kp_default = Joints.Body.default_kp_list()
+        self.kd_default = Joints.Body.default_kd_list()
         self.mode_machine_ = 0
         self.update_mode_machine_ = False
         self.flg_initialized = flg_initialized
@@ -62,7 +62,7 @@ class BodyController(Controller):
             self.mode_machine_ = self.low_state.mode_machine
             self.update_mode_machine_ = True
 
-    def low_cmd_control(self, target_angles, kp=None, kd=None, duration=5.0, interpolate=True, debug=False):
+    def low_cmd_control(self, target_angles, target_torques=None, target_velocities=None, kp=None, kd=None, duration=5.0, interpolate=True, debug=False):
         """
         Controls the whole body by interpolating to target angles over a duration.
 
@@ -79,11 +79,6 @@ class BodyController(Controller):
             print("Call init_msc() to enable control.")
             return
 
-        if kp is None:
-            kp = self.kp
-        if kd is None:
-            kd = self.kd
-
         start_angles = [motor.q for motor in self.low_state.motor_state]
         start_time = time.time()
 
@@ -96,14 +91,36 @@ class BodyController(Controller):
             ratio = np.clip(ratio, 0.0, 1.0)
 
             for i in range(self.num_motor_body):
+                # Activate motors
                 self.cmd.mode_pr = 0
                 self.cmd.mode_machine = self.mode_machine_
                 self.cmd.motor_cmd[i].mode = 1
-                self.cmd.motor_cmd[i].tau = 0.0
-                self.cmd.motor_cmd[i].dq = 0.0
-                self.cmd.motor_cmd[i].kp = kp[i]
-                self.cmd.motor_cmd[i].kd = kd[i]
 
+                # Set torques if provided
+                if target_torques is not None:
+                    self.cmd.motor_cmd[i].tau = target_torques[i]
+                else:
+                    self.cmd.motor_cmd[i].tau = 0.0
+
+                # Set velocities if provided
+                if target_velocities is not None:
+                    self.cmd.motor_cmd[i].dq = target_velocities[i]
+                else:
+                    self.cmd.motor_cmd[i].dq = 0.0
+                
+                # Set stiffness coefficient. Use default if not provided.
+                if kp is not None:
+                    self.cmd.motor_cmd[i].kp = kp[i]
+                else:
+                    self.cmd.motor_cmd[i].kp = self.kp_default[i]
+
+                # Set damping coefficient. Use default if not provided.
+                if kd is not None:
+                    self.cmd.motor_cmd[i].kd = kd[i]
+                else:
+                    self.cmd.motor_cmd[i].kd = self.kd_default[i]
+
+                # Interpolate the joint angles if specified. Otherwise drive joints directly to target for the duration.
                 if interpolate:
                     q_interpolated = (1.0 - ratio) * start_angles[i] + ratio * target_angles[i]
                     self.cmd.motor_cmd[i].q = q_interpolated
@@ -172,8 +189,8 @@ class BodyController(Controller):
                 self.cmd.motor_cmd[i].mode = 1
                 self.cmd.motor_cmd[i].tau = 0.0
                 self.cmd.motor_cmd[i].dq = 0.0
-                self.cmd.motor_cmd[i].kp = self.kp[i] * 2
-                self.cmd.motor_cmd[i].kd = self.kd[i] * 2
+                self.cmd.motor_cmd[i].kp = self.kp_default[i] * 2
+                self.cmd.motor_cmd[i].kd = self.kd_default[i] * 2
                 self.cmd.motor_cmd[i].q = current_angles[i]
 
             self.cmd.crc = self.crc.Crc(self.cmd)
@@ -269,8 +286,8 @@ class ArmController(Controller):
     def __init__(self):
         super().__init__()
 
-        self.kp = Joints.Body.default_kp_list()
-        self.kd = Joints.Body.default_kd_list()
+        self.kp_default = Joints.Body.default_kp_list()
+        self.kd_default = Joints.Body.default_kd_list()
 
         self.low_state = None 
         self.low_state_sub = ChannelSubscriber(Cfg.TOPIC_BODY_LOW_STATE, LowState_)
@@ -296,7 +313,7 @@ class ArmController(Controller):
         #TODO: G1 doesnt seem to send high state information. Figure out later.
         self.high_state = msg
 
-    def low_cmd_control(self, target_angles, kp=None, kd=None, duration=5.0, debug=False):
+    def low_cmd_control(self, target_angles, target_torques=None, target_velocities=None, kp=None, kd=None, duration=5.0, interpolate=True, debug=False):
         """
         Controls the upper body by interpolating to target angles over a duration.
 
@@ -307,11 +324,6 @@ class ArmController(Controller):
             duration (float, optional): The time over which to interpolate.
             debug (bool, optional): If True, print debug information.
         """
-
-        if kp is None:
-            kp = self.kp
-        if kd is None:
-            kd = self.kd
 
         start_angles = [motor.q for motor in self.low_state.motor_state]
         start_time = time.time()
@@ -324,15 +336,37 @@ class ArmController(Controller):
             ratio = elapsed / duration
             ratio = np.clip(ratio, 0.0, 1.0)
 
-            for joint in self.arm_joints:
-                self.cmd.motor_cmd[joint.idx].tau = 0.0
-                self.cmd.motor_cmd[joint.idx].dq = 0.0
-                self.cmd.motor_cmd[joint.idx].kp = kp[joint.idx]
-                self.cmd.motor_cmd[joint.idx].kd = kd[joint.idx]
+            for joint in self.arm_joints:   
+                # Set torques if provided
+                if target_torques is not None:
+                    self.cmd.motor_cmd[joint.idx].tau = target_torques[joint.idx]
+                else:
+                    self.cmd.motor_cmd[joint.idx].tau = 0.0
 
-                # Interpolate the joint angle
-                q_interpolated = (1.0 - ratio) * start_angles[joint.idx] + ratio * target_angles[joint.idx]
-                self.cmd.motor_cmd[joint.idx].q = q_interpolated
+                # Set velocities if provided
+                if target_velocities is not None:
+                    self.cmd.motor_cmd[joint.idx].dq = target_velocities[joint.idx]
+                else:
+                    self.cmd.motor_cmd[joint.idx].dq = 0.0
+
+                # Set stiffness coefficient. Use default if not provided.
+                if kp is not None:
+                    self.cmd.motor_cmd[joint.idx].kp = kp[joint.idx]
+                else:
+                    self.cmd.motor_cmd[joint.idx].kp = self.kp_default[joint.idx]
+
+                # Set damping coefficient. Use default if not provided.
+                if kd is not None:
+                    self.cmd.motor_cmd[joint.idx].kd = kd[joint.idx]
+                else:
+                    self.cmd.motor_cmd[joint.idx].kd = self.kd_default[joint.idx]
+
+                # Interpolate the joint angles if specified. Otherwise drive joints directly to target for the duration.
+                if interpolate:
+                    q_interpolated = (1.0 - ratio) * start_angles[joint.idx] + ratio * target_angles[joint.idx]
+                    self.cmd.motor_cmd[joint.idx].q = q_interpolated
+                else:
+                    self.cmd.motor_cmd[joint.idx].q = target_angles[joint.idx]
 
             # Enable upper body control
             self.cmd.motor_cmd[Cfg.ARM_SDK_IDX].q =  1.0
@@ -418,15 +452,19 @@ class HandController(Controller):
     def _touch_state_handler(self, msg: inspire_dds.inspire_hand_touch):
         self.touch_state = msg
 
-    def low_cmd_control(self, target_angles, duration=5.0, debug=False):
+    def low_cmd_control(self, target_angles, force_limits=None, duration=5.0, interpolate=True, debug=False):
         """
         Controls the hand by interpolating to target angles over a duration.
 
         Args:
             target_angles (list of int): 
                 Target joint angles, in normalized units  
-                Order: [Pinky, Ring, Middle, Index, Thumb-bend, Thumb-rotation]  
-                Range: 0 (closed) to 1000 (open)   
+                Order: [Pinky, Ring, Middle, Index, Thumb-bend, Thumb-rotation]
+                Range: 0 (closed) to 1000 (open)
+            force_limits (list of int):
+                Force limits for each joint, in grams
+                Order: [Pinky, Ring, Middle, Index, Thumb-bend, Thumb-rotation]
+                Range: 0 (no force) to 3000 (maximum force)
             duration (float, optional): The time over which to interpolate.
             debug (bool, optional): If True, print debug information.
         """
@@ -442,11 +480,22 @@ class HandController(Controller):
             ratio = elapsed / duration
             ratio = np.clip(ratio, 0.0, 1.0)
 
-            interpolated_angles = [
-                round((1.0 - ratio) * s + ratio * t)
-                for s, t in zip(start_angles, target_angles)
-            ]
-            self.cmd.angle_set = interpolated_angles
+            if interpolate:
+                interpolated_angles = [
+                    round((1.0 - ratio) * s + ratio * t)
+                    for s, t in zip(start_angles, target_angles)
+                ]
+                self.cmd.angle_set = interpolated_angles
+            else:
+                self.cmd.angle_set = target_angles
+            
+            #TODO: test
+            #TODO: add mode handling to mujoco
+            if force_limits is not None:
+                self.cmd.mode = 0b0001 | 0b0100  # angle + force
+                self.cmd.force_set = force_limits
+            else:
+                self.cmd.mode = 0b0001  # angle only
 
             self.cmd_pub.Write(self.cmd)
 
