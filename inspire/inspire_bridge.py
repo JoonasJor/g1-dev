@@ -120,9 +120,9 @@ class InspireBridge():
             speeds_12 = [0.0] * 12
 
             for i, joint_idx in enumerate(joint_indice):
-                # 2. Convert angles from (1000 - 0) to radians and forces from (4000 - -4000) to N
+                # 2. Convert angles from (1000 - 0) to radians and forces from (3000 - 0) to N
                 angles_12[i] = helpers.num_to_range(angles_scaled_12[i], 1000, 0, *self.joint_angle_range[i])
-                forces_12[i] = helpers.num_to_range(forces_scaled_12[i], 4000, -4000, *self.joint_force_range[i])
+                forces_12[i] = helpers.num_to_range(forces_scaled_12[i], 3000, 0, *self.joint_force_range[i])
                 speeds_12[i] = 0 # TODO: figure out later
 
                 # 3. Set the mujoco control command
