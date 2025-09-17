@@ -57,23 +57,19 @@ class CameraBridge():
         return depth_image
 
     def _publish_camera_image(self):
-        compressed_rgb = encode_image(self._rgb_image)
-        compressed_depth = encode_image(self._depth_image)
+        encoded_rgb = encode_image(self._rgb_image)
+        encoded_depth = encode_image(self._depth_image)
 
         self.camera_image.timestamp = self._timestamp
-        self.camera_image.rgb = compressed_rgb
-        self.camera_image.depth = compressed_depth
+        self.camera_image.rgb = encoded_rgb
+        self.camera_image.depth = encoded_depth
 
         self.camera_image_pub.Write(self.camera_image)
 
     def capture_and_publish(self):
-        start_time = time.time()
-
         self._renderer.update_scene(self._mj_data, camera=self._camera_name)
         self._rgb_image = self._capture_rgb_image()
         self._depth_image = self._capture_depth_image()
         self._timestamp = time.time()
 
         self._publish_camera_image()
-
-        #print(f"capture_and_publish time: {time.time() - start_time:.4f} seconds")
